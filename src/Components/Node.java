@@ -104,7 +104,7 @@ public class Node {
     public Set<Node> expend(int [] size)
     {
         Set<Node> neighbors = new HashSet<>();
-        int axis = ParamConfig.getInstance().getNummberOfAxisLegalToMoveInOneTurn();
+        int axis = ParamConfig.getInstance().getNumberOfAxisLegalToMoveInOneTurn();
         for(int i=0;i<=axis;i++)
         {
             generateAllNeighbors(0,"",neighbors,i,size);
@@ -128,8 +128,15 @@ public class Node {
             int addLength = additions.length();
             for(int i=0;i<addLength;i++)
             {
-                coordinates[i] = this.coordinates[i]+ (additions.charAt(i)-'0');
-                if(size[i]<=coordinates[i])//Ilegal
+                char c = additions.charAt(i);
+                if(c=='2')
+                {
+                    coordinates[i] = this.coordinates[i]-1;
+                }
+                else {
+                    coordinates[i] = this.coordinates[i] + (c - '0');
+                }
+                if(size[i]<=coordinates[i] || coordinates[i]<0)//Ilegal
                     return;
             }
             for(int i=addLength;i<this.coordinates.length;i++)
@@ -137,12 +144,25 @@ public class Node {
                 coordinates[i] = this.coordinates[i];
             }
             neighbors.add(new Node(coordinates));
+            return;
         }
         if(index == this.coordinates.length)
             return;
 
 
+        generateAllNeighbors(index+1,additions+"2",neighbors,axisAllowed-1,size);
         generateAllNeighbors(index+1,additions+"1",neighbors,axisAllowed-1,size);
-        generateAllNeighbors(index+1,additions+"0",neighbors,axisAllowed-1,size);
+        generateAllNeighbors(index+1,additions+"0",neighbors,axisAllowed,size);
+    }
+
+    @Override
+    public String toString() {
+        String str = "[";
+        for(int i=0;i<this.coordinates.length;i++)
+        {
+            str+=this.coordinates[i]+",";
+        }
+        str=str.substring(0,str.length()-1)+"]";
+        return str;
     }
 }

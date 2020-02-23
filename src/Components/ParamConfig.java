@@ -21,7 +21,7 @@ public class ParamConfig {
     private IPriorityPolicy priorityPolicy;//The priority policy
     private static ParamConfig instance;//The instance
     private final int numOfDimensions=2;//The number of dimensions;
-    private final int nummberOfAxisLegalToMoveInOneTurn = 2;
+    private final int numberOfAxisLegalToMoveInOneTurn = 2;
 
 
     /**
@@ -69,8 +69,8 @@ public class ParamConfig {
      * This function will return the number of axis the agent can move simultaneously in the same turn
      * @return - The number of axis the agent can move simultaneously in the same turn
      */
-    public int getNummberOfAxisLegalToMoveInOneTurn() {
-        return nummberOfAxisLegalToMoveInOneTurn;
+    public int getNumberOfAxisLegalToMoveInOneTurn() {
+        return numberOfAxisLegalToMoveInOneTurn;
     }
 
     /**

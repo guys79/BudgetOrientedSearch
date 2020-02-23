@@ -1,53 +1,75 @@
 package Components;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
+/**
+ * This class represent a node in the graph
+ */
 public class Node {
 
-    public static  int numOfNodes = 0;
-    private int id;
-    private int[] coordinates;
-    private List<Node> neighbors;
+    private static  int numOfNodes = 0;//The number of nodes
+    private int id;//The id of the nodes
+    private int[] coordinates;//The coordination of the node
 
+
+    /**
+     * The constructor of the class
+     * @param coordinates - The coordinates of the node
+     */
     public Node(int[] coordinates) {
 
         this.id = numOfNodes;
         numOfNodes++;
         this.coordinates = coordinates;
-        this.neighbors = new ArrayList<>();
+
     }
+
+    /**
+     * The empty constructor
+     */
     public Node()
     {
         this(null);
     }
 
+    /**
+     * This function will return the I'th coordinate of the node
+     * @param index - The index of the coordination
+     * @return - The coordinate in the I'th location
+     */
     public int getCoordinateAt(int index)
     {
         return this.coordinates[index];
     }
+
+    /**
+     * This function will return the number of nodes
+     * @return - The number of nodes
+     */
     public static int getNumOfNodes() {
         return numOfNodes;
     }
 
-    public static void setNumOfNodes(int numOfNodes) {
-        Node.numOfNodes = numOfNodes;
-    }
-
+    /**
+     * This function will return the id of the node
+     * @return - The id of the node
+     */
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
+    /**
+     * This function will return the coordinates of the node
+     * @return - The coordinates of the node
+     */
     public int[] getCoordinates() {
         return coordinates;
     }
 
+    /**
+     * This function will sett he coordinates of the node
+     * @param coordinates - The coordinates of the node
+     */
     public void setCoordinates(int[] coordinates) {
         this.coordinates = coordinates;
     }
@@ -57,28 +79,70 @@ public class Node {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Node node = (Node) o;
-        return id == node.id &&
-                Arrays.equals(coordinates, node.coordinates);
+        return Arrays.equals(coordinates, node.coordinates);
     }
 
     @Override
     public int hashCode() {
-
-        int result = Objects.hash(id);
-        result = 31 * result + Arrays.hashCode(coordinates);
-        return result;
+        return Arrays.hashCode(coordinates);
     }
 
+    /**
+     * This function will return the number of dimensions the node represents
+     * @return - The number of dimensions the node represents
+     */
     public int getNumOfDimensions()
     {
         return this.coordinates.length;
     }
-    public void addNeighbor(Node neigh)
+
+    /**
+     * This funciton will expand the node
+     * @param size - The size of the map
+     * @return - The neighbors of the node
+     */
+    public Set<Node> expend(int [] size)
     {
-        this.neighbors.add(neigh);
+        Set<Node> neighbors = new HashSet<>();
+        int axis = ParamConfig.getInstance().getNummberOfAxisLegalToMoveInOneTurn();
+        for(int i=0;i<=axis;i++)
+        {
+            generateAllNeighbors(0,"",neighbors,i,size);
+        }
+        return neighbors;
     }
 
-    public List<Node> getNeighbors() {
-        return neighbors;
+    /**
+     * This function will generate and return the neighbors of the node recursively
+     * @param index - The index in the array of coordinates
+     * @param additions - The additions in the coordinates
+     * @param neighbors - The neighbors set
+     * @param axisAllowed - The nu,ber od axis the agent can move at the same time
+     * @param size - The sizes of the graph
+     */
+    private void generateAllNeighbors(int index, String additions, Set<Node> neighbors, int axisAllowed,int [] size)
+    {
+        if(axisAllowed == 0)
+        {
+            int [] coordinates = new int[this.coordinates.length];
+            int addLength = additions.length();
+            for(int i=0;i<addLength;i++)
+            {
+                coordinates[i] = this.coordinates[i]+ (additions.charAt(i)-'0');
+                if(size[i]<=coordinates[i])//Ilegal
+                    return;
+            }
+            for(int i=addLength;i<this.coordinates.length;i++)
+            {
+                coordinates[i] = this.coordinates[i];
+            }
+            neighbors.add(new Node(coordinates));
+        }
+        if(index == this.coordinates.length)
+            return;
+
+
+        generateAllNeighbors(index+1,additions+"1",neighbors,axisAllowed-1,size);
+        generateAllNeighbors(index+1,additions+"0",neighbors,axisAllowed-1,size);
     }
 }

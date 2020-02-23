@@ -1,6 +1,9 @@
 package Components.CostFunction;
 import Components.Node;
 
+/**
+ * This class represents the octile cost function
+ */
 public class OctileGridFunction implements Components.CostFunction.ICostFunction {
 
     public OctileGridFunction() {

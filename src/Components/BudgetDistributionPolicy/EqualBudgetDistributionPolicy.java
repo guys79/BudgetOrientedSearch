@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This class represents a equal budget policy where all the agents get the same budget
+ */
 public class EqualBudgetDistributionPolicy implements IBudgetDistributionPolicy {
     @Override
     public Map<Agent, Integer> getBudgetDistribution(Set<Agent> agents, int totalBudget) {

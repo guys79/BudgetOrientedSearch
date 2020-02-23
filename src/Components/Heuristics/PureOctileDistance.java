@@ -2,6 +2,9 @@ package Components.Heuristics;
 
 import Components.Node;
 
+/**
+ * This class represents the classic octile distance heuristic
+ */
 public class PureOctileDistance implements IHeuristic{
 
     @Override

@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This class represents a priority policy where the agents get the same priority
+ */
 public class EqualPriorityPolicy implements IPriorityPolicy{
 
     @Override

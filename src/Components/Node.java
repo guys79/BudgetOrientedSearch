@@ -97,14 +97,14 @@ public class Node {
     }
 
     /**
-     * This funciton will expand the node
-     * @param size - The size of the map
+     * This function will expand the node
      * @return - The neighbors of the node
      */
-    public Set<Node> expend(int [] size)
+    public Set<Node> expend()
     {
         Set<Node> neighbors = new HashSet<>();
         int axis = ParamConfig.getInstance().getNumberOfAxisLegalToMoveInOneTurn();
+        int [] size = Problem.getInstance().getSize();
         for(int i=0;i<=axis;i++)
         {
             generateAllNeighbors(0,"",neighbors,i,size);
@@ -138,11 +138,14 @@ public class Node {
                 }
                 if(size[i]<=coordinates[i] || coordinates[i]<0)//Ilegal
                     return;
+
             }
             for(int i=addLength;i<this.coordinates.length;i++)
             {
                 coordinates[i] = this.coordinates[i];
             }
+            if(!Problem.getInstance().isValidLocation(coordinates))
+                return;
             neighbors.add(new Node(coordinates));
             return;
         }

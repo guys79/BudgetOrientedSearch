@@ -1,18 +1,29 @@
+import Components.Heuristics.UniformCostSearch;
 import Components.Node;
+import Components.Problem;
 
 import java.util.Set;
 
 public class Main {
     public static void main(String[] args) {
-        int [] coordinates = {4,4,4};
-        int [] size = {5,100,1000};
+        Problem.getInstance().setNewProblem("",1,1,1,1);
+        UniformCostSearch uniformCostSearch = new UniformCostSearch();
+        int [] loc1 = {0,0};
+        int [] loc2 = {3,2};
 
-        Node node = new Node(coordinates);
-        Set<Node> neighbors= node.expend(size);
+        Node start = new Node(loc1);
+        Node goal = new Node(loc2);
 
-        for(Node neigh :neighbors)
+        double res = uniformCostSearch.getHeuristic(start,goal);
+        double sqrt2 = Math.sqrt(2);
+        int counter = 0;
+        System.out.println(res);
+        while(res>=sqrt2 && Math.abs(res - (Math.round(res))*1.0) > 0.001)
         {
-            System.out.println(neigh);
+            res-=sqrt2;
+            counter++;
         }
+        System.out.println("moved "+counter+" times diagonally and "+Math.round(res) +" times normally");
+
     }
 }

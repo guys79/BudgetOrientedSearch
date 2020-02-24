@@ -4,7 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This class represents an isnstance of the problem
+ * This class represents an instance of the problem
+ * This class will use the Singleton design pattern
  */
 public class Problem {
     private String mapName;// The name of the map
@@ -17,15 +18,38 @@ public class Problem {
     private String mapPath;//The path to the map file
     private String scenarioPath;//The path to the scenario file
     private int [] size;//The size of the map
+    private static Problem instance;//The instance og Problem
+    private HashSet<String> validLocations;//The valid locations in the map
+
+
     /**
      * This constructor of the class
+     *
+     */
+    private Problem (){
+
+    }
+
+    /**
+     * This function will return the instance of the class
+     * @return - The instance of the class
+     */
+    public static Problem getInstance()
+    {
+        if(instance == null)
+            instance = new Problem();
+        return instance;
+    }
+    /**
+     * This function will set new problem
      * @param mapName - The name of the map
      * @param scenario - The scenario number
      * @param type - The type of param config
      * @param prefix - The lenght of the prefix that the agents need to calculate in each iteration
-     * @param totalBudget - The total amount of budget of all of the agents in each iteration
+     * @param totalBudget - The total amount of budget of all of the agents in each iteration@param totalBudget
      */
-    public Problem(String mapName, int scenario, int type,int prefix,int totalBudget) {
+    public void setNewProblem(String mapName, int scenario, int type,int prefix,int totalBudget)
+    {
         this.mapName = mapName;
         this.scenario = scenario;
         this.type = type;
@@ -33,13 +57,14 @@ public class Problem {
         this.prefix = prefix;
         this.agents = new HashSet<>();
         this.mapPath = this.filePaths+"\\maps\\"+this.mapName+".map";
+        this.validLocations = new HashSet<>();
         this.scenarioPath = this.filePaths+"\\scenarios\\"+this.mapName+".scen";
         ParamConfig.getInstance().configParamsWithType(type);
         this.size = new int[ParamConfig.getInstance().getNumOfDimensions()];
+        buildMap();
+        getScenario();
 
     }
-
-
     /**
      * This function will create the scenario
      */
@@ -47,6 +72,32 @@ public class Problem {
     {
         // TODO: 23/02/2020 Create the scenario . assign agents to their nodes
         
+    }
+
+    /**
+     * This function will build the map
+     */
+    private void buildMap()
+    {
+        int numRow = 4;
+        int numCol = 4;
+        for(int row =0;row<numRow;row++)
+        {
+            for(int col =0;col<numCol;col++)
+            {
+                validLocations.add(row+","+col);
+            }
+        }
+
+        validLocations.remove("1,1");
+        validLocations.remove("2,1");
+        validLocations.remove("0,1");
+        validLocations.remove("3,1");
+        size[0]= numRow;
+        size[1]= numCol;
+
+        // TODO: 24/02/2020 Update the validLocations set
+
     }
 
     /**
@@ -103,5 +154,21 @@ public class Problem {
      */
     public int[] getSize() {
         return size;
+    }
+
+    /**
+     * This function will return whether the location is valid or not
+     * @param loc - The given location
+     * @return - True if the location is valid
+     */
+    public boolean isValidLocation(int [] loc)
+    {
+        String locString = "";
+        for(int i=0;i<loc.length;i++)
+        {
+            locString += loc[i]+",";
+        }
+        locString = locString.substring(0,locString.length()-1);
+        return this.validLocations.contains(locString);
     }
 }

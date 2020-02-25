@@ -97,6 +97,31 @@ public class Node {
     }
 
     /**
+     * This function check if the given node is a neighbor of the current node
+     * @param node - The given node
+     * @return - True IFF the nodes are neighbors
+     */
+    public boolean isNeighbor(Node node)
+    {
+        int axis = ParamConfig.getInstance().getNumberOfAxisLegalToMoveInOneTurn();
+        int sum = 0;
+
+        int [] otherCo = node.coordinates;
+        int c1,c2,diff;
+        for(int i=0;i<otherCo.length;i++)
+        {
+            c1 = this.coordinates[i];
+            c2 = otherCo[i];
+            diff = Math.abs(c1-c2);
+            if(diff>1)
+                return false;
+            sum+=diff;
+        }
+        if(sum>axis)
+            return false;
+        return true;
+    }
+    /**
      * This function will expand the node
      * @return - The neighbors of the node
      */

@@ -52,6 +52,17 @@ public class ParamConfig {
                 priorityPolicy = null;
                 budgetDistributionPolicy = null;
         }
+        if(checkIfNull())
+            throw new UnsupportedOperationException("Some of the params are null in ParamConfig Class");
+    }
+
+    /**
+     * This function will check if one of the parameters is null
+     * @return - True IFF one of the parameters is null
+     */
+    private boolean checkIfNull()
+    {
+        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null;
     }
 
     /**

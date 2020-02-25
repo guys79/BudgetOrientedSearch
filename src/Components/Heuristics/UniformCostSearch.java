@@ -12,7 +12,6 @@ import java.util.*;
 public class UniformCostSearch implements IHeuristic {
 
 
-
     @Override
     public double getHeuristic(Node node, Node dest) {
 

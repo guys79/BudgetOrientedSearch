@@ -104,4 +104,10 @@ public class Agent {
 
         return Objects.hash(id, start, goal);
     }
+
+    @Override
+    public String toString() {
+        String str = "agent id "+id +" start - "+start +" goal - "+goal;
+        return str;
+    }
 }

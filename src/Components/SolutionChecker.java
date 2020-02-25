@@ -42,7 +42,7 @@ public class SolutionChecker {
     {
 
         int prefixSize = Problem.getInstance().getPrefix();
-        int numOfAgent = Problem.getInstance().getAgents().size();
+        int numOfAgent = Problem.getInstance().getNumOfAgents();
 
         return checkSize(prefixes,prefixSize) && checkPrefixesValidation(prefixes)&& checkCollisions(prefixes,prefixSize,numOfAgent) && checkSwipes(prefixes,prefixSize);
     }

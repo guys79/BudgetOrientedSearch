@@ -60,4 +60,18 @@ public class Prefix {
         str=str.substring(0,str.length()-1)+"}";
         return str;
     }
+
+    /**
+     * This function will extend the prefix with the given one
+     * @param prefix - The prefix
+     */
+    public void extendPrefix(Prefix prefix)
+    {
+        int size = prefix.getSize();
+        //Not starting with 0 to not repeat
+        for(int i=1;i<size;i++)
+        {
+            this.prefix.add(prefix.getNodeAt(i));
+        }
+    }
 }

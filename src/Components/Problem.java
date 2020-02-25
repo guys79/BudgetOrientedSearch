@@ -20,6 +20,7 @@ public class Problem {
     private int [] size;//The size of the map
     private static Problem instance;//The instance og Problem
     private HashSet<String> validLocations;//The valid locations in the map
+    private int numOfAgents; // The number of agents
 
 
     /**
@@ -48,17 +49,18 @@ public class Problem {
      * @param prefix - The lenght of the prefix that the agents need to calculate in each iteration
      * @param totalBudget - The total amount of budget of all of the agents in each iteration@param totalBudget
      */
-    public void setNewProblem(String mapName, int scenario, int type,int prefix,int totalBudget)
+    public void setNewProblem(String mapName, int scenario, int type,int prefix,int totalBudget,int numOfAgents)
     {
         this.mapName = mapName;
         this.scenario = scenario;
+        this.numOfAgents = numOfAgents;
         this.type = type;
         this.totalBudget = totalBudget;
         this.prefix = prefix;
         this.agents = new HashSet<>();
-        this.mapPath = this.filePaths+"\\maps\\"+this.mapName+".map";
+        this.mapPath = this.filePaths+"\\Maps\\"+this.mapName+".map";
         this.validLocations = new HashSet<>();
-        this.scenarioPath = this.filePaths+"\\scenarios\\"+this.mapName+".scen";
+        this.scenarioPath = this.filePaths+"\\Scenarios\\"+this.mapName+"\\+";
         ParamConfig.getInstance().configParamsWithType(type);
         this.size = new int[ParamConfig.getInstance().getNumOfDimensions()];
         buildMap();
@@ -79,6 +81,9 @@ public class Problem {
      */
     private void buildMap()
     {
+        // TODO: 25/02/2020 Remove this shit
+
+        /*
         int numRow = 4;
         int numCol = 4;
         for(int row =0;row<numRow;row++)
@@ -95,6 +100,9 @@ public class Problem {
         validLocations.remove("3,1");
         size[0]= numRow;
         size[1]= numCol;
+        */
+
+
 
         // TODO: 24/02/2020 Update the validLocations set
 
@@ -130,6 +138,14 @@ public class Problem {
      */
     public Set<Agent> getAgents() {
         return agents;
+    }
+
+    /**
+     * This function will return the number of agents
+     * @return - The number of agents
+     */
+    public int getNumOfAgents() {
+        return numOfAgents;
     }
 
     /**

@@ -1,9 +1,12 @@
 package Components;
 
+import Components.BoundedSingleSearchAlgorithms.ALSSLRTAStar;
+import Components.BoundedSingleSearchAlgorithms.IBoundedSingleSearchAlgorithm;
 import Components.BudgetDistributionPolicy.EqualBudgetDistributionPolicy;
 import Components.BudgetDistributionPolicy.IBudgetDistributionPolicy;
 import Components.CostFunction.ICostFunction;
 import Components.CostFunction.OctileGridFunction;
+import Components.Heuristics.HeuristicWithPersonalDatabase;
 import Components.Heuristics.IHeuristic;
 import Components.Heuristics.PureOctileDistance;
 import Components.PriorityPolicy.EqualPriorityPolicy;
@@ -19,9 +22,10 @@ public class ParamConfig {
     private IHeuristic heuristic;//The heuristic function
     private IBudgetDistributionPolicy budgetDistributionPolicy;//The budget distribution policy
     private IPriorityPolicy priorityPolicy;//The priority policy
+    private IBoundedSingleSearchAlgorithm searchAlgorithm;
     private static ParamConfig instance;//The instance
     private final int numOfDimensions=2;//The number of dimensions;
-    private final int numberOfAxisLegalToMoveInOneTurn = 2;
+    private final int numberOfAxisLegalToMoveInOneTurn = 2;//The number of axis that the agent can move simultaneously in a single move
 
 
     /**
@@ -44,6 +48,7 @@ public class ParamConfig {
                 heuristic = new PureOctileDistance();
                 priorityPolicy = new EqualPriorityPolicy();
                 budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
+                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
                 break;
 
             default:
@@ -51,6 +56,7 @@ public class ParamConfig {
                 heuristic = null;
                 priorityPolicy = null;
                 budgetDistributionPolicy = null;
+                searchAlgorithm = null;
         }
         if(checkIfNull())
             throw new UnsupportedOperationException("Some of the params are null in ParamConfig Class");
@@ -74,6 +80,14 @@ public class ParamConfig {
         if(instance == null)
             instance = new ParamConfig();
         return instance;
+    }
+
+    /**
+     * This function will return the bounded search algorithm
+     * @return - The bounded search algorithm
+     */
+    public IBoundedSingleSearchAlgorithm getSearchAlgorithm() {
+        return searchAlgorithm;
     }
 
     /**

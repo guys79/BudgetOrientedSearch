@@ -1,9 +1,12 @@
 package SearchAlgorithms;
 
 import Components.*;
+import Components.BoundedSingleSearchAlgorithms.ALSSLRTAStar;
+import Components.BoundedSingleSearchAlgorithms.IBoundedSingleSearchAlgorithm;
 import Components.BudgetDistributionPolicy.IBudgetDistributionPolicy;
 import Components.Heuristics.IHeuristic;
 import Components.PriorityPolicy.IPriorityPolicy;
+import javafx.util.Pair;
 
 import java.util.*;
 
@@ -15,6 +18,7 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
     private IHeuristic heuristicFunction;
     private IBudgetDistributionPolicy budgetDistributionPolicy;
     private IPriorityPolicy priorityPolicy;
+    private IBoundedSingleSearchAlgorithm searchAlgorithm;
     private int totalBudget;
     private Map<Agent,Double> prioritiesForAgents;
     private Map<Agent,Integer> budgetsForAgents;
@@ -31,6 +35,7 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
         this.priorityPolicy = ParamConfig.getInstance().getPriorityPolicy();
         this.totalBudget = Problem.getInstance().getTotalBudget();
         this.agents = Problem.getInstance().getAgents();
+        this.searchAlgorithm = ParamConfig.getInstance().getSearchAlgorithm();
     }
     @Override
     public Map<Agent, Prefix> getSolution() {
@@ -121,7 +126,8 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
             currAgent = prioritizedAgents.poll();
             currentLoc = currentLocation.get(currAgent);
             budget = this.budgetsForAgents.get(currAgent);
-            solutionForAgent = getPrefixForAgent(currAgent,currentLoc,budget,solution);
+            currentLocation.remove(currAgent);
+            solutionForAgent = getPrefixForAgent(currAgent,currentLoc,budget,solution,currentLocation);
             solution.add(solutionForAgent);
             if(solutionForAgent == null) {
                 System.out.println("Failed");
@@ -135,17 +141,42 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
     }
 
 
-    private Prefix getPrefixForAgent(Agent agent,Node current,int budget,Set<Prefix> solutions)
+    /**
+     * This function will calculate a prefix for a given agent
+     * @param agent - The given agent
+     * @param current - The current node
+     * @param budget - The budget
+     * @param solutions - The previous solutions
+     * @param currentLocation - The current locations of all the agents that didn't move yet
+     * @return - A prefix for a single agent
+     */
+    private Prefix getPrefixForAgent(Agent agent,Node current,int budget,Set<Prefix> solutions,Map<Agent,Node> currentLocation)
     {
-        // TODO: 26/02/2020
+        // TODO: 26/02/2020 Insert Backtrack
         Prefix solution = null;
 
-        // TODO: 26/02/2020 Remove this line
-        int remainingBudget = budget;
+        Pair<Prefix,Integer> prefixAndRemainingBudgetPair = searchForPrefix(agent,current,budget,solutions,currentLocation);
 
+        int remainingBudget = prefixAndRemainingBudgetPair.getValue();
+        solution = prefixAndRemainingBudgetPair.getKey();
 
         this.budgetPool+=remainingBudget;
+
         return solution;
+    }
+
+    /**
+     * This function will use a search algorithm to determine the prefix for the agent
+     * @param agent - The given agent
+     * @param current - The current node
+     * @param budget - The budget
+     * @param solutions - The previous solutions
+     * @param currentLocation - The current locations of all the agents
+     * @return - A prefix for the given agent
+     */
+    private Pair<Prefix,Integer> searchForPrefix(Agent agent, Node current, int budget,Set<Prefix> solutions,Map<Agent,Node> currentLocation)
+    {
+        return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,currentLocation);
     }
 
 

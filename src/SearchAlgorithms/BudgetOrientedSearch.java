@@ -19,6 +19,7 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
     private Map<Agent,Double> prioritiesForAgents;
     private Map<Agent,Integer> budgetsForAgents;
     private Set<Agent> agents;
+    private int budgetPool;
 
     /**
      * The constructor of the class
@@ -105,7 +106,7 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
      */
     private Set<Prefix> getPrefixForIteration(Map<Agent,Node> currentLocation)
     {
-
+        this.budgetPool = 0;
         this.budgetsForAgents = this.budgetDistributionPolicy.getBudgetDistribution(agents,totalBudget);
         this.prioritiesForAgents = this.priorityPolicy.getPriorityDistribution(agents);
         Set<Prefix> solution = new HashSet<>();
@@ -139,7 +140,11 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
         // TODO: 26/02/2020
         Prefix solution = null;
 
+        // TODO: 26/02/2020 Remove this line
+        int remainingBudget = budget;
 
+
+        this.budgetPool+=remainingBudget;
         return solution;
     }
     /**

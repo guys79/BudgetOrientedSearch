@@ -1,9 +1,6 @@
 package Components;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class is responsible to check a solution for a single iteration
@@ -35,10 +32,10 @@ public class SolutionChecker {
 
     /**
      * This function will check the given solution
-     * @param prefixes - The given solution (a set of prefixes)
+     * @param prefixes - The given solution (a Collection of prefixes)
      * @return - True IFF the solution is valid
      */
-    public boolean checkSolution(Set<Prefix> prefixes)
+    public boolean checkSolution(Collection<Prefix> prefixes)
     {
 
         int prefixSize = Problem.getInstance().getPrefix();
@@ -48,11 +45,11 @@ public class SolutionChecker {
     }
 
     /**
-     * This function will check thje validation of all of the prefixes in the set
+     * This function will check the validation of all of the prefixes in the Collection
      * @param prefixes - The prefixes
      * @return - True if all of the prefixes are valid
      */
-    private boolean checkPrefixesValidation(Set<Prefix> prefixes)
+    private boolean checkPrefixesValidation(Collection<Prefix> prefixes)
     {
         for(Prefix prefix:prefixes)
         {
@@ -97,7 +94,7 @@ public class SolutionChecker {
      * @param prefixSize - The prefix size
      * @return - True if there prefixes' sizes are valid
      */
-    private boolean checkSize(Set<Prefix> prefixes,int prefixSize)
+    private boolean checkSize(Collection<Prefix> prefixes,int prefixSize)
     {
         //Check if the prefix size is as defined
         for(Prefix prefix : prefixes)
@@ -117,9 +114,9 @@ public class SolutionChecker {
      * @param numOfAgent - The number of agents
      * @return - True if there are no collisions
      */
-    private boolean checkCollisions(Set<Prefix> prefixes,int prefixSize,int numOfAgent)
+    private boolean checkCollisions(Collection<Prefix> prefixes,int prefixSize,int numOfAgent)
     {
-        Set<Node> nodes;
+        Collection<Node> nodes;
 
         //In each time slot
         for(int i=0;i<prefixSize;i++)
@@ -153,7 +150,7 @@ public class SolutionChecker {
      * @param prefixSize - The prefixes' size
      * @return - True if there are no swipes
      */
-    private boolean checkSwipes(Set<Prefix> prefixes,int prefixSize)
+    private boolean checkSwipes(Collection<Prefix> prefixes,int prefixSize)
     {
         Map<Node,Agent> nodes;
         Map<Node,Agent> newNodes;

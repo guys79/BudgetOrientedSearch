@@ -12,10 +12,7 @@ import java.util.Map;
 public interface IMultiAgentSearchAlgorithm {
 
     /**
-     * This function will sarch for a path for
-     * @param current
-     * @param goa
-     * @return
+     * This function will search for a path for each agent
      */
-    public Map<Agent, Prefix> getSolution(Map<Agent, Node> current, Map<Agent, Node> goa);
+    public Map<Agent, Prefix> getSolution();
 }

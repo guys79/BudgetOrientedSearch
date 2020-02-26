@@ -1,5 +1,6 @@
 package Components;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +22,17 @@ public class Prefix {
         this.agent = agent;
     }
 
+    /**
+     * The constructor of the prefix
+     * @param start - the given start goal
+     * @param agent  - The agent
+     */
+    public Prefix(Node start,Agent agent)
+    {
+        this.prefix = new ArrayList<>();
+        prefix.add(start);
+        this.agent = agent;
+    }
     /**
      * This function will return the size of the node
      * @return - The size of the node

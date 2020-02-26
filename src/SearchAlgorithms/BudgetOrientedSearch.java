@@ -147,6 +147,8 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
         this.budgetPool+=remainingBudget;
         return solution;
     }
+
+
     /**
      * This class will compare the agents according to their priorities
      * If the priority of an agent is bigger than the priority of the other agent, The first is more significant

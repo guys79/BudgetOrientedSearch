@@ -12,5 +12,5 @@ import java.util.Set;
  * This interface represents a search algorithm for a single agent that considers past paths
  */
 public interface IBoundedSingleSearchAlgorithm {
-    public Pair<Prefix,Integer> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions, Map<Agent,Node> currentLocation);
+    public Pair<Prefix,Integer> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions,int prefixSize);
 }

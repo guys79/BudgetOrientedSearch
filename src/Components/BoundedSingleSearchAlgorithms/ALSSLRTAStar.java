@@ -8,9 +8,7 @@ import Components.Node;
 import Components.Prefix;
 import javafx.util.Pair;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class represents the alSS-LRTA* algorithm (hernandes et al. , 2011)
@@ -18,32 +16,274 @@ import java.util.Set;
 public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 {
     private ICostFunction costFunction;//The cost function
-    private Map<Node,Double> nodeToGValue;//Key - node, value a pair of the g value
+    private Map<ALSSLRTAStarNode,Double> nodeToGValue;//Key - node, value a pair of the g value
     private HeuristicWithPersonalDatabase heuristic;//The heuristic function
     private Agent agent;//The agent whom we do the search for
-    public Node goal;//The goal node
+    private Node goal;//The goal node
+    private Set<Node> updated;//The nodes that have been updated
+    private Map<ALSSLRTAStarNode,ALSSLRTAStarNode> predMap; // key - node, val - its predecessor
+    private Set <ALSSLRTAStarNode> inQueue;//The nodes that are in the open list
 
-    
     /**
      * The constructor of the class
      */
     public ALSSLRTAStar(ICostFunction costFunction, HeuristicWithPersonalDatabase heuristic)
     {
         this.costFunction = costFunction;
-        this.nodeToGValue = new HashMap<>();
         this.heuristic = heuristic;
-        this.goal = this.agent.getGoal();
         if(! (heuristic instanceof HeuristicWithPersonalDatabase))
             throw new UnsupportedOperationException("The heuristic function is not with database");
+
 
 
     }
 
     @Override
-    public Pair<Prefix, Integer> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions, Map<Agent, Node> currentLocation) {
+    public Pair<Prefix, Integer> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions,int prefixSize) {
         this.agent = agent;
-        // TODO: 26/02/2020 complete
-        return null;
+        this.nodeToGValue = new HashMap<>();
+        this.goal = this.agent.getGoal();
+        this.updated = new HashSet<>();
+        this.predMap = new HashMap<>();
+        this.inQueue = new HashSet<>();
+
+
+
+        PriorityQueue<ALSSLRTAStarNode> openList = new PriorityQueue<>(new AStartFValueNodeComparator());
+        PriorityQueue<ALSSLRTAStarNode> closed = new PriorityQueue<>();
+
+        //The A* procedure
+        int remainBudget = AStarProcedure(current,openList,budget,closed,prefixSize,solutions);
+
+        //No solution
+        if(openList == null)
+            return new Pair<>(null,remainBudget);
+
+        //Get the best Node
+        ALSSLRTAStarNode best = getBestState(openList);
+
+        //Update nodes
+        dijkstraProcedure(openList,closed);
+
+        List<Node> pathNodes = new ArrayList<>();
+
+        ALSSLRTAStarNode nodeInPath = best;
+
+
+        //Assemble prefix
+        while(nodeInPath == null)
+        {
+            pathNodes.add(0,nodeInPath.getNode());
+            nodeInPath = getPredecessor(nodeInPath);
+        }
+
+        int size = pathNodes.size();
+        //Stay in place
+        while(size<prefixSize)
+        {
+            pathNodes.add(pathNodes.get(size-1));
+        }
+        Prefix prefix = new Prefix(pathNodes,agent);
+
+        Pair<Prefix,Integer> sol = new Pair<>(prefix,remainBudget);
+        return sol;
+    }
+
+    /**
+     * This function represents the A* procedure
+     * @param current - The current node
+     * @param openList - The open list
+     * @param budget - The budget
+     * @param closed - The close list
+     * @param prefixSize - The prefix size
+     * @param solutions - The prev solutions
+     * @return - The remaining budget
+     */
+    private int AStarProcedure(Node current,PriorityQueue<ALSSLRTAStarNode> openList,int budget,PriorityQueue<ALSSLRTAStarNode> closed,int prefixSize,Set<Prefix> solutions)
+    {
+
+        //Set current node's gVal to 0 and add to open
+
+        ALSSLRTAStarNode currentNode = new ALSSLRTAStarNode(current,0);
+        setGValue(currentNode,0);
+        addToOpenList(currentNode,openList);
+
+        int expansions = 0;
+        Set<Node> neighbors;
+        double neighborGValue;
+        double costFromCurrentToNeighbor;
+        double pathCostFromCurrentToNeighbor;
+        double currentGValue;
+        int currentTimeStamp;
+        ALSSLRTAStarNode neighborNode;
+
+
+        while(openList.size()>0 && expansions<budget)
+        {
+            currentNode = dequeueOpenList(openList);
+            expansions++;
+
+            //If the node is the goal node, stop the search
+            if(isGoal(currentNode.getNode()))
+                return budget - expansions;
+
+            //Add to close list
+            closed.add(currentNode);
+
+
+            //Expend node
+            currentTimeStamp = currentNode.getTimeStamp();
+
+            //Will not develop further than the prefix size
+            if(currentTimeStamp < prefixSize) {
+
+                neighbors = currentNode.getNode().expend();
+                currentGValue = getGValue(currentNode);
+
+                for (Node neighbor : neighbors) {
+                    neighborNode = new ALSSLRTAStarNode(neighbor, currentTimeStamp + 1);
+
+                    //Only if the state is valid we will insert is to the open
+                    if(isStateValid(neighborNode,solutions)) {
+
+
+                        neighborGValue = getGValue(neighborNode);
+                        costFromCurrentToNeighbor = this.costFunction.getCost(currentNode.getNode(), neighbor);
+                        pathCostFromCurrentToNeighbor = currentGValue + costFromCurrentToNeighbor;
+
+                        //If the cost through the current node is cheaper than the current g val of the node
+                        if (neighborGValue > pathCostFromCurrentToNeighbor) {
+                            //Set the new g val
+                            setGValue(neighborNode, pathCostFromCurrentToNeighbor);
+                            //Set the current node as the predecessor
+                            setPredecessor(neighborNode, currentNode);
+                            //Insert neighbor into open
+                            addToOpenList(neighborNode, openList);
+
+                        }
+
+                    }
+
+                }
+
+            }
+        }
+        return budget - expansions;
+
+    }
+
+    /**
+     * This function wll return the best state from the open
+     * @param openList - The openList
+     * @return - The best state
+     */
+    private ALSSLRTAStarNode getBestState(PriorityQueue<ALSSLRTAStarNode> openList)
+    {
+        ALSSLRTAStarNode best;
+        PriorityQueue<ALSSLRTAStarNode> heap = new PriorityQueue<>(new AStartFValueUpdatedNodeComparator());
+        heap.addAll(openList);
+        best = heap.poll();
+        return best;
+    }
+
+    /**
+     * This function will update both the heuristics of the nodes and the update mark
+     * @param openList - The openList
+     * @param closeList - The closed list
+     */
+    private void dijkstraProcedure(PriorityQueue<ALSSLRTAStarNode> openList,PriorityQueue<ALSSLRTAStarNode> closeList)
+    {
+        for(ALSSLRTAStarNode node : closeList)
+            this.setHValue(node, Double.MAX_VALUE);
+
+        PriorityQueue<ALSSLRTAStarNode> openListOrederedByHVal = new PriorityQueue<>(new AStartHValueNodeComparator());
+        openListOrederedByHVal.addAll(openList);
+
+        ALSSLRTAStarNode current,neigh;
+        double hVal,initialHVal,hNeighbor,hValThrpughCurrent;
+        Set<Node> neighbors;
+        while(closeList.size()>0)
+        {
+            current = dequeueOpenList(openListOrederedByHVal);
+            hVal = getHValue(current);
+            initialHVal = getInitialHValue(current);
+
+            if(hVal>initialHVal)
+                updateNode(current.getNode());
+
+            closeList.remove(current);
+
+            neighbors = current.getNode().expend();
+
+            for(Node neighbor : neighbors)
+            {
+                neigh = new ALSSLRTAStarNode(neighbor,current.getTimeStamp()+1);
+                if (closeList.contains(neigh))
+                {
+                    hNeighbor = getHValue(neigh);
+                    hValThrpughCurrent = hVal + this.costFunction.getCost(current.getNode(),neighbor);
+                    if(hNeighbor>hValThrpughCurrent) {
+                        setHValue(neigh,hValThrpughCurrent);
+                        addToOpenList(neigh,openListOrederedByHVal);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * This function will return if the state is valid
+     * @param node - The given state
+     * @param solutions - The prev solutions
+     * @return - True IFF the state is valid
+     */
+    private boolean isStateValid(ALSSLRTAStarNode node,Set<Prefix> solutions)
+    {
+        return checkForCollisions( node, solutions) && checkForSwipes( node, solutions);
+    }
+
+    /**
+     * This function will return if in this state the agent will not swipe with other agents
+     * @param node - The given state
+     * @param solutions - The prev solutions
+     * @return - True IFF the agent will not swipe with other agents
+     */
+    private boolean checkForSwipes(ALSSLRTAStarNode node, Set<Prefix> solutions) {
+
+
+        int timeStamp = node.getTimeStamp();
+        if(timeStamp == 0)
+            return true;
+        Node actualNode = node.getNode();
+        Node prevNode = getPredecessor(node).getNode();
+        for(Prefix sol : solutions)
+        {
+            if(sol.getNodeAt(timeStamp).equals(actualNode)) {
+                if(sol.getNodeAt(timeStamp-1).equals(prevNode))
+                    return false;
+            }
+        }
+        return true;
+
+    }
+
+    /**
+     * This function will return if in this state the agent will not collide with other agents
+     * @param node - The given state
+     * @param solutions - The prev solutions
+     * @return - True IFF the agent will not collide with other agents
+     */
+    private boolean checkForCollisions(ALSSLRTAStarNode node, Set<Prefix> solutions) {
+        int timeStamp = node.getTimeStamp();
+        Node actualNode = node.getNode();
+
+        for(Prefix sol : solutions)
+        {
+            if(sol.getNodeAt(timeStamp).equals(actualNode))
+                return false;
+        }
+
+        return true;
     }
 
     /**
@@ -51,7 +291,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param node - The g value of the node
      * @return - The g value of the node
      */
-    private double getGValue(Node node)
+    private double getGValue(ALSSLRTAStarNode node)
     {
         if(this.nodeToGValue.containsKey(node))
             return this.nodeToGValue.get(node);
@@ -63,9 +303,19 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param node - The h value of the node
      * @return - The h value of the node
      */
-    private double getHValue(Node node)
+    private double getHValue(ALSSLRTAStarNode node)
     {
-        return this.heuristic.getHeuristic(node,this.goal,agent);
+        return this.heuristic.getHeuristic(node.getNode(),this.goal,agent);
+    }
+
+    /**
+     * This function will return the h value of the node
+     * @param node - The h value of the node
+     * @return - The h value of the node
+     */
+    private double getInitialHValue(ALSSLRTAStarNode node)
+    {
+        return this.heuristic.getHeuristic(node.getNode(),this.goal);
     }
 
     /**
@@ -73,7 +323,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param node - The f value of the node
      * @return - The f value of the node
      */
-    private double getFValue(Node node)
+    private double getFValue(ALSSLRTAStarNode node)
     {
         return getGValue(node) + getHValue(node);
     }
@@ -83,7 +333,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param node - The given node
      * @param newVal - The new gVal
      */
-    private void setGValue(Node node, double newVal)
+    private void setGValue(ALSSLRTAStarNode node, double newVal)
     {
         this.nodeToGValue.put(node,newVal);
     }
@@ -93,10 +343,173 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param node - The given node
      * @param newVal - The new hVal
      */
-    private void setHValue(Node node, double newVal)
+    private void setHValue(ALSSLRTAStarNode node, double newVal)
     {
-        this.heuristic.storeNewVal(agent,node,goal,newVal);
+        this.heuristic.storeNewVal(agent,node.getNode(),goal,newVal);
     }
 
+    /**
+     * This function will return if the given node is a goal node
+     * @param node - The given node
+     * @return - True IFF the given node is the goal node
+     */
+    private boolean isGoal(Node node)
+    {
+        return this.goal.equals(node);
+    }
 
+    /**
+     * This function will add to the open queue the given node
+     * @param node - The node
+     * @param openList - The open list
+     */
+    private void addToOpenList(ALSSLRTAStarNode node,PriorityQueue<ALSSLRTAStarNode> openList)
+    {
+        if(!this.inQueue.contains(node))
+        {
+            this.inQueue.add(node);
+            openList.add(node);
+        }
+    }
+
+    /**
+     * This function will dequeue the queue
+     * @param openList - The openList
+     * @return - The node
+     */
+    private ALSSLRTAStarNode dequeueOpenList(PriorityQueue<ALSSLRTAStarNode> openList)
+    {
+
+        ALSSLRTAStarNode node = openList.poll();
+        this.inQueue.remove(node);
+        return node;
+    }
+    /**
+     * This function will mark the node as updated
+     * @param node - The given node
+     */
+    private void updateNode(Node node)
+    {
+        this.updated.add(node);
+    }
+
+    /**
+     * This function will un mark a node as updated
+     * @param node - The given node
+     */
+    private void unUpdateNode(Node node)
+    {
+        this.updated.remove(node);
+    }
+
+    /**
+     * This function will check if the node is marked as updated or not
+     * @param node - The given node
+     * @return - True IFF the node is marked as updated
+     */
+    private boolean isNodeUpdated(Node node)
+    {
+        return this.updated.contains(node);
+    }
+
+    /**
+     * This function will set the given node's predecessor
+     * @param node - The given node
+     * @param predecessor - The predecessor
+     */
+    private void setPredecessor(ALSSLRTAStarNode node , ALSSLRTAStarNode predecessor)
+    {
+        this.predMap.put(node,predecessor);
+    }
+
+    /**
+     * This function will return the predecessor of the given node
+     * @param node - The given node
+     * @return - The predecessor of the given node
+     */
+    private ALSSLRTAStarNode getPredecessor(ALSSLRTAStarNode node)
+    {
+        return this.predMap.get(node);
+    }
+    /**
+     * This class will compare between two Nodes (the node with the minimum F value is first)
+     */
+    public class AStartFValueNodeComparator implements Comparator<ALSSLRTAStarNode>
+    {
+
+
+
+        @Override
+        public int compare(ALSSLRTAStarNode node1, ALSSLRTAStarNode node2) {
+
+            double f1 = getFValue(node1);
+            double f2 = getFValue(node2);
+
+            if(f1<f2)
+                return -1;
+            if(f1>f2)
+                return 1;
+
+            //The F value is equal
+
+            boolean isGoal1 = isGoal(node1.getNode());
+            boolean isGoal2 = isGoal(node2.getNode());
+            if(isGoal1 && ! isGoal2)
+                return -1;
+
+            if(!isGoal1 && isGoal2)
+                return 1;
+
+            int timeStamp1 = node1.getTimeStamp();
+            int timeStamp2 = node2.getTimeStamp();
+
+            return timeStamp1 - timeStamp2;
+
+        }
+    }
+
+    /**
+     * This class will compare between two Nodes (the node with the minimum F value is first) including consideration in the updated sign
+     */
+    public class AStartFValueUpdatedNodeComparator extends AStartFValueNodeComparator
+    {
+
+        @Override
+        public int compare(ALSSLRTAStarNode node1, ALSSLRTAStarNode node2) {
+
+           boolean isUpdated1 = isNodeUpdated(node1.getNode());
+           boolean isUpdated2 = isNodeUpdated(node2.getNode());
+
+           if(!isUpdated1 && isUpdated2)
+               return -1;
+
+            if(isUpdated1 && !isUpdated2)
+                return 1;
+
+            return super.compare(node1,node2);
+        }
+    }
+
+    /**
+     * This class will compare between two Nodes (the node with the minimum H value is first)
+     */
+    public class AStartHValueNodeComparator implements Comparator<ALSSLRTAStarNode>
+    {
+
+
+
+        @Override
+        public int compare(ALSSLRTAStarNode node1, ALSSLRTAStarNode node2) {
+
+            double h1 = getHValue(node1);
+            double h2 = getHValue(node2);
+
+            if(h1<h2)
+                return -1;
+            if(h1>h2)
+                return 1;
+            return 0;
+
+        }
+    }
 }

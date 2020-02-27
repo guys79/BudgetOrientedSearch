@@ -14,6 +14,7 @@ import java.util.*;
  * Our algorithm - BudgetOrientedSearch
  */
 public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
+    // TODO: 27/02/2020 AddBacktrack 
 
     private IHeuristic heuristicFunction;
     private IBudgetDistributionPolicy budgetDistributionPolicy;
@@ -24,6 +25,7 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
     private Map<Agent,Integer> budgetsForAgents;
     private Set<Agent> agents;
     private int budgetPool;
+    private int prefixSize;
 
     /**
      * The constructor of the class
@@ -36,6 +38,7 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
         this.totalBudget = Problem.getInstance().getTotalBudget();
         this.agents = Problem.getInstance().getAgents();
         this.searchAlgorithm = ParamConfig.getInstance().getSearchAlgorithm();
+        this.prefixSize = Problem.getInstance().getPrefix();
     }
     @Override
     public Map<Agent, Prefix> getSolution() {
@@ -127,7 +130,7 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
             currentLoc = currentLocation.get(currAgent);
             budget = this.budgetsForAgents.get(currAgent);
             currentLocation.remove(currAgent);
-            solutionForAgent = getPrefixForAgent(currAgent,currentLoc,budget,solution,currentLocation);
+            solutionForAgent = getPrefixForAgent(currAgent,currentLoc,budget,solution);
             solution.add(solutionForAgent);
             if(solutionForAgent == null) {
                 System.out.println("Failed");
@@ -147,15 +150,14 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
      * @param current - The current node
      * @param budget - The budget
      * @param solutions - The previous solutions
-     * @param currentLocation - The current locations of all the agents that didn't move yet
      * @return - A prefix for a single agent
      */
-    private Prefix getPrefixForAgent(Agent agent,Node current,int budget,Set<Prefix> solutions,Map<Agent,Node> currentLocation)
+    private Prefix getPrefixForAgent(Agent agent,Node current,int budget,Set<Prefix> solutions)
     {
         // TODO: 26/02/2020 Insert Backtrack
         Prefix solution = null;
 
-        Pair<Prefix,Integer> prefixAndRemainingBudgetPair = searchForPrefix(agent,current,budget,solutions,currentLocation);
+        Pair<Prefix,Integer> prefixAndRemainingBudgetPair = searchForPrefix(agent,current,budget,solutions);
 
         int remainingBudget = prefixAndRemainingBudgetPair.getValue();
         solution = prefixAndRemainingBudgetPair.getKey();
@@ -171,12 +173,11 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
      * @param current - The current node
      * @param budget - The budget
      * @param solutions - The previous solutions
-     * @param currentLocation - The current locations of all the agents
      * @return - A prefix for the given agent
      */
-    private Pair<Prefix,Integer> searchForPrefix(Agent agent, Node current, int budget,Set<Prefix> solutions,Map<Agent,Node> currentLocation)
+    private Pair<Prefix,Integer> searchForPrefix(Agent agent, Node current, int budget,Set<Prefix> solutions)
     {
-        return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,currentLocation);
+        return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize);
     }
 
 

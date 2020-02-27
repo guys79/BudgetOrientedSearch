@@ -45,7 +45,7 @@ public class ParamConfig {
         {
             case 1:
                 costFunction = new OctileGridFunction();
-                heuristic = new PureOctileDistance();
+                heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
                 priorityPolicy = new EqualPriorityPolicy();
                 budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);

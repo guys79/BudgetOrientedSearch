@@ -3,11 +3,10 @@ import Components.Heuristics.HeuristicWithPersonalDatabase;
 import Components.Heuristics.IHeuristic;
 import Components.Heuristics.PureOctileDistance;
 import Components.Heuristics.UniformCostSearch;
+import SearchAlgorithms.BudgetOrientedSearch;
+import SearchAlgorithms.IMultiAgentSearchAlgorithm;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -38,11 +37,14 @@ public class Main {
             System.out.println();
         }
 
-        Set<Agent> agents = Problem.getInstance().getAgents();
-        for(Agent agent:agents)
-        {
-            System.out.println(agent);
-        }
+        IMultiAgentSearchAlgorithm searchAlgorithm = new BudgetOrientedSearch();
 
+        Map<Agent,Prefix> solutions = searchAlgorithm.getSolution();
+
+        for(Map.Entry<Agent,Prefix> entry : solutions.entrySet())
+        {
+            System.out.println(entry.getKey());
+            System.out.println(entry.getValue());
+        }
     }
 }

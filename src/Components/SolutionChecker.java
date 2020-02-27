@@ -33,15 +33,17 @@ public class SolutionChecker {
     /**
      * This function will check the given solution
      * @param prefixes - The given solution (a Collection of prefixes)
+     * @param iterationNumber
      * @return - True IFF the solution is valid
      */
-    public boolean checkSolution(Collection<Prefix> prefixes)
+    public boolean checkSolution(Collection<Prefix> prefixes,  int iterationNumber)
     {
 
         int prefixSize = Problem.getInstance().getPrefix();
         int numOfAgent = Problem.getInstance().getNumOfAgents();
-
-        return checkSize(prefixes,prefixSize) && checkPrefixesValidation(prefixes)&& checkCollisions(prefixes,prefixSize,numOfAgent) && checkSwipes(prefixes,prefixSize);
+        if(iterationNumber == 0)
+            return checkSize(prefixes,prefixSize,iterationNumber);
+        return checkSize(prefixes,prefixSize,iterationNumber) && checkPrefixesValidation(prefixes)&& checkCollisions(prefixes,prefixSize,numOfAgent) && checkSwipes(prefixes,prefixSize);
     }
 
     /**
@@ -92,14 +94,16 @@ public class SolutionChecker {
      * This fnction will check the validation of the sizes of the prefixes
      * @param prefixes - The size of the prefixes
      * @param prefixSize - The prefix size
+
      * @return - True if there prefixes' sizes are valid
      */
-    private boolean checkSize(Collection<Prefix> prefixes,int prefixSize)
+    private boolean checkSize(Collection<Prefix> prefixes, int prefixSize,int iterationNumber)
     {
+
         //Check if the prefix size is as defined
         for(Prefix prefix : prefixes)
         {
-            if(prefix.getSize()!=prefixSize) {
+            if(prefix.getSize()!=prefixSize*iterationNumber - (iterationNumber-1)) {
                 System.out.println("Wrong prefix size");
                 return false;
             }

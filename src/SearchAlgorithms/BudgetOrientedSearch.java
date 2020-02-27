@@ -54,14 +54,21 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
 
         Set<Prefix> givenSolution;
         Agent agent;
+        ParamConfig ins = ParamConfig.getInstance();
+        int iterationNumber = 0;
         //Until he search is finished (succeed or failed)
-        while (!isFinished(currentPaths.values()))
+        while (!isFinished(currentPaths.values(),iterationNumber))
         {
+            iterationNumber++;
+            PerformanceTracker.getInstance().addIteration();
+
+            System.out.println("Start "+iterationNumber);
             givenSolution = this.getPrefixForIteration(currentLocation);
 
             currentLocation.clear();
             for(Prefix prefixForAgent : givenSolution)
             {
+                System.out.println(prefixForAgent);
                 if(prefixForAgent == null)
                     break;
 
@@ -72,26 +79,29 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
                 //Update the current paths
                 currentPaths.get(agent).extendPrefix(prefixForAgent);
             }
+
         }
 
-        return null;
+        return currentPaths;
     }
 
     /**
      * This function will check if the search is finished or not
      * @param prefixes - The prefixes of the agents
+     * @param iterationNumber
      * @return - True of the search is finished (succeeded or failed)
      */
-    public boolean isFinished(Collection<Prefix> prefixes)
+    public boolean isFinished(Collection<Prefix> prefixes, int iterationNumber)
     {
         if(prefixes.contains(null)) {
             System.out.println("failed - couldn't find a path");
             return true;
         }
 
-        if(!SolutionChecker.getInstance().checkSolution(prefixes))
+        if(!SolutionChecker.getInstance().checkSolution(prefixes,iterationNumber))
         {
             System.out.println("failed - the solution is not valid");
+            return true;
         }
 
 
@@ -118,7 +128,9 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
         this.budgetsForAgents = this.budgetDistributionPolicy.getBudgetDistribution(agents,totalBudget);
         this.prioritiesForAgents = this.priorityPolicy.getPriorityDistribution(agents);
         Set<Prefix> solution = new HashSet<>();
+
         PriorityQueue <Agent> prioritizedAgents = new PriorityQueue<>(new PriorityCompareAgents(this.prioritiesForAgents));
+        prioritizedAgents.addAll(agents);
 
         Agent currAgent;
         Node currentLoc;

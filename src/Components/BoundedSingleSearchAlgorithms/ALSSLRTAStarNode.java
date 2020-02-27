@@ -42,9 +42,10 @@ public class ALSSLRTAStarNode {
     }
 
 
-
-
-
+    @Override
+    public String toString() {
+        return node +" time = "+this.timeStamp;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -25,7 +25,7 @@ public class ParamConfig {
     private IBoundedSingleSearchAlgorithm searchAlgorithm;
     private static ParamConfig instance;//The instance
     private final int numOfDimensions=2;//The number of dimensions;
-    private final int numberOfAxisLegalToMoveInOneTurn = 2;//The number of axis that the agent can move simultaneously in a single move
+    private final int numberOfAxisLegalToMoveInOneTurn = 1;//The number of axis that the agent can move simultaneously in a single move
 
 
     /**

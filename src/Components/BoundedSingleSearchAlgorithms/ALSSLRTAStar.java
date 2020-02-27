@@ -5,6 +5,7 @@ import Components.CostFunction.ICostFunction;
 import Components.Heuristics.HeuristicWithPersonalDatabase;
 import Components.Heuristics.IHeuristic;
 import Components.Node;
+import Components.PerformanceTracker;
 import Components.Prefix;
 import javafx.util.Pair;
 
@@ -20,9 +21,10 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     private HeuristicWithPersonalDatabase heuristic;//The heuristic function
     private Agent agent;//The agent whom we do the search for
     private Node goal;//The goal node
-    private Set<Node> updated;//The nodes that have been updated
+    private Map<Agent,Set<Node>> updated;//The nodes that have been updated
     private Map<ALSSLRTAStarNode,ALSSLRTAStarNode> predMap; // key - node, val - its predecessor
     private Set <ALSSLRTAStarNode> inQueue;//The nodes that are in the open list
+    private ALSSLRTAStarNode currentBest;//The current best node
 
     /**
      * The constructor of the class
@@ -31,6 +33,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     {
         this.costFunction = costFunction;
         this.heuristic = heuristic;
+        this.updated = new HashMap<>();
         if(! (heuristic instanceof HeuristicWithPersonalDatabase))
             throw new UnsupportedOperationException("The heuristic function is not with database");
 
@@ -40,17 +43,19 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
     @Override
     public Pair<Prefix, Integer> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions,int prefixSize) {
+
         this.agent = agent;
         this.nodeToGValue = new HashMap<>();
         this.goal = this.agent.getGoal();
-        this.updated = new HashSet<>();
+
         this.predMap = new HashMap<>();
         this.inQueue = new HashSet<>();
+        currentBest = null;
 
 
 
         PriorityQueue<ALSSLRTAStarNode> openList = new PriorityQueue<>(new AStartFValueNodeComparator());
-        PriorityQueue<ALSSLRTAStarNode> closed = new PriorityQueue<>();
+        Set<Node> closed = new HashSet<>();
 
         //The A* procedure
         int remainBudget = AStarProcedure(current,openList,budget,closed,prefixSize,solutions);
@@ -60,8 +65,8 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             return new Pair<>(null,remainBudget);
 
         //Get the best Node
-        ALSSLRTAStarNode best = getBestState(openList);
-
+        ALSSLRTAStarNode best = getBestState(openList,prefixSize);
+        openList.add(best);
         //Update nodes
         dijkstraProcedure(openList,closed);
 
@@ -71,7 +76,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
 
         //Assemble prefix
-        while(nodeInPath == null)
+        while(nodeInPath != null)
         {
             pathNodes.add(0,nodeInPath.getNode());
             nodeInPath = getPredecessor(nodeInPath);
@@ -82,6 +87,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         while(size<prefixSize)
         {
             pathNodes.add(pathNodes.get(size-1));
+            size = pathNodes.size();
         }
         Prefix prefix = new Prefix(pathNodes,agent);
 
@@ -99,7 +105,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param solutions - The prev solutions
      * @return - The remaining budget
      */
-    private int AStarProcedure(Node current,PriorityQueue<ALSSLRTAStarNode> openList,int budget,PriorityQueue<ALSSLRTAStarNode> closed,int prefixSize,Set<Prefix> solutions)
+    private int AStarProcedure(Node current,PriorityQueue<ALSSLRTAStarNode> openList,int budget,Set<Node> closed,int prefixSize,Set<Prefix> solutions)
     {
 
         //Set current node's gVal to 0 and add to open
@@ -116,26 +122,31 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         double currentGValue;
         int currentTimeStamp;
         ALSSLRTAStarNode neighborNode;
-
-
+        Set<ALSSLRTAStarNode> rest = new HashSet<>();
+        int [] t = {4,5};
+        Node test = new Node(t);
         while(openList.size()>0 && expansions<budget)
         {
             currentNode = dequeueOpenList(openList);
+          //  System.out.println(currentNode);
             expansions++;
-
+            if(test.equals(currentNode.getNode()))
+                System.out.println();
             //If the node is the goal node, stop the search
-            if(isGoal(currentNode.getNode()))
+            if(isGoal(currentNode.getNode())) {
+                openList.add(currentNode);
                 return budget - expansions;
+            }
 
             //Add to close list
-            closed.add(currentNode);
+            closed.add(currentNode.getNode());
 
 
             //Expend node
             currentTimeStamp = currentNode.getTimeStamp();
 
             //Will not develop further than the prefix size
-            if(currentTimeStamp < prefixSize) {
+            if(currentTimeStamp < prefixSize-1) {
 
                 neighbors = currentNode.getNode().expend();
                 currentGValue = getGValue(currentNode);
@@ -144,7 +155,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                     neighborNode = new ALSSLRTAStarNode(neighbor, currentTimeStamp + 1);
 
                     //Only if the state is valid we will insert is to the open
-                    if(isStateValid(neighborNode,solutions)) {
+                    if(isStateValid(neighborNode,solutions,currentNode)) {
 
 
                         neighborGValue = getGValue(neighborNode);
@@ -167,7 +178,16 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                 }
 
             }
+            else
+            {
+                rest.add(currentNode);
+            }
         }
+        for(ALSSLRTAStarNode node : rest)
+        {
+            addToOpenList(node,openList);
+        }
+
         return budget - expansions;
 
     }
@@ -175,14 +195,22 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     /**
      * This function wll return the best state from the open
      * @param openList - The openList
+     * @param prefixSize
      * @return - The best state
      */
-    private ALSSLRTAStarNode getBestState(PriorityQueue<ALSSLRTAStarNode> openList)
+    private ALSSLRTAStarNode getBestState(PriorityQueue<ALSSLRTAStarNode> openList, int prefixSize)
     {
         ALSSLRTAStarNode best;
-        PriorityQueue<ALSSLRTAStarNode> heap = new PriorityQueue<>(new AStartFValueUpdatedNodeComparator());
+        PriorityQueue<ALSSLRTAStarNode> heap = new PriorityQueue<>(new AStartFValueUpdatedNodeComparator(prefixSize));
         heap.addAll(openList);
+        for(ALSSLRTAStarNode s : heap)
+            if(s.getTimeStamp() == prefixSize -1)
+                System.out.println(s+" "+getFValue(s));
         best = heap.poll();
+        if(best == null)
+            best = currentBest;
+        else
+            openList.remove(best);
         return best;
     }
 
@@ -191,42 +219,53 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param openList - The openList
      * @param closeList - The closed list
      */
-    private void dijkstraProcedure(PriorityQueue<ALSSLRTAStarNode> openList,PriorityQueue<ALSSLRTAStarNode> closeList)
+    private void dijkstraProcedure(PriorityQueue<ALSSLRTAStarNode> openList,Set<Node> closeList)
     {
-        for(ALSSLRTAStarNode node : closeList)
+
+        for(Node node : closeList) {
             this.setHValue(node, Double.MAX_VALUE);
 
-        PriorityQueue<ALSSLRTAStarNode> openListOrederedByHVal = new PriorityQueue<>(new AStartHValueNodeComparator());
-        openListOrederedByHVal.addAll(openList);
+        }
 
-        ALSSLRTAStarNode current,neigh;
+        if(PerformanceTracker.getInstance().getNumberOFIteration() == 217)
+            System.out.println();
+        PriorityQueue<Node> openListOrederedByHVal = new PriorityQueue<>(new HValueNodeComparator());
+        Set<Node> openSet = new HashSet<>();
+        for (ALSSLRTAStarNode node : openList) {
+            openSet.add(node.getNode());
+        }
+        openListOrederedByHVal.addAll(openSet);
+
+
+        Node current;
         double hVal,initialHVal,hNeighbor,hValThrpughCurrent;
         Set<Node> neighbors;
+
         while(closeList.size()>0)
         {
-            current = dequeueOpenList(openListOrederedByHVal);
+            current = openListOrederedByHVal.poll();
+
             hVal = getHValue(current);
             initialHVal = getInitialHValue(current);
 
             if(hVal>initialHVal)
-                updateNode(current.getNode());
+                updateNode(current);
 
             closeList.remove(current);
 
-            neighbors = current.getNode().expend();
+            neighbors = current.expend();
 
             for(Node neighbor : neighbors)
             {
-                neigh = new ALSSLRTAStarNode(neighbor,current.getTimeStamp()+1);
-                if (closeList.contains(neigh))
-                {
-                    hNeighbor = getHValue(neigh);
-                    hValThrpughCurrent = hVal + this.costFunction.getCost(current.getNode(),neighbor);
-                    if(hNeighbor>hValThrpughCurrent) {
-                        setHValue(neigh,hValThrpughCurrent);
-                        addToOpenList(neigh,openListOrederedByHVal);
+                if (closeList.contains(neighbor)) {
+                        hNeighbor = getHValue(neighbor);
+                        hValThrpughCurrent = hVal + this.costFunction.getCost(current, neighbor);
+                        if (hNeighbor > hValThrpughCurrent) {
+                            setHValue(neighbor, hValThrpughCurrent);
+                            openListOrederedByHVal.add(neighbor);
+                        }
                     }
-                }
+
             }
         }
     }
@@ -235,27 +274,29 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * This function will return if the state is valid
      * @param node - The given state
      * @param solutions - The prev solutions
+     * @param predecessor - The predecessor
      * @return - True IFF the state is valid
      */
-    private boolean isStateValid(ALSSLRTAStarNode node,Set<Prefix> solutions)
+    private boolean isStateValid(ALSSLRTAStarNode node,Set<Prefix> solutions,ALSSLRTAStarNode predecessor)
     {
-        return checkForCollisions( node, solutions) && checkForSwipes( node, solutions);
+        return checkForCollisions( node, solutions) && checkForSwipes( node, predecessor,solutions);
     }
 
     /**
      * This function will return if in this state the agent will not swipe with other agents
      * @param node - The given state
      * @param solutions - The prev solutions
+     * @param predecessor - The predecessor
      * @return - True IFF the agent will not swipe with other agents
      */
-    private boolean checkForSwipes(ALSSLRTAStarNode node, Set<Prefix> solutions) {
+    private boolean checkForSwipes(ALSSLRTAStarNode node,ALSSLRTAStarNode predecessor, Set<Prefix> solutions) {
 
 
         int timeStamp = node.getTimeStamp();
         if(timeStamp == 0)
             return true;
         Node actualNode = node.getNode();
-        Node prevNode = getPredecessor(node).getNode();
+        Node prevNode = predecessor.getNode();
         for(Prefix sol : solutions)
         {
             if(sol.getNodeAt(timeStamp).equals(actualNode)) {
@@ -313,9 +354,18 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param node - The h value of the node
      * @return - The h value of the node
      */
-    private double getInitialHValue(ALSSLRTAStarNode node)
+    private double getHValue(Node node)
     {
-        return this.heuristic.getHeuristic(node.getNode(),this.goal);
+        return this.heuristic.getHeuristic(node,this.goal,agent);
+    }
+    /**
+     * This function will return the h value of the node
+     * @param node - The h value of the node
+     * @return - The h value of the node
+     */
+    private double getInitialHValue(Node node)
+    {
+        return this.heuristic.getHeuristic(node,this.goal);
     }
 
     /**
@@ -349,6 +399,15 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     }
 
     /**
+     * This function will set the h value for the
+     * @param node - The given node
+     * @param newVal - The new hVal
+     */
+    private void setHValue(Node node, double newVal)
+    {
+        this.heuristic.storeNewVal(agent,node,goal,newVal);
+    }
+    /**
      * This function will return if the given node is a goal node
      * @param node - The given node
      * @return - True IFF the given node is the goal node
@@ -368,6 +427,11 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         if(!this.inQueue.contains(node))
         {
             this.inQueue.add(node);
+            openList.add(node);
+        }
+        else
+        {
+            openList.remove(node);
             openList.add(node);
         }
     }
@@ -390,7 +454,12 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      */
     private void updateNode(Node node)
     {
-        this.updated.add(node);
+
+        if(!this.updated.containsKey(agent))
+            this.updated.put(agent,new HashSet<>());
+
+        Set<Node>updatedAgents = this.updated.get(agent);
+        updatedAgents.add(node);
     }
 
     /**
@@ -409,7 +478,12 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      */
     private boolean isNodeUpdated(Node node)
     {
-        return this.updated.contains(node);
+        if(!this.updated.containsKey(agent))
+            return false;
+
+        Set<Node> updatedAgents = this.updated.get(agent);
+
+        return updatedAgents.contains(node);
     }
 
     /**
@@ -473,10 +547,21 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      */
     public class AStartFValueUpdatedNodeComparator extends AStartFValueNodeComparator
     {
-
+        private int prefixSize;
+        public AStartFValueUpdatedNodeComparator(int prefixSize)
+        {
+            this.prefixSize = prefixSize;
+        }
         @Override
         public int compare(ALSSLRTAStarNode node1, ALSSLRTAStarNode node2) {
 
+            int t1 = node1.getTimeStamp();
+            int t2 = node2.getTimeStamp();
+
+            if(t2<prefixSize - 1 && t1==prefixSize-1)
+                return -1;
+           if(t1<prefixSize - 1 && t2==prefixSize-1)
+               return 1;
            boolean isUpdated1 = isNodeUpdated(node1.getNode());
            boolean isUpdated2 = isNodeUpdated(node2.getNode());
 
@@ -486,20 +571,9 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             if(isUpdated1 && !isUpdated2)
                 return 1;
 
-            return super.compare(node1,node2);
-        }
-    }
-
-    /**
-     * This class will compare between two Nodes (the node with the minimum H value is first)
-     */
-    public class AStartHValueNodeComparator implements Comparator<ALSSLRTAStarNode>
-    {
-
-
-
-        @Override
-        public int compare(ALSSLRTAStarNode node1, ALSSLRTAStarNode node2) {
+            int superScore = super.compare(node1,node2);
+            if(superScore!=0)
+                return superScore;
 
             double h1 = getHValue(node1);
             double h2 = getHValue(node2);
@@ -509,7 +583,24 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             if(h1>h2)
                 return 1;
             return 0;
+        }
+    }
 
+    /**
+     * This class will compare between two Nodes (the node with the minimum H value is first)
+     */
+    public class HValueNodeComparator implements Comparator<Node>
+    {
+        @Override
+        public int compare(Node node1, Node node2) {
+            double h1 = getHValue(node1);
+            double h2 = getHValue(node2);
+
+            if(h1<h2)
+                return -1;
+            if(h1>h2)
+                return 1;
+            return 0;
         }
     }
 }

@@ -45,7 +45,7 @@ public class HeuristicWithPersonalDatabase  implements IHeuristic{
 
             if(dataBase.isNodeStoredInDataBase(node))
             {
-                System.out.println("Get val from dataBase");
+          //      System.out.println("Get val from dataBase");
                 val = dataBase.getStoredValueForNode(node);
                 flag = true;
             }
@@ -58,7 +58,7 @@ public class HeuristicWithPersonalDatabase  implements IHeuristic{
         }
         if(!flag)
         {
-            System.out.println("New val");
+  //          System.out.println("New val");
             val = this.getHeuristic(node,dest);
             dataBase.storeValue(node,val);
         }

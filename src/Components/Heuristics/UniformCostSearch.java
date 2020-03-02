@@ -11,13 +11,31 @@ import java.util.*;
  */
 public class UniformCostSearch implements IHeuristic {
 
+    private HashMap<Node,Double> costs;//The costs
+
+    /**
+     * The constructor
+     */
+    public UniformCostSearch()
+    {
+        costs = new HashMap<>();
+    }
+
+    /**
+     * This function will get the costs map
+     * @return - The costs map
+     */
+    public HashMap<Node, Double> getCosts() {
+        return costs;
+    }
 
     @Override
     public double getHeuristic(Node node, Node dest) {
 
+
         //The cost function
         ICostFunction costFunction = ParamConfig.getInstance().getCostFunction();
-        HashMap<Node,Double> costs = new HashMap<>();
+
         PriorityQueue<Node> priorityQueue = new PriorityQueue<>(new UniformCostSearchNodeComparator(costs));
 
         //Putting the start state in the priority queue with the value of 0

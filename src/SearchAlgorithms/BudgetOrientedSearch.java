@@ -1,7 +1,6 @@
 package SearchAlgorithms;
 
 import Components.*;
-import Components.BoundedSingleSearchAlgorithms.ALSSLRTAStar;
 import Components.BoundedSingleSearchAlgorithms.IBoundedSingleSearchAlgorithm;
 import Components.BudgetDistributionPolicy.IBudgetDistributionPolicy;
 import Components.Heuristics.IHeuristic;
@@ -13,7 +12,7 @@ import java.util.*;
 /**
  * Our algorithm - BudgetOrientedSearch
  */
-public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
+public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     // TODO: 27/02/2020 AddBacktrack 
 
     private IHeuristic heuristicFunction;
@@ -63,6 +62,8 @@ public class BudgetOrientedSearch implements IMultiAgentSearchAlgorithm {
             PerformanceTracker.getInstance().addIteration();
 
             System.out.println("Start "+iterationNumber);
+            if(iterationNumber == 4)
+                System.out.println("asdfasd");
             givenSolution = this.getPrefixForIteration(currentLocation);
 
             currentLocation.clear();

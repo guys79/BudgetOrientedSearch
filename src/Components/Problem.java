@@ -266,4 +266,22 @@ public class Problem {
         locString = locString.substring(0,locString.length()-1);
         return this.validLocations.contains(locString);
     }
+
+    public int [][] getGrid()
+    {
+        int height = size[0];
+        int width = size[1];
+
+        int [][] grid = new int[height][width];
+
+        for(int i=0;i<height;i++){
+            for(int j=0;j<height;j++){
+                if(this.validLocations.contains(i+","+j))
+                    grid[i][j] = 1;
+                else
+                    grid[i][j] = -1;
+            }
+        }
+        return grid;
+    }
 }

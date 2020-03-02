@@ -1,12 +1,9 @@
 package Components.BoundedSingleSearchAlgorithms;
 
-import Components.Agent;
+import Components.*;
 import Components.CostFunction.ICostFunction;
 import Components.Heuristics.HeuristicWithPersonalDatabase;
 import Components.Heuristics.IHeuristic;
-import Components.Node;
-import Components.PerformanceTracker;
-import Components.Prefix;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -123,15 +120,18 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         int currentTimeStamp;
         ALSSLRTAStarNode neighborNode;
         Set<ALSSLRTAStarNode> rest = new HashSet<>();
-        int [] t = {4,5};
-        Node test = new Node(t);
+       // int [] t = {4,5};
+       // Node test = new Node(t);
         while(openList.size()>0 && expansions<budget)
         {
+         //   for(ALSSLRTAStarNode n : openList)
+          //  {
+            //    System.out.println(n +" F - "+getFValue(n));
+           // }
             currentNode = dequeueOpenList(openList);
           //  System.out.println(currentNode);
             expansions++;
-            if(test.equals(currentNode.getNode()))
-                System.out.println();
+
             //If the node is the goal node, stop the search
             if(isGoal(currentNode.getNode())) {
                 openList.add(currentNode);
@@ -203,9 +203,9 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         ALSSLRTAStarNode best;
         PriorityQueue<ALSSLRTAStarNode> heap = new PriorityQueue<>(new AStartFValueUpdatedNodeComparator(prefixSize));
         heap.addAll(openList);
-        for(ALSSLRTAStarNode s : heap)
-            if(s.getTimeStamp() == prefixSize -1)
-                System.out.println(s+" "+getFValue(s));
+     //   for(ALSSLRTAStarNode s : heap)
+       //     if(s.getTimeStamp() == prefixSize -1)
+         //       System.out.println(s+" "+getFValue(s));
         best = heap.poll();
         if(best == null)
             best = currentBest;
@@ -279,7 +279,10 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      */
     private boolean isStateValid(ALSSLRTAStarNode node,Set<Prefix> solutions,ALSSLRTAStarNode predecessor)
     {
-        return checkForCollisions( node, solutions) && checkForSwipes( node, predecessor,solutions);
+        // TODO: 02/03/2020 Check Map  
+        if(Problem.getInstance().isValidLocation(node.getNode().getCoordinates()))
+            return checkForCollisions( node, solutions) && checkForSwipes( node, predecessor,solutions);
+        return false;
     }
 
     /**

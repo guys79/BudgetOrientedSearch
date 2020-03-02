@@ -41,7 +41,7 @@ public class HeuristicWithPersonalDatabase  implements IHeuristic{
 
             dataBase = this.databasesForAgents.get(agent);
             if(!dest.equals(dataBase.getDestination()))
-                throw new UnsupportedOperationException("The destination of this agent is not as recived");
+                throw new UnsupportedOperationException("The destination of this agent is not as received");
 
             if(dataBase.isNodeStoredInDataBase(node))
             {

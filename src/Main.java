@@ -5,20 +5,32 @@ import Components.Heuristics.PureOctileDistance;
 import Components.Heuristics.UniformCostSearch;
 import SearchAlgorithms.BudgetOrientedSearch;
 import SearchAlgorithms.IMultiAgentSearchAlgorithm;
+import View.Controller;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 import java.util.*;
 
-public class Main {
-    public static void main(String[] args) {
+public class Main  extends Application{
 
+    public static void main(String[] args)
 
-        //String mapName = "Berlin_1_256";
+    {
+        launch(args);
+    }
+
+    public void init(Controller controller)
+    {
+        String mapName = "Berlin_1_256";
         //String mapName = "random-32-32-10";
-        String mapName = "empty-8-8";
-        int scenario = 2;
+        //String mapName = "empty-8-8";
+        int scenario = 5;
         int type = 1;
-        int prefixLength =4;
-        int totalBudget = 15;
+        int prefixLength =18;
+        int totalBudget = 100;
         int numOfAgents = 1;
         Problem.getInstance().setNewProblem(mapName,scenario,type,prefixLength,totalBudget,numOfAgents);
         int height = Problem.getInstance().getSize()[0];
@@ -46,7 +58,8 @@ public class Main {
         IMultiAgentSearchAlgorithm searchAlgorithm = new BudgetOrientedSearch();
 
 
-        Map<Agent,Prefix> solutions = searchAlgorithm.getSolution();
+
+        Map<Agent,Prefix> solutions = searchAlgorithm.getSolution(controller);
         if(solutions!=null) {
             for (Map.Entry<Agent, Prefix> entry : solutions.entrySet()) {
                 System.out.println(entry.getKey());
@@ -54,6 +67,20 @@ public class Main {
             }
         }
 
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        //String path = System.getProperty("user.dir")+"\\src\\View\\view.fxml";
+        String path = "View/view.fxml";
+        Parent root = fxmlLoader.load(getClass().getResource(path).openStream());
+        Controller controller = fxmlLoader.getController();
+        primaryStage.setTitle("BOS");
+        primaryStage.setScene(new Scene(root, 800, 540));
+        primaryStage.show();
+
+        init(controller);
 
     }
 }

@@ -62,8 +62,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             PerformanceTracker.getInstance().addIteration();
 
             System.out.println("Start "+iterationNumber);
-            if(iterationNumber == 4)
-                System.out.println("asdfasd");
+
             givenSolution = this.getPrefixForIteration(currentLocation);
 
             currentLocation.clear();

@@ -88,10 +88,17 @@ public class Controller {
         for (HashMap.Entry<int[], Color> entry : paths.entrySet()){
             int[] path = entry.getKey();
             int nodeID = getNode(path, time.getValue());
+            int initialId = getNode(path, 0);
+            int endId = getNode(path, path.length-1);
             int[] pos = idToLoc(nodeID);
+            int[] initialPos = idToLoc(initialId);
+            int[] endPos = idToLoc(endId);
             context.setFill(entry.getValue());
-            context.fillOval(pos[0] * cellWidth, pos[1] * cellHeight, cellWidth, cellHeight);
+            context.fillOval(pos[1] * cellWidth, pos[0] * cellHeight, cellWidth, cellHeight);
+            context.fillOval(initialPos[1] * cellWidth, initialPos[0] * cellHeight, cellWidth, cellHeight);
+            context.fillOval(endPos[1] * cellWidth, endPos[0] * cellHeight, cellWidth, cellHeight);
         }
+
     }
 
     private int getNode(int[] path, int t) {

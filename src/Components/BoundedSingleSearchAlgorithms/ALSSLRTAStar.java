@@ -56,13 +56,14 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
         //The A* procedure
         int remainBudget = AStarProcedure(current,openList,budget,closed,prefixSize,solutions);
-
+       System.out.println("Remaining Budget "+remainBudget);
         //No solution
         if(openList == null)
             return new Pair<>(null,remainBudget);
 
         //Get the best Node
         ALSSLRTAStarNode best = getBestState(openList,prefixSize);
+      //  System.out.println("F - "+getFValue(best));
         openList.add(best);
         //Update nodes
         dijkstraProcedure(openList,closed);
@@ -106,8 +107,11 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     {
 
         //Set current node's gVal to 0 and add to open
-
+       Map<Node,Integer> openListMap = new HashMap<>();
         ALSSLRTAStarNode currentNode = new ALSSLRTAStarNode(current,0);
+        openListMap.put(current,1);
+    //    openListSet.add(current);
+
         setGValue(currentNode,0);
         addToOpenList(currentNode,openList);
 
@@ -120,15 +124,33 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         int currentTimeStamp;
         ALSSLRTAStarNode neighborNode;
         Set<ALSSLRTAStarNode> rest = new HashSet<>();
+
+        int restSize = 0;
+        ALSSLRTAStarNode lastNode = null;
+        int numOfOccur;
+        int numberOfUniqueInOpenListThatCloseDoesntContain = 1;
        // int [] t = {4,5};
        // Node test = new Node(t);
-        while(openList.size()>0 && expansions<budget)
+        while(openList.size()>0 && expansions<budget && (restSize = getUniqueOpenSize(openListMap,rest)) !=closed.size())
         {
-         //   for(ALSSLRTAStarNode n : openList)
-          //  {
-            //    System.out.println(n +" F - "+getFValue(n));
-           // }
+          /*  System.out.println();
+            for(ALSSLRTAStarNode n : openList)
+            {
+                System.out.println(n +" F - "+getFValue(n) +" G - "+getGValue(n)+" H - "+ getHValue(n));
+            }
+            System.out.println();*/
+        //    count++;
+
             currentNode = dequeueOpenList(openList);
+            numOfOccur = openListMap.get(currentNode.getNode());
+            if(numOfOccur == 1)
+                openListMap.remove(currentNode.getNode());
+            else
+            {
+                numOfOccur--;
+                openListMap.put(currentNode.getNode(),numOfOccur);
+            }
+           // System.out.println("current - "+currentNode);
           //  System.out.println(currentNode);
             expansions++;
 
@@ -139,7 +161,11 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             }
 
             //Add to close list
+            int sizePrev = closed.size();
             closed.add(currentNode.getNode());
+            int sizeAfter = closed.size();
+            if(sizeAfter>sizePrev)
+                lastNode = currentNode;
 
 
             //Expend node
@@ -171,6 +197,15 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                             //Insert neighbor into open
                             addToOpenList(neighborNode, openList);
 
+                            if(!openListMap.containsKey(neighbor))
+                                openListMap.put(neighbor,1);
+                            else
+                            {
+                                numOfOccur = openListMap.get(neighbor) + 1;
+                                openListMap.put(neighbor,numOfOccur);
+
+                            }
+
                         }
 
                     }
@@ -181,7 +216,19 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             else
             {
                 rest.add(currentNode);
+
             }
+
+        }
+
+        if(restSize == closed.size())
+        {
+            System.out.println("asdjada");
+            closed.remove(lastNode.getNode());
+        }
+        if(openList.size() == 0)
+        {
+            System.out.println("open is 0");
         }
         for(ALSSLRTAStarNode node : rest)
         {
@@ -192,6 +239,16 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
     }
 
+    private int getUniqueOpenSize(Map<Node,Integer> openMap, Set<ALSSLRTAStarNode> rest)
+    {
+        int size = openMap.size();
+        for(ALSSLRTAStarNode node : rest)
+        {
+            if(!openMap.containsKey(node.getNode()))
+                size++;
+        }
+        return size;
+    }
     /**
      * This function wll return the best state from the open
      * @param openList - The openList
@@ -222,28 +279,46 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     private void dijkstraProcedure(PriorityQueue<ALSSLRTAStarNode> openList,Set<Node> closeList)
     {
 
-        for(Node node : closeList) {
-            this.setHValue(node, Double.MAX_VALUE);
 
-        }
-
-        if(PerformanceTracker.getInstance().getNumberOFIteration() == 217)
-            System.out.println();
-        PriorityQueue<Node> openListOrederedByHVal = new PriorityQueue<>(new HValueNodeComparator());
+        PriorityQueue<Node> openListOrderedByHVal = new PriorityQueue<>(new HValueNodeComparator());
         Set<Node> openSet = new HashSet<>();
-        for (ALSSLRTAStarNode node : openList) {
-            openSet.add(node.getNode());
-        }
-        openListOrederedByHVal.addAll(openSet);
+        Set<Node> openNotInCloseSet = new HashSet<>();
+        Node toOpen;
 
+        //Get the openList states (NOT including time).
+        //The states that are not in the close list
+        for (ALSSLRTAStarNode node : openList) {
+            toOpen = node.getNode();
+            openSet.add(toOpen);
+            if(!closeList.contains(toOpen)) {
+                openNotInCloseSet.add(toOpen);
+  //              System.out.println(toOpen+" F - "+getFValue(node));
+            }
+        }
+
+        if(openNotInCloseSet.size() == 0) {
+            System.out.println("wat");
+            return;
+        }
+
+        openListOrderedByHVal.addAll(openSet);
+        Set<Node> toDelete = new HashSet<>();
+
+        //Update closeList nodes
+        for(Node node : closeList) {
+
+            this.setHValue(node, Double.MAX_VALUE);
+            toDelete.add(node);
+        }
 
         Node current;
-        double hVal,initialHVal,hNeighbor,hValThrpughCurrent;
         Set<Node> neighbors;
+        double hVal,initialHVal,hNeighbor,hValThrpughCurrent;
 
         while(closeList.size()>0)
         {
-            current = openListOrederedByHVal.poll();
+
+            current = openListOrderedByHVal.poll();
 
             hVal = getHValue(current);
             initialHVal = getInitialHValue(current);
@@ -262,12 +337,17 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                         hValThrpughCurrent = hVal + this.costFunction.getCost(current, neighbor);
                         if (hNeighbor > hValThrpughCurrent) {
                             setHValue(neighbor, hValThrpughCurrent);
-                            openListOrederedByHVal.add(neighbor);
+                           // System.out.println("hello");
+                            toDelete.remove(neighbor);
+                            openListOrderedByHVal.add(neighbor);
                         }
                     }
 
             }
+
         }
+        if(toDelete.size()!=0)
+            System.out.println("DaFack");
     }
 
     /**
@@ -279,10 +359,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      */
     private boolean isStateValid(ALSSLRTAStarNode node,Set<Prefix> solutions,ALSSLRTAStarNode predecessor)
     {
-        // TODO: 02/03/2020 Check Map  
-        if(Problem.getInstance().isValidLocation(node.getNode().getCoordinates()))
-            return checkForCollisions( node, solutions) && checkForSwipes( node, predecessor,solutions);
-        return false;
+        return checkForCollisions( node, solutions) && checkForSwipes( node, predecessor,solutions);
     }
 
     /**
@@ -537,6 +614,23 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             if(!isGoal1 && isGoal2)
                 return 1;
 
+/*
+             double g1 = getGValue(node1);
+             double g2 = getGValue(node1);
+
+            if(g1>g2)
+                return -1;
+            if(g1<g2)
+                return 1;
+*/
+            boolean isSameAsBack1 = getPredecessor(node1).getNode().equals(node1.getNode());
+            boolean isSameAsBack2 = getPredecessor(node2).getNode().equals(node2.getNode());
+
+            if(!isSameAsBack1 && isSameAsBack2)
+                return -1;
+
+            if(isSameAsBack1 && !isSameAsBack2)
+                return 1;
             int timeStamp1 = node1.getTimeStamp();
             int timeStamp2 = node2.getTimeStamp();
 

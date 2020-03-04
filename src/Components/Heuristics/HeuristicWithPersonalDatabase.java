@@ -2,6 +2,8 @@ package Components.Heuristics;
 
 import Components.Agent;
 import Components.Node;
+import Components.PerformanceTracker;
+import Components.Problem;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +15,7 @@ public class HeuristicWithPersonalDatabase  implements IHeuristic{
 
     private Map<Agent,HeuristicDataBase> databasesForAgents; //The key is the agent, the value is the agent's database
     private IHeuristic heuristic;//The heuristic
+    protected boolean preCompute;//True if we want to pre-compute the heuristics
 
     /**
      * This constructor
@@ -22,11 +25,13 @@ public class HeuristicWithPersonalDatabase  implements IHeuristic{
     {
         this.heuristic = heuristic;
         this.databasesForAgents = new HashMap<>();
+        this.preCompute = false;
     }
 
 
     @Override
     public double getHeuristic(Node node, Node dest) {
+
         return this.heuristic.getHeuristic(node,dest);
     }
 
@@ -37,7 +42,6 @@ public class HeuristicWithPersonalDatabase  implements IHeuristic{
         HeuristicDataBase dataBase;
         if(this.databasesForAgents.containsKey(agent))
         {
-
 
             dataBase = this.databasesForAgents.get(agent);
             if(!dest.equals(dataBase.getDestination()))
@@ -58,9 +62,25 @@ public class HeuristicWithPersonalDatabase  implements IHeuristic{
         }
         if(!flag)
         {
-  //          System.out.println("New val");
-            val = this.getHeuristic(node,dest);
-            dataBase.storeValue(node,val);
+            if(this.preCompute)
+            {
+
+                long before = System.currentTimeMillis();
+                System.out.println("PreComputing.. "+(PerformanceTracker.getInstance().getNumOfPreComputedAgents()+1)+"/"+Problem.getInstance().getNumOfAgents());
+                Map<Node,Double> nodeToHeuristic = preCompute(dest);
+                PerformanceTracker.getInstance().addNumOfPreComputedAgents();
+                long after = System.currentTimeMillis();
+                PerformanceTracker.getInstance().addPreCompute(after-before);
+                for(Map.Entry<Node,Double> entry : nodeToHeuristic.entrySet())
+                {
+                    dataBase.storeValue(entry.getKey(),entry.getValue());
+                }
+                val = dataBase.getStoredValueForNode(node);
+            }
+            else {
+                val = this.getHeuristic(node, dest);
+                dataBase.storeValue(node, val);
+            }
         }
         return val;
     }
@@ -83,5 +103,15 @@ public class HeuristicWithPersonalDatabase  implements IHeuristic{
             this.databasesForAgents.put(agent,dataBase);
         }
         dataBase.storeValue(node,val);
+    }
+
+    /**
+     * This function will pre compute the heuristics of the nodes to the destination
+     * @param dest - The destination
+     * @return - The heuristics of the nodes to the destination
+     */
+    protected Map<Node,Double> preCompute(Node dest)
+    {
+        return null;
     }
 }

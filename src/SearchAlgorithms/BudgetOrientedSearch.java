@@ -68,7 +68,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             currentLocation.clear();
             for(Prefix prefixForAgent : givenSolution)
             {
-                System.out.println(prefixForAgent);
+                //System.out.println(prefixForAgent);
                 if(prefixForAgent == null)
                     break;
 
@@ -108,8 +108,10 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         for(Prefix prefix :prefixes)
         {
             //If there is still an agent that is not in its goal node
-            if(!prefix.getNodeAt(prefix.getSize()-1).equals(prefix.getAgent().getGoal()))
+            if(!prefix.getNodeAt(prefix.getSize()-1).equals(prefix.getAgent().getGoal())) {
+                System.out.println("Agent "+prefix.getAgent().getId()+" didn't finish");
                 return false;
+            }
 
         }
 
@@ -126,7 +128,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     {
         this.budgetPool = 0;
         this.budgetsForAgents = this.budgetDistributionPolicy.getBudgetDistribution(agents,totalBudget);
-        this.prioritiesForAgents = this.priorityPolicy.getPriorityDistribution(agents);
+        this.prioritiesForAgents = this.priorityPolicy.getPriorityDistribution(agents,currentLocation);
         Set<Prefix> solution = new HashSet<>();
 
         PriorityQueue <Agent> prioritizedAgents = new PriorityQueue<>(new PriorityCompareAgents(this.prioritiesForAgents));
@@ -136,13 +138,17 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         Node currentLoc;
         int budget;
         Prefix solutionForAgent;
+        int [] test = {182,111};
         while(prioritizedAgents.size()>0)
         {
             currAgent = prioritizedAgents.poll();
             currentLoc = currentLocation.get(currAgent);
+
             budget = this.budgetsForAgents.get(currAgent);
             currentLocation.remove(currAgent);
             solutionForAgent = getPrefixForAgent(currAgent,currentLoc,budget,solution);
+
+     //       System.out.println(solutionForAgent);
             solution.add(solutionForAgent);
             if(solutionForAgent == null) {
                 System.out.println("Failed");

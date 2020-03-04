@@ -64,7 +64,7 @@ public class Prefix {
 
     @Override
     public String toString() {
-        String str = "{";
+        String str = "agent "+agent.getId()+" {";
         for(int i=0;i<this.prefix.size();i++)
         {
             str+=this.prefix.get(i)+",";

@@ -3,13 +3,13 @@ package SearchAlgorithms;
 import Components.Agent;
 import Components.Prefix;
 import Components.Problem;
-import View.Controller;
+import View.View;
 
 import java.util.Map;
 
 public abstract class AbstractMultiAgentSearchAlgorithm implements IMultiAgentSearchAlgorithm {
 
-    private Controller controller;
+    private View view;
 
     public AbstractMultiAgentSearchAlgorithm()
     {
@@ -17,17 +17,17 @@ public abstract class AbstractMultiAgentSearchAlgorithm implements IMultiAgentSe
     }
 
     @Override
-    public Map<Agent, Prefix> getSolution(Controller controller) {
-        this.controller = controller;
+    public Map<Agent, Prefix> getSolution(View view) {
+        this.view = view;
         int [][]grid = Problem.getInstance().getGrid();
-        this.controller.initialize(grid);
+        this.view.initialize(grid);
         Map<Agent, Prefix> solutions = getSolution();
 
         for(Prefix prefix : solutions.values())
         {
-            this.controller.addAgent(prefix);
+            this.view.addAgent(prefix);
         }
-        controller.draw();
+        view.draw();
         return solutions;
     }
 

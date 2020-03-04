@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * For rendering the GUI. This class is not fully commented.
  */
-public class Controller {
+public class View {
 
     @FXML
     public Text timeText;

@@ -1,9 +1,8 @@
 package SearchAlgorithms;
 
 import Components.Agent;
-import Components.Node;
 import Components.Prefix;
-import View.Controller;
+import View.View;
 
 import java.util.Map;
 
@@ -19,7 +18,7 @@ public interface IMultiAgentSearchAlgorithm {
 
     /**
      * This function will search for a path for each agent
-     * @param controller - The controller
+     * @param view - The view
      */
-    public Map<Agent, Prefix> getSolution(Controller controller);
+    public Map<Agent, Prefix> getSolution(View view);
 }

@@ -8,6 +8,7 @@ import Components.CostFunction.ICostFunction;
 import Components.CostFunction.OctileGridFunction;
 import Components.Heuristics.HeuristicWithPersonalDatabase;
 import Components.Heuristics.IHeuristic;
+import Components.Heuristics.PreComputedUniformCostSearch;
 import Components.Heuristics.PureOctileDistance;
 import Components.PriorityPolicy.EqualPriorityPolicy;
 import Components.PriorityPolicy.IPriorityPolicy;
@@ -45,7 +46,8 @@ public class ParamConfig {
         {
             case 1:
                 costFunction = new OctileGridFunction();
-                heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
+                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
+                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
                 priorityPolicy = new EqualPriorityPolicy();
                 budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);

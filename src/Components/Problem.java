@@ -80,8 +80,8 @@ public class Problem {
 
     private void create2DScenarios()
     {
-        // TODO: 23/02/2020 Create the scenario . assign agents to their nodes
-        System.out.println(this.scenarioPath);
+
+       // System.out.println(this.scenarioPath);
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(this.scenarioPath)));
             String line;

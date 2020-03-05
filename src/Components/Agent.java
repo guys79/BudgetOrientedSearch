@@ -25,6 +25,10 @@ public class Agent {
 
     }
 
+    public static void restNumOfAgents()
+    {
+        numberOfExistingAgents = 0;
+    }
     /**
      * The empty constructor
      */

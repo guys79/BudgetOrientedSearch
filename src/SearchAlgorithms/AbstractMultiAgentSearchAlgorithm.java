@@ -1,6 +1,7 @@
 package SearchAlgorithms;
 
 import Components.Agent;
+import Components.PerformanceTracker;
 import Components.Prefix;
 import Components.Problem;
 import View.View;
@@ -21,8 +22,10 @@ public abstract class AbstractMultiAgentSearchAlgorithm implements IMultiAgentSe
         this.view = view;
         int [][]grid = Problem.getInstance().getGrid();
         this.view.initialize(grid);
+        long before = System.currentTimeMillis();
         Map<Agent, Prefix> solutions = getSolution();
-
+        long after = System.currentTimeMillis();
+        PerformanceTracker.getInstance().setOverAllSearch(after-before);
         for(Prefix prefix : solutions.values())
         {
             this.view.addAgent(prefix);

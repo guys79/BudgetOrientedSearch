@@ -1,6 +1,7 @@
 package View;
 
 import Components.Prefix;
+import Controller.Controller;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
@@ -10,6 +11,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
@@ -27,12 +29,19 @@ public class View {
     public Button forwardButton;
     public Slider slider;
     public Button backButton;
-
+    public Button nextButton;
+    public TextField enter_x_textField;
+    public TextField enter_y_textField;
+    public TextField acenNumber;
     public GraphicsContext context;
     public IntegerProperty time = new SimpleIntegerProperty();
     public int[][] grid;
     public HashMap<Integer, int[]> nodeLocations = new HashMap<>();
     public HashMap<int[], Color> paths = new HashMap<>();
+
+    private int scenNum;
+    private int marked_x;
+    private int marked_y;
     private int agentCount = 0;
     private Color[] colors = {
             Color.RED,
@@ -49,8 +58,11 @@ public class View {
     private double cellWidth;
     private double cellHeight;
     private int maxTime = 0;
-
+    private Controller controller;
     public void initialize(int[][] grid){
+        this.marked_x = -1;
+        this.marked_y = -1;
+
         slider.setBlockIncrement(1);
         slider.valueProperty().addListener((ChangeListener) (arg0, arg1, arg2) -> {
 //            time.setValue((int)(slider.getValue()/100*maxTime));
@@ -65,10 +77,103 @@ public class View {
         cellHeight = canvas.getHeight()/grid.length;
     }
 
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
+
+    public void unMark()
+    {
+        if(this.marked_x != -1 && this.marked_y!=-1)
+        {
+            unMark(this.marked_x,this.marked_y);
+            this.marked_x = -1;
+            this.marked_y = -1;
+        }
+
+    }
+    public void setScenario()
+    {
+        boolean toSetScene;
+
+        try {
+            scenNum = Integer.parseInt(this.acenNumber.getText());
+
+            toSetScene = true;
+        }
+        catch (NumberFormatException e)
+        {
+            toSetScene = false;
+        }
+        if(toSetScene)
+            controller.init(this.scenNum);
+    }
     public void draw(){
         timeText.setText("t = "+time.getValue());
         drawGrid();
         drawAgents();
+    }
+    /**
+     * This function will unMark the cell at x,y
+     * @param x - The x coordinates
+     * @param y - The y coordinates
+     */
+    private void unMark(int x, int y)
+    {
+        if(grid[x][y] == -1)
+            context.setFill(Color.BLACK);
+        else
+            context.setFill(Color.WHITE);
+
+        context.fillRect(y * cellWidth, x * cellHeight, cellWidth + 1, cellHeight + 1);
+    }
+    /**
+     * This function will implement the functionallity of the Marj button (The onclick event)
+     */
+    public void markButton()
+    {
+
+        boolean toMark;
+        int x = -1,y = -1;
+        try {
+            x = Integer.parseInt(this.enter_x_textField.getText());
+            y = Integer.parseInt(this.enter_y_textField.getText());
+            toMark = true;
+        }
+        catch (NumberFormatException e)
+        {
+            toMark = false;
+        }
+
+        if(toMark)
+        {
+            marked_x = x;
+            marked_y = y;
+            mark(marked_x,marked_y);
+        }
+
+        this.enter_y_textField.setText("");
+        this.enter_x_textField.setText("");
+    }
+    /**
+     * This function will mark the cell at x,y
+     * @param x - The x coordinates
+     * @param y - The y coordinates
+     */
+    public void mark (int x,int y)
+    {
+
+        if(x<0 || x>= grid.length)
+            return;
+        if(y<0 || y>=grid[x].length)
+            return;
+        context.setFill(Color.BLUE);
+        context.fillRect(y * cellWidth, x * cellHeight, cellWidth + 1, cellHeight + 1);
+        if(grid[x][y] == -1)
+            context.setFill(Color.BLACK);
+        else
+            context.setFill(Color.WHITE);
+        context.fillRect(y * cellWidth+(1.0/12)*cellWidth, x * cellHeight+(1.0/12)*cellHeight, cellWidth *5.0/6, cellHeight *5.0/6);
+
     }
 
     private void drawGrid(){
@@ -88,15 +193,25 @@ public class View {
         for (HashMap.Entry<int[], Color> entry : paths.entrySet()){
             int[] path = entry.getKey();
             int nodeID = getNode(path, time.getValue());
-            int initialId = getNode(path, 0);
+            //int initialId = getNode(path, 0);
             int endId = getNode(path, path.length-1);
             int[] pos = idToLoc(nodeID);
-            int[] initialPos = idToLoc(initialId);
+            //int[] initialPos = idToLoc(initialId);
             int[] endPos = idToLoc(endId);
-            context.setFill(entry.getValue());
-            context.fillOval(pos[1] * cellWidth, pos[0] * cellHeight, cellWidth, cellHeight);
-            context.fillOval(initialPos[1] * cellWidth, initialPos[0] * cellHeight, cellWidth, cellHeight);
-            context.fillOval(endPos[1] * cellWidth, endPos[0] * cellHeight, cellWidth, cellHeight);
+            if(endId != nodeID) {
+                context.setFill(entry.getValue());
+                context.fillOval(pos[1] * cellWidth, pos[0] * cellHeight, cellWidth, cellHeight);
+                // context.fillOval(initialPos[1] * cellWidth, initialPos[0] * cellHeight, cellWidth, cellHeight);
+
+   //             context.fillOval(endPos[1] * cellWidth, endPos[0] * cellHeight, cellWidth, cellHeight);
+            }
+            else
+            {
+                context.setFill(Color.GRAY);
+                context.fillOval(pos[1] * cellWidth, pos[0] * cellHeight, cellWidth, cellHeight);
+            }
+
+
         }
 
     }

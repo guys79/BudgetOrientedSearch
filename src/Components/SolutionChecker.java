@@ -128,18 +128,23 @@ public class SolutionChecker {
             nodes = new HashSet<>();
             for(Prefix prefix : prefixes)
             {
+
                 nodes.add(prefix.getNodeAt(i));
             }
 
             //check that there is no duplicate
             if(numOfAgent!=nodes.size()) {
+                System.out.println("Damn");
                 for(Prefix prefix : prefixes)
                 {
-                    if(nodes.contains(prefix.getNodeAt(i))) {
-                        System.out.println("Two agents collided at " + prefix.getNodeAt(i));
-                        return false;
+                    for(Prefix prefix2 : prefixes)
+                    {
+                        if(prefix2!=prefix && prefix2.getNodeAt(i).equals(prefix.getNodeAt(i)))
+                        {
+                            System.out.println("Agent "+prefix.getAgent().getId()+" and Agent "+prefix2.getAgent().getId()+" collided at "+prefix.getNodeAt(i));
+                            return false;
+                        }
                     }
-                    nodes.add(prefix.getNodeAt(i));
                 }
 
                 return false;

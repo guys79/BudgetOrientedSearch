@@ -11,6 +11,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.TextField?>
 <GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
     <columnConstraints>
         <ColumnConstraints />
@@ -20,11 +23,12 @@
     </rowConstraints>
     <BorderPane>
         <center>
-            <Canvas fx:id="canvas" height="500.0" width="800.0" BorderPane.alignment="CENTER" />
+            <Canvas fx:id="canvas" height="850.0" width="1300.0" BorderPane.alignment="CENTER" />
         </center>
         <bottom>
             <GridPane prefHeight="38.0" style="-fx-background-color: #d2cbd2" BorderPane.alignment="CENTER">
                 <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -45,6 +49,11 @@
                         <Font name="System Bold" size="18.0" />
                     </font>
                 </Button>
+                <Button fx:id="nextButton" mnemonicParsing="false" onAction="#unMark" prefHeight="48.0" prefWidth="266.0" text="Un Mark" GridPane.columnIndex="5" GridPane.rowSpan="2">
+                    <font>
+                        <Font name="System Bold" size="18.0" />
+                    </font>
+                </Button>
                 <Slider fx:id="slider" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1">
                     <GridPane.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" />
@@ -57,5 +66,91 @@
                 </Button>
             </GridPane>
         </bottom>
+        <top>
+            <GridPane BorderPane.alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints />
+
+                </rowConstraints>
+                <children>
+                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Enter scenario number" GridPane.columnSpan="1" GridPane.rowIndex="1" GridPane.rowSpan="1">
+                        <font>
+                            <Font name="System Bold" size="30.0" />
+                        </font>
+                    </Text>
+                    <TextField fx:id="acenNumber" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="320.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <GridPane.margin>
+                            <Insets />
+                        </GridPane.margin>
+                    </TextField>
+                    <Button fx:id="scen_btn" mnemonicParsing="false" onAction="#setScenario" prefHeight="25.0" prefWidth="320.0" text="Enter" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                </children>
+            </GridPane>
+        </top>
+        <left>
+            <GridPane prefWidth="200.0" BorderPane.alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                </rowConstraints>
+                <children>
+
+                    <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                        <items>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="98.0">
+                                <children>
+                                    <Text layoutX="24.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter X">
+                                        <font>
+                                            <Font name="System Bold" size="15.0" />
+                                        </font>
+                                    </Text>
+                                </children>
+                            </AnchorPane>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                <children>
+                                    <TextField fx:id="enter_x_textField" layoutX="-7.0" layoutY="26.0" prefHeight="25.0" prefWidth="105.0" />
+                                </children>
+                            </AnchorPane>
+                        </items>
+                    </SplitPane>
+
+
+                    <Button fx:id="mark_btn" alignment="TOP_CENTER" onAction="#markButton" prefHeight="52.0" prefWidth="100.0" GridPane.columnSpan="1" GridPane.rowIndex="2" text="Mark">
+                        <opaqueInsets>
+                            <Insets />
+                        </opaqueInsets></Button>
+                    <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" GridPane.rowIndex="1">
+                        <items>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="98.0">
+                                <children>
+                                    <Text layoutX="24.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Y">
+                                        <font>
+                                            <Font name="System Bold" size="15.0" />
+                                        </font>
+                                    </Text>
+                                </children>
+                            </AnchorPane>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                <children>
+                                    <TextField fx:id="enter_y_textField" layoutX="-7.0" layoutY="26.0" prefHeight="25.0" prefWidth="105.0" />
+                                </children>
+                            </AnchorPane>
+                        </items>
+                    </SplitPane>
+
+                </children>
+            </GridPane>
+        </left>
     </BorderPane>
 </GridPane>

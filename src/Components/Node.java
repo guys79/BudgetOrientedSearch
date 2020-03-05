@@ -24,6 +24,10 @@ public class Node {
 
     }
 
+    public static void restNumOfNodes()
+    {
+        numOfNodes = 0;
+    }
     /**
      * The empty constructor
      */

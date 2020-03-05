@@ -79,7 +79,11 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
       // System.out.println("Remaining Budget "+remainBudget);
         //No solution
         if(openList == null)
+        {
+            System.out.println("Agent "+agent.getId()+" couldn't find a state to be on");
             return new Pair<>(null,remainBudget);
+        }
+
 
         //Get the best Node
         ALSSLRTAStarNode best = getBestState(openList,prefixSize);
@@ -104,6 +108,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         //Stay in place
         while(size<prefixSize)
         {
+
             pathNodes.add(pathNodes.get(size-1));
             size = pathNodes.size();
         }
@@ -149,8 +154,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         ALSSLRTAStarNode lastNode = null;//The unique node
         int numOfOccur;//The number of occurrences of the node in the open list (different times)
 
-        //if(agent.getId() == 106)
-       //     System.out.println();
+
         //While:
         //1. The open list is not empty
         //2. The number of expansions is smaller than the budget (while there is still remaining budget)
@@ -213,16 +217,17 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
                 //For each neighbor
                 for (Node neighbor : neighbors) {
-                    /*int [] o = {182,111};
-                    if(agent.getId() == 6 && PerformanceTracker.getInstance().getNumberOFIteration() == 50 && neighbor.equals(o)) {
+                   /* int [] o = {21,16};
+                    if(agent.getId() == 26 && neighbor.equals(new Node(o)) && currentTimeStamp +1 ==4) {
                         System.out.println();
                     }*/
+
                     neighborNode = new ALSSLRTAStarNode(neighbor, currentTimeStamp + 1);
 
                     //Only if the state is valid we will insert is to the open
                     if(isStateValid(neighborNode,solutions,currentNode)) {
-
-
+                        if(agent.getId() == 65 && currentTimeStamp == 3)
+                            System.out.println();
                         neighborGValue = getGValue(neighborNode);
                         costFromCurrentToNeighbor = this.costFunction.getCost(currentNode.getNode(), neighbor);
                         pathCostFromCurrentToNeighbor = currentGValue + costFromCurrentToNeighbor;
@@ -426,8 +431,8 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         Node prevNode = predecessor.getNode();
         for(Prefix sol : solutions)
         {
-            if(sol.getNodeAt(timeStamp).equals(actualNode)) {
-                if(sol.getNodeAt(timeStamp-1).equals(prevNode))
+            if(sol.getNodeAt(timeStamp).equals(prevNode)) {
+                if(sol.getNodeAt(timeStamp-1).equals(actualNode))
                     return false;
             }
         }
@@ -447,6 +452,8 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
         for(Prefix sol : solutions)
         {
+            /*if(agent.getId() == 26 && sol.getAgent().getId() == 79)
+                System.out.println();*/
             if(sol.getNodeAt(timeStamp).equals(actualNode))
                 return false;
         }
@@ -575,9 +582,9 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     {
 
         ALSSLRTAStarNode node = openList.poll();
-        int [] o = {182,111};
-        if(agent.getId() == 6 && PerformanceTracker.getInstance().getNumberOFIteration() == 50 && node.getNode().equals(new Node(o)))
-            System.out.println();
+       // int [] o = {182,111};
+        /*if(agent.getId() == 6 && PerformanceTracker.getInstance().getNumberOFIteration() == 50 && node.getNode().equals(new Node(o)))
+            System.out.println();*/
         this.inQueue.remove(node);
         return node;
     }

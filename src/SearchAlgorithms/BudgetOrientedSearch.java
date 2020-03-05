@@ -138,7 +138,6 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         Node currentLoc;
         int budget;
         Prefix solutionForAgent;
-        int [] test = {182,111};
         while(prioritizedAgents.size()>0)
         {
             currAgent = prioritizedAgents.poll();
@@ -146,9 +145,10 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
             budget = this.budgetsForAgents.get(currAgent);
             currentLocation.remove(currAgent);
+
             solutionForAgent = getPrefixForAgent(currAgent,currentLoc,budget,solution);
 
-     //       System.out.println(solutionForAgent);
+            System.out.println(solutionForAgent);
             solution.add(solutionForAgent);
             if(solutionForAgent == null) {
                 System.out.println("Failed");

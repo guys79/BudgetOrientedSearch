@@ -78,7 +78,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         int remainBudget = AStarProcedure(current,openList,budget,closed,prefixSize,solutions);
       // System.out.println("Remaining Budget "+remainBudget);
         //No solution
-        if(openList == null)
+        if(openList == null || openList.size() == 0)
         {
             System.out.println("Agent "+agent.getId()+" couldn't find a state to be on");
             return new Pair<>(null,remainBudget);
@@ -88,7 +88,15 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         //Get the best Node
         ALSSLRTAStarNode best = getBestState(openList,prefixSize);
       //  System.out.println("F - "+getFValue(best));
-        openList.add(best);
+        try {
+            openList.add(best);
+        }
+        catch (Exception e)
+        {
+            System.out.println(best);
+            System.out.println(openList);
+            throw e;
+        }
         //Update nodes
         dijkstraProcedure(openList,closed);
 
@@ -226,8 +234,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
                     //Only if the state is valid we will insert is to the open
                     if(isStateValid(neighborNode,solutions,currentNode)) {
-                        if(agent.getId() == 65 && currentTimeStamp == 3)
-                            System.out.println();
+
                         neighborGValue = getGValue(neighborNode);
                         costFromCurrentToNeighbor = this.costFunction.getCost(currentNode.getNode(), neighbor);
                         pathCostFromCurrentToNeighbor = currentGValue + costFromCurrentToNeighbor;
@@ -271,7 +278,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         //If the while stopped because the unique states in the open list and the close list ARE the same
         if(restSize == closed.size())
         {
-
+       //     System.out.println("rest Size");
             closed.remove(lastNode.getNode());
         }
 

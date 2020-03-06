@@ -109,7 +109,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         {
             //If there is still an agent that is not in its goal node
             if(!prefix.getNodeAt(prefix.getSize()-1).equals(prefix.getAgent().getGoal())) {
-                System.out.println("Agent "+prefix.getAgent().getId()+" didn't finish");
+               // System.out.println("Agent "+prefix.getAgent().getId()+" didn't finish");
                 return false;
             }
 
@@ -148,7 +148,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
             solutionForAgent = getPrefixForAgent(currAgent,currentLoc,budget,solution);
 
-            System.out.println(solutionForAgent);
+           // System.out.println(solutionForAgent);
             solution.add(solutionForAgent);
             if(solutionForAgent == null) {
                 System.out.println("Failed");

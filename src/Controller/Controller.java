@@ -20,13 +20,13 @@ public class Controller {
 
     public void init(int scenNum) {
 
-        //String mapName = "Berlin_1_256";
-        String mapName = "random-32-32-10";
+        String mapName = "lak303d";
+        //String mapName = "random-32-32-10";
         //String mapName = "empty-8-8";
         int scenario = scenNum;
         int type = 1;
         int prefixLength = 5;
-        int numOfAgents = 70;
+        int numOfAgents = 350;
         int budgetPerAgent = 150;
         int totalBudget = numOfAgents * budgetPerAgent;
 

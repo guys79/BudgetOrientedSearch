@@ -1,5 +1,6 @@
 package View;
 
+import Components.Agent;
 import Components.Prefix;
 import Controller.Controller;
 import javafx.beans.property.IntegerProperty;
@@ -14,6 +15,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,12 +35,13 @@ public class View {
     public TextField enter_x_textField;
     public TextField enter_y_textField;
     public TextField acenNumber;
+    public TextField mark_agent_id;
     public GraphicsContext context;
     public IntegerProperty time = new SimpleIntegerProperty();
     public int[][] grid;
     public HashMap<Integer, int[]> nodeLocations = new HashMap<>();
-    public HashMap<int[], Color> paths = new HashMap<>();
-
+    public HashMap<int[], Pair<Color, Agent>> paths = new HashMap<>();
+    private int markedAgent;
     private int scenNum;
     private int marked_x;
     private int marked_y;
@@ -62,6 +65,7 @@ public class View {
     public void initialize(int[][] grid){
         this.marked_x = -1;
         this.marked_y = -1;
+        this.markedAgent = -1;
 
         slider.setBlockIncrement(1);
         slider.valueProperty().addListener((ChangeListener) (arg0, arg1, arg2) -> {
@@ -91,6 +95,8 @@ public class View {
         }
 
     }
+
+
     public void setScenario()
     {
         boolean toSetScene;
@@ -186,11 +192,21 @@ public class View {
             }
         }
     }
-
+    public void markAgent()
+    {
+        try {
+            markedAgent = Integer.parseInt(this.mark_agent_id.getText());
+        }
+        catch (Exception e)
+        {
+            markedAgent = -1;
+        }
+        drawAgents();
+    }
     private void drawAgents(){
         if (grid == null) return;
         drawGrid();
-        for (HashMap.Entry<int[], Color> entry : paths.entrySet()){
+        for (HashMap.Entry<int[], Pair<Color,Agent>> entry : paths.entrySet()){
             int[] path = entry.getKey();
             int nodeID = getNode(path, time.getValue());
             //int initialId = getNode(path, 0);
@@ -198,8 +214,15 @@ public class View {
             int[] pos = idToLoc(nodeID);
             //int[] initialPos = idToLoc(initialId);
             int[] endPos = idToLoc(endId);
+            Agent agent;
             if(endId != nodeID) {
-                context.setFill(entry.getValue());
+                agent = entry.getValue().getValue();
+                context.setFill(entry.getValue().getKey());
+                if(markedAgent != -1 && markedAgent != agent.getId())
+                {
+                    context.setFill(Color.GRAY);
+
+                }
                 context.fillOval(pos[1] * cellWidth, pos[0] * cellHeight, cellWidth, cellHeight);
                 // context.fillOval(initialPos[1] * cellWidth, initialPos[0] * cellHeight, cellWidth, cellHeight);
 
@@ -221,8 +244,8 @@ public class View {
         else return path[t];
     }
 
-    public void addAgent(int[] path){
-        paths.put(path, colors[agentCount++ % colors.length]);
+    public void addAgent(int[] path,Agent agent){
+        paths.put(path, new Pair<>(colors[agentCount++ % colors.length],agent));
         if (path.length-1 > maxTime){
             maxTime = path.length-1;
             slider.setMax(maxTime);
@@ -237,7 +260,7 @@ public class View {
             loc = prefix.getNodeAt(i).getCoordinates();
             pathArr[i] = locToId(loc[0],loc[1]);
         }
-        addAgent(pathArr);
+        addAgent(pathArr,prefix.getAgent());
     }
     private int locToId(int x, int y)
     {

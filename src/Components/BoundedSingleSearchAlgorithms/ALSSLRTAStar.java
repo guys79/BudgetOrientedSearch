@@ -98,7 +98,8 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             throw e;
         }
         //Update nodes
-        dijkstraProcedure(openList,closed);
+        //The heuristic is perfect.. there is no need to update the heuristic
+        //dijkstraProcedure(openList,closed);
 
         List<Node> pathNodes = new ArrayList<>();
 

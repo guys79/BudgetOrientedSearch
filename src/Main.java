@@ -26,6 +26,8 @@ public class Main  extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
+
         FXMLLoader fxmlLoader = new FXMLLoader();
         //String path = System.getProperty("user.dir")+"\\src\\View\\view.fxml";
         String path = "View/view.fxml";

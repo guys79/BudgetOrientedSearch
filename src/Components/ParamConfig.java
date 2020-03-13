@@ -27,6 +27,7 @@ public class ParamConfig {
     private static ParamConfig instance;//The instance
     private final int numOfDimensions=2;//The number of dimensions;
     private final int numberOfAxisLegalToMoveInOneTurn = 2;//The number of axis that the agent can move simultaneously in a single move
+    private long tineLimitPerAgentInMs;
 
 
     /**
@@ -51,6 +52,8 @@ public class ParamConfig {
                 priorityPolicy = new EqualPriorityPolicy();
                 budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
+                double limitInSeconds = 3;
+                this.tineLimitPerAgentInMs = (long) (1000 * limitInSeconds);
                 break;
 
             default:
@@ -82,6 +85,14 @@ public class ParamConfig {
         if(instance == null)
             instance = new ParamConfig();
         return instance;
+    }
+
+    /**
+     * This function will return the time limit for search pre agent
+     * @return - The time limit for search pre agent
+     */
+    public long getTineLimitPerAgentInMs() {
+        return tineLimitPerAgentInMs;
     }
 
     /**

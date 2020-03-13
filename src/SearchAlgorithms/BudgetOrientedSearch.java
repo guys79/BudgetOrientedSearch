@@ -13,7 +13,7 @@ import java.util.*;
  * Our algorithm - BudgetOrientedSearch
  */
 public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
-    // TODO: 27/02/2020 AddBacktrack 
+
 
     private IHeuristic heuristicFunction;
     private IBudgetDistributionPolicy budgetDistributionPolicy;
@@ -25,6 +25,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private Set<Agent> agents;
     private int budgetPool;
     private int prefixSize;
+    private TimeLimiter timeLimiter;
 
     /**
      * The constructor of the class
@@ -41,7 +42,8 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     }
     @Override
     public Map<Agent, Prefix> getSolution() {
-
+        this.timeLimiter = new TimeLimiter(Problem.getInstance().getNumOfAgents()*ParamConfig.getInstance().getTineLimitPerAgentInMs());
+        timeLimiter.start();
         Map<Agent,Node> currentLocation = new HashMap<>();
         Map<Agent,Prefix> currentPaths = new HashMap<>();
         //Setting the start node as the current
@@ -97,7 +99,11 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             System.out.println("failed - couldn't find a path");
             return true;
         }
-
+        if(this.timeLimiter.isTimeEnded())
+        {
+            System.out.println("failed - couldn't finish on time");
+            return true;
+        }
         if(!SolutionChecker.getInstance().checkSolution(prefixes,iterationNumber))
         {
             System.out.println("failed - the solution is not valid");

@@ -6,6 +6,7 @@ import Components.BudgetDistributionPolicy.IBudgetDistributionPolicy;
 import Components.Heuristics.IHeuristic;
 import Components.PriorityPolicy.IPriorityPolicy;
 import javafx.util.Pair;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -24,6 +25,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private Map<Agent,Integer> budgetsForAgents;
     private Set<Agent> agents;
     private int budgetPool;
+    private boolean backtracking;
     private int prefixSize;
     private TimeLimiter timeLimiter;
 
@@ -38,6 +40,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         this.totalBudget = Problem.getInstance().getTotalBudget();
         this.agents = Problem.getInstance().getAgents();
         this.searchAlgorithm = ParamConfig.getInstance().getSearchAlgorithm();
+        this.backtracking = ParamConfig.getInstance().getBacktrack();
         this.prefixSize = Problem.getInstance().getPrefix();
     }
     @Override
@@ -181,14 +184,47 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         // TODO: 26/02/2020 Insert Backtrack
         Prefix solution = null;
 
-        Pair<Prefix,Integer> prefixAndRemainingBudgetPair = searchForPrefix(agent,current,budget,solutions);
+        Triplet<Prefix,Integer,Boolean> prefixAndRemainingBudgetPair = searchForPrefix(agent,current,budget,solutions);
 
-        int remainingBudget = prefixAndRemainingBudgetPair.getValue();
-        solution = prefixAndRemainingBudgetPair.getKey();
 
+        int remainingBudget = prefixAndRemainingBudgetPair.getSecond();
+        solution = prefixAndRemainingBudgetPair.getFirst();
+        boolean didTheAgentSucceeded = prefixAndRemainingBudgetPair.getThird();
+        if(!didTheAgentSucceeded && backtracking && budgetPool!=0)
+        {
+            preformBacktrack(agent, current,remainingBudget,solutions);
+        }
         this.budgetPool+=remainingBudget;
 
         return solution;
+    }
+
+    /**
+     * This function will preform backtracking
+     * @param agent - The problematic agent
+     * @param current - The current node of the agent
+     * @param budget - The remaining budget of the agent
+     * @param solutions - The previous solutions
+     */
+    private void preformBacktrack(Agent agent, Node current, int budget, Set<Prefix> solutions) {
+        Set<Agent> problematicAgents = findProblematicAgents();
+        Agent minPriorityAgent = findMinPriorityAgent(agent,solutions);
+
+        // TODO: 17/03/2020 Recalculate + update budget pool 
+    }
+
+    private Set<Agent> findProblematicAgents() {
+        throw new NotImplementedException();
+    }
+
+    /**
+     * This function will return the agent with the minimal priority out of the agents that
+     * @param agent
+     * @param solutions
+     * @return
+     */
+    private Agent findMinPriorityAgent(Agent agent, Set<Prefix> solutions) {
+      return null;
     }
 
     /**
@@ -199,7 +235,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
      * @param solutions - The previous solutions
      * @return - A prefix for the given agent
      */
-    private Pair<Prefix,Integer> searchForPrefix(Agent agent, Node current, int budget,Set<Prefix> solutions)
+    private Triplet<Prefix,Integer,Boolean> searchForPrefix(Agent agent, Node current, int budget,Set<Prefix> solutions)
     {
         return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize);
     }

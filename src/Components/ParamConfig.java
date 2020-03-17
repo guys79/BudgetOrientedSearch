@@ -27,7 +27,8 @@ public class ParamConfig {
     private static ParamConfig instance;//The instance
     private final int numOfDimensions=2;//The number of dimensions;
     private final int numberOfAxisLegalToMoveInOneTurn = 2;//The number of axis that the agent can move simultaneously in a single move
-    private long tineLimitPerAgentInMs;
+    private Long tineLimitPerAgentInMs;
+    private Boolean backtrack;
 
 
     /**
@@ -52,6 +53,7 @@ public class ParamConfig {
                 priorityPolicy = new EqualPriorityPolicy();
                 budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
+                this.backtrack = true;
                 double limitInSeconds = 3;
                 this.tineLimitPerAgentInMs = (long) (1000 * limitInSeconds);
                 break;
@@ -73,7 +75,7 @@ public class ParamConfig {
      */
     private boolean checkIfNull()
     {
-        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null;
+        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm ==null|| tineLimitPerAgentInMs == null || backtrack == null;
     }
 
     /**
@@ -142,6 +144,14 @@ public class ParamConfig {
      */
     public int getType() {
         return type;
+    }
+
+    /**
+     * This function will return True if the algorithm preforms backtracking
+     * @return - True IFF the algorithm preforms backtracking
+     */
+    public Boolean getBacktrack() {
+        return backtrack;
     }
 
     /**

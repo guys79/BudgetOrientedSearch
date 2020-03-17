@@ -39,7 +39,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     }
 
     @Override
-    public Pair<Prefix, Integer> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions,int prefixSize) {
+    public Triplet<Prefix,Integer,Boolean> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions,int prefixSize) {
 
         this.agent = agent;
         this.nodeToGValue = new HashMap<>();
@@ -67,7 +67,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                     sol.add(current);
                 }
                 Prefix solP = new Prefix(sol,agent);
-                return new Pair<>(solP,budget-1);
+                return new Triplet<>(solP,budget-1,true);
             }
         }
 
@@ -81,7 +81,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         if(openList == null || openList.size() == 0)
         {
             System.out.println("Agent "+agent.getId()+" couldn't find a state to be on");
-            return new Pair<>(null,remainBudget);
+            return new Triplet<>(null,remainBudget,false);
         }
 
 
@@ -114,16 +114,24 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         }
 
         int size = pathNodes.size();
+        Node nodeToAdd;
         //Stay in place
         while(size<prefixSize)
         {
-
-            pathNodes.add(pathNodes.get(size-1));
+            System.out.println("didn't find path? "+agent);
+            nodeToAdd = pathNodes.get(size-1);
+            if(isStateValid(nodeToAdd,size-1,solutions,nodeToAdd))
+                pathNodes.add(pathNodes.get(size-1));
+            else {
+                Triplet<Prefix,Integer,Boolean> sol = new Triplet<>(null,remainBudget,false);
+                isStateValid(nodeToAdd,size-1,solutions,nodeToAdd);
+                return sol;
+            }
             size = pathNodes.size();
         }
         Prefix prefix = new Prefix(pathNodes,agent);
-
-        Pair<Prefix,Integer> sol = new Pair<>(prefix,remainBudget);
+        // TODO: 16/03/2020 Probably need to check if it is always true 
+        Triplet<Prefix,Integer,Boolean> sol = new Triplet<>(prefix,remainBudget,true);
         return sol;
     }
 
@@ -199,9 +207,9 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
             //Add to the number of expansions +1
             expansions++;
-
+            currentTimeStamp = currentNode.getTimeStamp();
             //If the node is the goal node, stop the search
-            if(isGoal(currentNode.getNode())) {
+            if(isGoal(currentNode.getNode()) && currentTimeStamp == prefixSize-1) {
                 openList.add(currentNode);
                 return budget - expansions;
             }
@@ -216,8 +224,6 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
 
             //Expend node
-            currentTimeStamp = currentNode.getTimeStamp();
-
             //Will not develop further than the prefix size
             if(currentTimeStamp < prefixSize-1) {
 
@@ -226,12 +232,14 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
                 //For each neighbor
                 for (Node neighbor : neighbors) {
+
                    /* int [] o = {21,16};
                     if(agent.getId() == 26 && neighbor.equals(new Node(o)) && currentTimeStamp +1 ==4) {
                         System.out.println();
                     }*/
 
                     neighborNode = new ALSSLRTAStarNode(neighbor, currentTimeStamp + 1);
+
 
                     //Only if the state is valid we will insert is to the open
                     if(isStateValid(neighborNode,solutions,currentNode)) {
@@ -273,12 +281,14 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             }
 
         }
+
        /* int [] o = {182,111};
         if(agent.getId() == 6 && PerformanceTracker.getInstance().getNumberOFIteration() == 50 )
             System.out.println();*/
         //If the while stopped because the unique states in the open list and the close list ARE the same
         if(restSize == closed.size())
         {
+
        //     System.out.println("rest Size");
             closed.remove(lastNode.getNode());
         }
@@ -421,7 +431,18 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     {
         return checkForCollisions( node, solutions) && checkForSwipes( node, predecessor,solutions);
     }
-
+    /**
+     * This function will return if the state is valid
+     * @param node - The given state
+     * @param timeStamp - The time stamp
+     * @param solutions - The prev solutions
+     * @param predecessor - The predecessor
+     * @return - True IFF the state is valid
+     */
+    private boolean isStateValid(Node node,int timeStamp,Set<Prefix> solutions,Node predecessor)
+    {
+        return checkForCollisions( node,timeStamp, solutions) && checkForSwipes( node,timeStamp, predecessor,solutions);
+    }
     /**
      * This function will return if in this state the agent will not swipe with other agents
      * @param node - The given state
@@ -447,7 +468,30 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         return true;
 
     }
+    /**
+     * This function will return if in this state the agent will not swipe with other agents
+     * @param node - The given state
+     * @param timeStamp  - The time stamp
+     * @param solutions - The prev solutions
+     * @param predecessor - The predecessor
+     * @return - True IFF the agent will not swipe with other agents
+     */
+    private boolean checkForSwipes (Node node,int timeStamp,Node predecessor, Set<Prefix> solutions) {
 
+        if(timeStamp == 0)
+            return true;
+        Node actualNode = node;
+        Node prevNode = predecessor;
+        for(Prefix sol : solutions)
+        {
+            if(sol.getNodeAt(timeStamp).equals(prevNode)) {
+                if(sol.getNodeAt(timeStamp-1).equals(actualNode))
+                    return false;
+            }
+        }
+        return true;
+
+    }
     /**
      * This function will return if in this state the agent will not collide with other agents
      * @param node - The given state
@@ -457,6 +501,27 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     private boolean checkForCollisions(ALSSLRTAStarNode node, Set<Prefix> solutions) {
         int timeStamp = node.getTimeStamp();
         Node actualNode = node.getNode();
+
+        for(Prefix sol : solutions)
+        {
+            /*if(agent.getId() == 26 && sol.getAgent().getId() == 79)
+                System.out.println();*/
+            if(sol.getNodeAt(timeStamp).equals(actualNode))
+                return false;
+        }
+
+        return true;
+    }
+    /**
+     * This function will return if in this state the agent will not collide with other agents
+     * @param node - The given state
+     * @param timeStamp - The time stamp
+     * @param solutions - The prev solutions
+     * @return - True IFF the agent will not collide with other agents
+     */
+    private boolean checkForCollisions(Node node, int timeStamp, Set<Prefix> solutions) {
+       ;
+        Node actualNode = node;
 
         for(Prefix sol : solutions)
         {

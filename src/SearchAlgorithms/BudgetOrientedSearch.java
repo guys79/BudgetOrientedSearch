@@ -184,12 +184,12 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         // TODO: 26/02/2020 Insert Backtrack
         Prefix solution = null;
 
-        Triplet<Prefix,Integer,Boolean> prefixAndRemainingBudgetPair = searchForPrefix(agent,current,budget,solutions);
+        Triplet<Prefix,Integer,Set<Agent>> prefixAndRemainingBudgetPair = searchForPrefix(agent,current,budget,solutions);
 
 
         int remainingBudget = prefixAndRemainingBudgetPair.getSecond();
         solution = prefixAndRemainingBudgetPair.getFirst();
-        boolean didTheAgentSucceeded = prefixAndRemainingBudgetPair.getThird();
+        boolean didTheAgentSucceeded = prefixAndRemainingBudgetPair.getThird() == null;
         if(!didTheAgentSucceeded && backtracking && budgetPool!=0)
         {
             preformBacktrack(agent, current,remainingBudget,solutions);
@@ -213,15 +213,16 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         // TODO: 17/03/2020 Recalculate + update budget pool 
     }
 
+
     private Set<Agent> findProblematicAgents() {
         throw new NotImplementedException();
     }
 
     /**
      * This function will return the agent with the minimal priority out of the agents that
-     * @param agent
-     * @param solutions
-     * @return
+     * @param agent - The given agent
+     * @param solutions - The previous solution
+     * @return - The agent with the minimum priority
      */
     private Agent findMinPriorityAgent(Agent agent, Set<Prefix> solutions) {
       return null;
@@ -235,7 +236,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
      * @param solutions - The previous solutions
      * @return - A prefix for the given agent
      */
-    private Triplet<Prefix,Integer,Boolean> searchForPrefix(Agent agent, Node current, int budget,Set<Prefix> solutions)
+    private Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget,Set<Prefix> solutions)
     {
         return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize);
     }

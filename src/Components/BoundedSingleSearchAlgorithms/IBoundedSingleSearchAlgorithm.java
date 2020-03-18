@@ -11,7 +11,8 @@ import java.util.Set;
 
 /**
  * This interface represents a search algorithm for a single agent that considers past paths
+ * The set of conflicted agents
  */
 public interface IBoundedSingleSearchAlgorithm {
-    public Triplet<Prefix,Integer,Boolean> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions, int prefixSize);
+    public Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions, int prefixSize);
 }

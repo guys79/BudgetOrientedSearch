@@ -39,7 +39,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     }
 
     @Override
-    public Triplet<Prefix,Integer,Boolean> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions,int prefixSize) {
+    public Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions,int prefixSize) {
 
         this.agent = agent;
         this.nodeToGValue = new HashMap<>();
@@ -67,7 +67,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                     sol.add(current);
                 }
                 Prefix solP = new Prefix(sol,agent);
-                return new Triplet<>(solP,budget-1,true);
+                return new Triplet<>(solP,budget-1,null);
             }
         }
 
@@ -75,13 +75,16 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         Set<Node> closed = new HashSet<>();
 
         //The A* procedure
-        int remainBudget = AStarProcedure(current,openList,budget,closed,prefixSize,solutions);
+        Pair<Integer,Map<Node,Node>> aStarResult = AStarProcedure(current,openList,budget,closed,prefixSize,solutions);
+        int remainBudget = aStarResult.getKey();
+        Map<Node,Node> notValidLeafStatesAndPredecessors = aStarResult.getValue();
+
       // System.out.println("Remaining Budget "+remainBudget);
         //No solution
         if(openList == null || openList.size() == 0)
         {
             System.out.println("Agent "+agent.getId()+" couldn't find a state to be on");
-            return new Triplet<>(null,remainBudget,false);
+            return new Triplet<>(null,remainBudget,getConflictedAgentsOutOfStates(notValidLeafStatesAndPredecessors,solutions,prefixSize-1));
         }
 
 
@@ -123,17 +126,17 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             if(isStateValid(nodeToAdd,size-1,solutions,nodeToAdd))
                 pathNodes.add(pathNodes.get(size-1));
             else {
-                Triplet<Prefix,Integer,Boolean> sol = new Triplet<>(null,remainBudget,false);
-                isStateValid(nodeToAdd,size-1,solutions,nodeToAdd);
+                Triplet<Prefix,Integer,Set<Agent>> sol = new Triplet<>(null,remainBudget,getConflictedAgents(nodeToAdd,size-1,solutions,nodeToAdd));
                 return sol;
             }
             size = pathNodes.size();
         }
         Prefix prefix = new Prefix(pathNodes,agent);
         // TODO: 16/03/2020 Probably need to check if it is always true 
-        Triplet<Prefix,Integer,Boolean> sol = new Triplet<>(prefix,remainBudget,true);
+        Triplet<Prefix,Integer,Set<Agent>> sol = new Triplet<>(prefix,remainBudget,null);
         return sol;
     }
+
 
     /**
      * This function represents the A* procedure
@@ -145,7 +148,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param solutions - The prev solutions
      * @return - The remaining budget
      */
-    private int AStarProcedure(Node current,PriorityQueue<ALSSLRTAStarNode> openList,int budget,Set<Node> closed,int prefixSize,Set<Prefix> solutions)
+    private Pair<Integer,Map<Node,Node>> AStarProcedure(Node current,PriorityQueue<ALSSLRTAStarNode> openList,int budget,Set<Node> closed,int prefixSize,Set<Prefix> solutions)
     {
 
         //Set current node's gVal to 0 and add to open
@@ -170,7 +173,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         int restSize = 0;//The sze of unique states in the openList (and rest set)
         ALSSLRTAStarNode lastNode = null;//The unique node
         int numOfOccur;//The number of occurrences of the node in the open list (different times)
-
+        Map<Node,Node> notValidLeafStatesAndPredecessors = new HashMap<>();//All the states with timeStamp = prefixLength - 1 that are not valid (conflicted with other agents)
 
         //While:
         //1. The open list is not empty
@@ -211,7 +214,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             //If the node is the goal node, stop the search
             if(isGoal(currentNode.getNode()) && currentTimeStamp == prefixSize-1) {
                 openList.add(currentNode);
-                return budget - expansions;
+                return new Pair<>( budget - expansions,notValidLeafStatesAndPredecessors);
             }
 
             //Add to close list
@@ -269,6 +272,14 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                         }
 
                     }
+                    else
+                    {
+                        if(prefixSize - 2 == currentTimeStamp)
+                        {
+                            notValidLeafStatesAndPredecessors.put(neighbor,current);
+                        }
+                    }
+
 
                 }
 
@@ -299,10 +310,107 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             addToOpenList(node,openList);
         }
 
-        return budget - expansions;
+        return new Pair<>(budget - expansions,notValidLeafStatesAndPredecessors);
 
     }
 
+    /**
+     * This function will return the set of conflicted agents
+     * @param state - The given state
+     * @param timeStamp - The given time stamp
+     * @param solutions - The previous solutions
+     * @param predecessor - The predecessor of the state
+     * @return - A set of the conflicted agents
+     */
+    private Set<Agent> getConflictedAgents(Node state, int timeStamp,Set<Prefix>solutions,Node predecessor)
+    {
+            Set<Agent> conflictedAgents = new HashSet<>();
+            conflictedAgents.addAll(getConflictedFromCollisions(state,timeStamp,solutions));
+            conflictedAgents.addAll(getConflictedFromSwipes(state,timeStamp,predecessor,solutions));
+            return conflictedAgents;
+    }
+
+    private Set<Agent> getConflictedAgentsOutOfStates(Map<Node,Node> notValidLeafStatesAndPredecessors, Set<Prefix> solutions, int timeStamp)
+    {
+        Set<Node> states = new HashSet<>(notValidLeafStatesAndPredecessors.keySet());
+        Set<Agent> agents = new HashSet<>();
+        Node nodeInQuestion;
+        for(Prefix sol : solutions)
+        {
+            nodeInQuestion = sol.getNodeAt(timeStamp);
+            if(states.contains(nodeInQuestion))
+            {
+                agents.add(sol.getAgent());
+                states.remove(nodeInQuestion);
+            }
+
+        }
+
+        if(timeStamp == 0)
+            return agents;
+
+
+        for(Node node : states) {
+            Node prevNode = notValidLeafStatesAndPredecessors.get(node);
+            for (Prefix sol : solutions) {
+                if (sol.getNodeAt(timeStamp).equals(prevNode)) {
+                    if (sol.getNodeAt(timeStamp - 1).equals(node))
+                        agents.add(sol.getAgent());
+                }
+            }
+        }
+        return agents;
+
+
+
+
+    }
+    /**
+     * This function will return the set of conflicted agents. Reason - collision
+     * @param node - The given state
+     * @param timeStamp - The time stamp
+     * @param solutions - The prev solutions
+     * @return - A set of the conflicted agents
+     */
+    private Set<Agent> getConflictedFromCollisions(Node node, int timeStamp, Set<Prefix> solutions) {
+
+        Node actualNode = node;
+        Set<Agent> agents = new HashSet<>();
+        for(Prefix sol : solutions)
+        {
+            if(sol.getNodeAt(timeStamp).equals(actualNode))
+                agents.add(sol.getAgent());
+        }
+
+        return agents;
+    }
+
+    /**
+     * This function will return the set of conflicted agents. Reason - swipes
+     * @param node - The given state
+     * @param timeStamp  - The time stamp
+     * @param solutions - The prev solutions
+     * @param predecessor - The predecessor
+     * @return - A set of the conflicted agents
+     */
+    private Set<Agent> getConflictedFromSwipes (Node node,int timeStamp,Node predecessor, Set<Prefix> solutions) {
+
+        Set<Agent> agents = new HashSet<>();
+        if(timeStamp == 0)
+            return agents;
+
+        Node actualNode = node;
+        Node prevNode = predecessor;
+        for(Prefix sol : solutions)
+        {
+            if(sol.getNodeAt(timeStamp).equals(prevNode)) {
+                if(sol.getNodeAt(timeStamp-1).equals(actualNode))
+                    agents.add(sol.getAgent());
+            }
+        }
+        return agents;
+
+    }
     /**
      * This function will return the amount of unique states in the open list and in the rest set
      * @param openMap - The open map
@@ -525,8 +633,6 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
         for(Prefix sol : solutions)
         {
-            /*if(agent.getId() == 26 && sol.getAgent().getId() == 79)
-                System.out.println();*/
             if(sol.getNodeAt(timeStamp).equals(actualNode))
                 return false;
         }
@@ -860,3 +966,4 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         }
     }
 }
+

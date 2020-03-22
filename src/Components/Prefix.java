@@ -79,6 +79,8 @@ public class Prefix {
      */
     public void extendPrefix(Prefix prefix)
     {
+        if(prefix == null)
+            return;
         int size = prefix.getSize();
         //Not starting with 0 to not repeat
         for(int i=1;i<size;i++)

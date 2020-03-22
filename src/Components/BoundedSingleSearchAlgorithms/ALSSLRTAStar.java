@@ -132,7 +132,6 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             size = pathNodes.size();
         }
         Prefix prefix = new Prefix(pathNodes,agent);
-        // TODO: 16/03/2020 Probably need to check if it is always true 
         Triplet<Prefix,Integer,Set<Agent>> sol = new Triplet<>(prefix,remainBudget,null);
         return sol;
     }
@@ -614,8 +613,18 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         {
             /*if(agent.getId() == 26 && sol.getAgent().getId() == 79)
                 System.out.println();*/
-            if(sol.getNodeAt(timeStamp).equals(actualNode))
-                return false;
+            try {
+                if(sol.getNodeAt(timeStamp).equals(actualNode))
+                    return false;
+            }
+            catch (Exception e)
+                {
+                    // TODO: 22/03/2020 why null? 
+                e.printStackTrace();
+                System.out.println(agent);
+                throw e;
+            }
+
         }
 
         return true;

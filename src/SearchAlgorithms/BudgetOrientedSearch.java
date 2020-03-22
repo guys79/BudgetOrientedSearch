@@ -28,6 +28,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private boolean backtracking;
     private int prefixSize;
     private TimeLimiter timeLimiter;
+    private PriorityQueue <Agent> prioritizedAgents;
 
     /**
      * The constructor of the class
@@ -140,7 +141,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         this.prioritiesForAgents = this.priorityPolicy.getPriorityDistribution(agents,currentLocation);
         Set<Prefix> solution = new HashSet<>();
 
-        PriorityQueue <Agent> prioritizedAgents = new PriorityQueue<>(new PriorityCompareAgents(this.prioritiesForAgents));
+        prioritizedAgents = new PriorityQueue<>(new PriorityCompareAgents(this.prioritiesForAgents));
         prioritizedAgents.addAll(agents);
 
         Agent currAgent;
@@ -153,13 +154,24 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             currentLoc = currentLocation.get(currAgent);
 
             budget = this.budgetsForAgents.get(currAgent);
-            currentLocation.remove(currAgent);
+            if(budget == -1)//Use Budget pool
+            {
+                if(budgetPool == 0)
+                {
+                    //The agents that tries to do backtrack doesn't have budget
+                    System.out.println("The agents that tries to do backtrack doesn't have budget");
+                    return null;
+                }
+                budget = budgetPool;
+                budgetPool = 0;
+            }
+            //currentLocation.remove(currAgent);
 
             solutionForAgent = getPrefixForAgent(currAgent,currentLoc,budget,solution);
 
            // System.out.println(solutionForAgent);
             solution.add(solutionForAgent);
-            if(solutionForAgent == null) {
+            if(solutionForAgent == null && (!backtracking || budgetPool == 0)) {
                 System.out.println("Failed");
                 return solution;
             }
@@ -189,10 +201,11 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
         int remainingBudget = prefixAndRemainingBudgetPair.getSecond();
         solution = prefixAndRemainingBudgetPair.getFirst();
-        boolean didTheAgentSucceeded = prefixAndRemainingBudgetPair.getThird() == null;
+        Set<Agent> problematicAgents = prefixAndRemainingBudgetPair.getThird();
+        boolean didTheAgentSucceeded =  problematicAgents== null;
         if(!didTheAgentSucceeded && backtracking && budgetPool!=0)
         {
-            preformBacktrack(agent, current,remainingBudget,solutions);
+            preformBacktrack(agent,problematicAgents,solutions);
         }
         this.budgetPool+=remainingBudget;
 
@@ -202,30 +215,64 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     /**
      * This function will preform backtracking
      * @param agent - The problematic agent
-     * @param current - The current node of the agent
-     * @param budget - The remaining budget of the agent
-     * @param solutions - The previous solutions
+     * @param problematicAgents
+     * @param solutions
      */
-    private void preformBacktrack(Agent agent, Node current, int budget, Set<Prefix> solutions) {
-        Set<Agent> problematicAgents = findProblematicAgents();
-        Agent minPriorityAgent = findMinPriorityAgent(agent,solutions);
+    private void preformBacktrack(Agent agent, Set<Agent> problematicAgents, Set<Prefix> solutions) {
+        Agent minPriorityAgent = findMinPriorityAgent(problematicAgents);
 
-        // TODO: 17/03/2020 Recalculate + update budget pool 
+        double newPriorityForAgent, newPriorityForProblematicAgent;
+        if(this.prioritiesForAgents.size() == 0)
+        {
+            newPriorityForAgent = 1;
+            newPriorityForProblematicAgent = 0;
+
+        }
+        else
+        {
+            Agent nextAgent = this.prioritizedAgents.peek();
+            double nextAgentPriority = this.prioritiesForAgents.get(nextAgent);
+            newPriorityForAgent = nextAgentPriority + 1;
+            newPriorityForProblematicAgent = nextAgentPriority + 2;
+
+        }
+
+        this.prioritiesForAgents.put(agent,newPriorityForAgent);
+        this.prioritiesForAgents.put(minPriorityAgent,newPriorityForProblematicAgent);
+        this.prioritizedAgents.add(agent);
+        this.prioritizedAgents.add(minPriorityAgent);
+        this.budgetsForAgents.put(agent,-1);
+        this.budgetsForAgents.put(minPriorityAgent,-1);
+        System.out.println("The agent is "+agent);
+        System.out.println("The other agent is "+minPriorityAgent);
+
+
+
     }
 
 
-    private Set<Agent> findProblematicAgents() {
-        throw new NotImplementedException();
-    }
+
 
     /**
      * This function will return the agent with the minimal priority out of the agents that
-     * @param agent - The given agent
-     * @param solutions - The previous solution
+     * @param problematicAgents - The set of problematic agents
      * @return - The agent with the minimum priority
      */
-    private Agent findMinPriorityAgent(Agent agent, Set<Prefix> solutions) {
-      return null;
+    private Agent findMinPriorityAgent(Set<Agent> problematicAgents) {
+
+        double minPriority = Double.MAX_VALUE;
+        Agent minPriorityAgent = null;
+        double agentPriority;
+        for(Agent agent : problematicAgents)
+        {
+            agentPriority = this.prioritiesForAgents.get(agent);
+            if(agentPriority< minPriority)
+            {
+                minPriority = agentPriority;
+                minPriorityAgent = agent;
+            }
+        }
+        return minPriorityAgent;
     }
 
     /**

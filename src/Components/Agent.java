@@ -24,6 +24,14 @@ public class Agent {
         this.goal = goal;
 
     }
+    public Agent(Node start, Node goal,int id) {
+
+        this.id = id;
+
+        this.start = start;
+        this.goal = goal;
+
+    }
 
     public static void restNumOfAgents()
     {

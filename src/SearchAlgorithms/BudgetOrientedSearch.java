@@ -29,12 +29,14 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private int prefixSize;
     private TimeLimiter timeLimiter;
     private PriorityQueue <Agent> prioritizedAgents;
+    private Set<Agent> preformingBackTrack;
 
     /**
      * The constructor of the class
      */
     public BudgetOrientedSearch()
     {
+        this.preformingBackTrack = new HashSet<>();
         this.budgetDistributionPolicy = ParamConfig.getInstance().getBudgetDistributionPolicy();
         this.heuristicFunction = ParamConfig.getInstance().getHeuristic();
         this.priorityPolicy = ParamConfig.getInstance().getPriorityPolicy();
@@ -80,9 +82,14 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
                 //The agent that the prefix is for
                 agent = prefixForAgent.getAgent();
+
                 //Update the current locations
                 currentLocation.put(agent,prefixForAgent.getNodeAt(prefixForAgent.getSize()-1));
                 //Update the current paths
+                if(PerformanceTracker.getInstance().getNumberOFIteration()==200 && agent.getId() == 318)
+                {
+                    System.out.println();
+                }
                 currentPaths.get(agent).extendPrefix(prefixForAgent);
             }
 
@@ -99,6 +106,10 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
      */
     public boolean isFinished(Collection<Prefix> prefixes, int iterationNumber)
     {
+        if(PerformanceTracker.getInstance().getNumberOFIteration() == 200) {
+            System.out.println("HALAS");
+            return true;
+        }
         if(prefixes.contains(null)) {
             System.out.println("failed - couldn't find a path");
             return true;
@@ -119,7 +130,9 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         {
             //If there is still an agent that is not in its goal node
             if(!prefix.getNodeAt(prefix.getSize()-1).equals(prefix.getAgent().getGoal())) {
-               // System.out.println("Agent "+prefix.getAgent().getId()+" didn't finish");
+
+                System.out.println("Agent "+prefix.getAgent().getId()+" didn't finish");
+
                 return false;
             }
 
@@ -150,7 +163,17 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         Prefix solutionForAgent;
         while(prioritizedAgents.size()>0)
         {
-            currAgent = prioritizedAgents.poll();
+           if(PerformanceTracker.getInstance().getNumberOFIteration() == 200)
+            {
+                int [] s = {124,127};// TODO: 29/03/2020 Check the behavior of agent 318 
+                int [] e = {36,171};
+                Node stratn = new Node(s);
+                Node endn = new Node(e);
+                currAgent = new Agent(stratn,endn,318);
+            }
+            else {
+               currAgent = prioritizedAgents.poll();
+           }
             currentLoc = currentLocation.get(currAgent);
 
             budget = this.budgetsForAgents.get(currAgent);
@@ -170,11 +193,31 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             solutionForAgent = getPrefixForAgent(currAgent,currentLoc,budget,solution);
 
            // System.out.println(solutionForAgent);
-            solution.add(solutionForAgent);
             if(solutionForAgent == null && (!backtracking || budgetPool == 0)) {
                 System.out.println("Failed");
+                solution.add(null);
                 return solution;
             }
+            if(!(solutionForAgent == null && backtracking))
+            {
+                solution.add(solutionForAgent);
+            }
+            else
+            {
+                if(backtracking) {
+                    if(this.preformingBackTrack.contains(currAgent))
+                    {
+                        if(currAgent.getId() == 244)
+                            System.out.println();
+                        System.out.println(currAgent+" didn't find path");
+                    }
+                    //this.preformingBackTrack.remove(currAgent);
+
+                }
+            }
+
+
+
         }
 
 
@@ -193,7 +236,6 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
      */
     private Prefix getPrefixForAgent(Agent agent,Node current,int budget,Set<Prefix> solutions)
     {
-        // TODO: 26/02/2020 Insert Backtrack
         Prefix solution = null;
 
         Triplet<Prefix,Integer,Set<Agent>> prefixAndRemainingBudgetPair = searchForPrefix(agent,current,budget,solutions);
@@ -202,12 +244,26 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         int remainingBudget = prefixAndRemainingBudgetPair.getSecond();
         solution = prefixAndRemainingBudgetPair.getFirst();
         Set<Agent> problematicAgents = prefixAndRemainingBudgetPair.getThird();
+        this.budgetPool+=remainingBudget;
         boolean didTheAgentSucceeded =  problematicAgents== null;
+        if(agent.getId() == 318 && PerformanceTracker.getInstance().getNumberOFIteration()==200)
+        {
+            System.out.println();
+        }
+        if(!didTheAgentSucceeded) {
+            System.out.println("The conflicted agents of agent " + agent + " are:");
+            for (Agent agnt : problematicAgents) {
+                System.out.println(agnt);
+            }
+            System.out.println();
+
+        }
         if(!didTheAgentSucceeded && backtracking && budgetPool!=0)
         {
+
             preformBacktrack(agent,problematicAgents,solutions);
         }
-        this.budgetPool+=remainingBudget;
+
 
         return solution;
     }
@@ -232,8 +288,8 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         {
             Agent nextAgent = this.prioritizedAgents.peek();
             double nextAgentPriority = this.prioritiesForAgents.get(nextAgent);
-            newPriorityForAgent = nextAgentPriority + 1;
-            newPriorityForProblematicAgent = nextAgentPriority + 2;
+            newPriorityForAgent = nextAgentPriority + 2;
+            newPriorityForProblematicAgent = nextAgentPriority + 1;
 
         }
 
@@ -241,8 +297,23 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         this.prioritiesForAgents.put(minPriorityAgent,newPriorityForProblematicAgent);
         this.prioritizedAgents.add(agent);
         this.prioritizedAgents.add(minPriorityAgent);
+
+
         this.budgetsForAgents.put(agent,-1);
         this.budgetsForAgents.put(minPriorityAgent,-1);
+        Prefix toDelete = null;
+        for(Prefix sol : solutions)
+        {
+            if(sol.getAgent().equals(minPriorityAgent))
+            {
+                toDelete = sol;
+                break;
+            }
+        }
+        solutions.remove(toDelete);
+        this.preformingBackTrack.add(agent);
+        this.preformingBackTrack.add(minPriorityAgent);
+
         System.out.println("The agent is "+agent);
         System.out.println("The other agent is "+minPriorityAgent);
 
@@ -268,8 +339,10 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             agentPriority = this.prioritiesForAgents.get(agent);
             if(agentPriority< minPriority)
             {
-                minPriority = agentPriority;
-                minPriorityAgent = agent;
+                if(!this.preformingBackTrack.contains(agent)) {
+                    minPriority = agentPriority;
+                    minPriorityAgent = agent;
+                }
             }
         }
         return minPriorityAgent;

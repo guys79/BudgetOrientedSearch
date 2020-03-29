@@ -22,6 +22,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     private Map<ALSSLRTAStarNode,ALSSLRTAStarNode> predMap; // key - node, val - its predecessor
     private Set <ALSSLRTAStarNode> inQueue;//The nodes that are in the open list
     private ALSSLRTAStarNode currentBest;//The current best node
+    private Node currentState;
 
     /**
      * The constructor of the class
@@ -48,13 +49,13 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         this.predMap = new HashMap<>();
         this.inQueue = new HashSet<>();
         currentBest = null;
-
+        this.currentState = current;
 
         if(current.equals(goal))
         {
             boolean needToSearch = false;
             for (int i = 1; i < prefixSize; i++) {
-                if (!checkForCollisions(new ALSSLRTAStarNode(current, i), solutions)) {
+                if (checkForCollisions(new ALSSLRTAStarNode(current, i), solutions) != null) {
                     needToSearch = true;
                     break;
                 }
@@ -75,31 +76,27 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         Set<Node> closed = new HashSet<>();
 
         //The A* procedure
-        Pair<Integer,Map<Node,Node>> aStarResult = AStarProcedure(current,openList,budget,closed,prefixSize,solutions);
+        Pair<Integer,Set<Agent>> aStarResult = AStarProcedure(current,openList,budget,closed,prefixSize,solutions);
         int remainBudget = aStarResult.getKey();
-        Map<Node,Node> notValidLeafStatesAndPredecessors = aStarResult.getValue();
+        Set<Agent> problematicAgents = aStarResult.getValue();
 
-      // System.out.println("Remaining Budget "+remainBudget);
+
         //No solution
         if(openList == null || openList.size() == 0)
         {
             System.out.println("Agent "+agent.getId()+" couldn't find a state to be on");
-            return new Triplet<>(null,remainBudget,getConflictedAgentsOutOfStates(notValidLeafStatesAndPredecessors,solutions,prefixSize-1));
+            return new Triplet<>(null,remainBudget,problematicAgents);
         }
 
-
+        if(PerformanceTracker.getInstance().getNumberOFIteration()==200 && agent.getId() == 318)
+        {
+             System.out.println("best");
+        }
         //Get the best Node
         ALSSLRTAStarNode best = getBestState(openList,prefixSize);
-      //  System.out.println("F - "+getFValue(best));
-        try {
-            openList.add(best);
-        }
-        catch (Exception e)
-        {
-            System.out.println(best);
-            System.out.println(openList);
-            throw e;
-        }
+
+        openList.add(best);
+
         //Update nodes
         //The heuristic is perfect.. there is no need to update the heuristic
         //dijkstraProcedure(openList,closed);
@@ -119,14 +116,26 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         int size = pathNodes.size();
         Node nodeToAdd;
         //Stay in place
+
+
         while(size<prefixSize)
         {
-            System.out.println("didn't find path? "+agent);
+
             nodeToAdd = pathNodes.get(size-1);
             if(isStateValid(nodeToAdd,size-1,solutions,nodeToAdd))
                 pathNodes.add(pathNodes.get(size-1));
             else {
-                Triplet<Prefix,Integer,Set<Agent>> sol = new Triplet<>(null,remainBudget,getConflictedAgents(nodeToAdd,size-1,solutions,nodeToAdd));
+             /*   Set<Agent> conflicted = null;
+                if(pathNodes.size()==0)
+                {
+                    conflicted = getConflictedAgents(nodeToAdd,0,solutions,nodeToAdd);
+                }
+                else
+                {
+                    conflicted = getConflictedAgents(nodeToAdd,size-1,solutions,nodeToAdd);
+                }
+                problematicAgents.addAll(conflicted);*/
+                Triplet<Prefix,Integer,Set<Agent>> sol = new Triplet<>(null,remainBudget,problematicAgents);
                 return sol;
             }
             size = pathNodes.size();
@@ -144,10 +153,9 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param budget - The budget
      * @param closed - The close list
      * @param prefixSize - The prefix size
-     * @param solutions - The prev solutions
      * @return - The remaining budget
      */
-    private Pair<Integer,Map<Node,Node>> AStarProcedure(Node current,PriorityQueue<ALSSLRTAStarNode> openList,int budget,Set<Node> closed,int prefixSize,Set<Prefix> solutions)
+    private Pair<Integer,Set<Agent>> AStarProcedure(Node current,PriorityQueue<ALSSLRTAStarNode> openList,int budget,Set<Node> closed,int prefixSize,Set<Prefix> solutions)
     {
 
         //Set current node's gVal to 0 and add to open
@@ -157,7 +165,6 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         openListMap.put(current,1);//Update number of occurrences of node in open list
         setGValue(currentNode,0);//Set the G value of the node to be 0
         addToOpenList(currentNode,openList);//Add the current node to the open list
-
         int expansions = 0;//Number of expansions
         Set<Node> neighbors;//The neighbor set of the dequeued node
         double neighborGValue;//The G value of the neighbor of the dequeued node
@@ -173,7 +180,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         ALSSLRTAStarNode lastNode = null;//The unique node
         int numOfOccur;//The number of occurrences of the node in the open list (different times)
         Map<Node,Node> notValidLeafStatesAndPredecessors = new HashMap<>();//All the states with timeStamp = prefixLength - 1 that are not valid (conflicted with other agents)
-
+        Set<Agent> problematicAgent = new HashSet<>();
         //While:
         //1. The open list is not empty
         //2. The number of expansions is smaller than the budget (while there is still remaining budget)
@@ -181,21 +188,10 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         while(openList.size()>0 && expansions<budget && (restSize = getUniqueOpenSize(openListMap,rest)) !=closed.size())
         {
 
-           /* if(agent.getId() == 6 && PerformanceTracker.getInstance().getNumberOFIteration() == 50) {
-                System.out.println();
-                System.out.println(openListMap.get(current));
-                for (ALSSLRTAStarNode node : openList) {
-                    System.out.println(node + " F - " + getFValue(node) +" Pred -"+getPredecessor(node));
-                }
-                System.out.println();
-                System.out.println();
 
-            }*/
 
             currentNode = dequeueOpenList(openList);//Dequeue a node from the open list (Minimal F value)
-           /* if(agent.getId() == 6 && PerformanceTracker.getInstance().getNumberOFIteration() == 50) {
-                System.out.println("Current -" + currentNode);
-            }*/
+
             numOfOccur = openListMap.get(currentNode.getNode());//Get the number of occurrences of the node in the open list
 
             //Remove node from open list
@@ -213,7 +209,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             //If the node is the goal node, stop the search
             if(isGoal(currentNode.getNode()) && currentTimeStamp == prefixSize-1) {
                 openList.add(currentNode);
-                return new Pair<>( budget - expansions,notValidLeafStatesAndPredecessors);
+                return new Pair<>( budget - expansions,problematicAgent);
             }
 
             //Add to close list
@@ -235,16 +231,11 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                 //For each neighbor
                 for (Node neighbor : neighbors) {
 
-                   /* int [] o = {21,16};
-                    if(agent.getId() == 26 && neighbor.equals(new Node(o)) && currentTimeStamp +1 ==4) {
-                        System.out.println();
-                    }*/
-
                     neighborNode = new ALSSLRTAStarNode(neighbor, currentTimeStamp + 1);
 
-
+                    Set<Agent> problematicAgentForState = isStateValid(neighborNode,solutions,currentNode);
                     //Only if the state is valid we will insert is to the open
-                    if(isStateValid(neighborNode,solutions,currentNode)) {
+                    if(problematicAgentForState.size() == 0) {
 
                         neighborGValue = getGValue(neighborNode);
                         costFromCurrentToNeighbor = this.costFunction.getCost(currentNode.getNode(), neighbor);
@@ -273,10 +264,11 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                     }
                     else
                     {
-                        if(prefixSize - 2 == currentTimeStamp)
+                       /* if(prefixSize - 2 == currentTimeStamp)
                         {
                             notValidLeafStatesAndPredecessors.put(neighbor,current);
-                        }
+                        }*/
+                       problematicAgent.addAll(problematicAgentForState);
                     }
 
 
@@ -292,14 +284,11 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
         }
 
-       /* int [] o = {182,111};
-        if(agent.getId() == 6 && PerformanceTracker.getInstance().getNumberOFIteration() == 50 )
-            System.out.println();*/
+
         //If the while stopped because the unique states in the open list and the close list ARE the same
         if(restSize == closed.size())
         {
 
-       //     System.out.println("rest Size");
             closed.remove(lastNode.getNode());
         }
 
@@ -309,7 +298,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             addToOpenList(node,openList);
         }
 
-        return new Pair<>(budget - expansions,notValidLeafStatesAndPredecessors);
+        return new Pair<>(budget - expansions,problematicAgent);
 
     }
 
@@ -323,10 +312,17 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      */
     private Set<Agent> getConflictedAgents(Node state, int timeStamp,Set<Prefix>solutions,Node predecessor)
     {
-            Set<Agent> conflictedAgents = new HashSet<>();
-            conflictedAgents.addAll(getConflictedFromCollisions(state,timeStamp,solutions));
-            conflictedAgents.addAll(getConflictedFromSwipes(state,timeStamp,predecessor,solutions));
-            return conflictedAgents;
+        Set<Agent> conflictedAgents = new HashSet<>();
+        Set<Node> problomaticLocations = state.expend();
+        for(Node problematicState : problomaticLocations)
+        {
+            conflictedAgents.addAll(getConflictedFromCollisions(problematicState,timeStamp,solutions));
+            conflictedAgents.addAll(getConflictedFromSwipes(problematicState,timeStamp,predecessor,solutions));
+        }
+
+
+
+        return conflictedAgents;
     }
 
     private Set<Agent> getConflictedAgentsOutOfStates(Map<Node,Node> notValidLeafStatesAndPredecessors, Set<Prefix> solutions, int timeStamp)
@@ -435,11 +431,9 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     private ALSSLRTAStarNode getBestState(PriorityQueue<ALSSLRTAStarNode> openList, int prefixSize)
     {
         ALSSLRTAStarNode best;
-        PriorityQueue<ALSSLRTAStarNode> heap = new PriorityQueue<>(new AStartFValueUpdatedNodeComparator(prefixSize));
+        PriorityQueue<ALSSLRTAStarNode> heap = new PriorityQueue<>(new AStartFValueUpdatedNodeComparator(prefixSize,this));
         heap.addAll(openList);
-     //   for(ALSSLRTAStarNode s : heap)
-       //     if(s.getTimeStamp() == prefixSize -1)
-         //       System.out.println(s+" "+getFValue(s));
+
         best = heap.poll();
         if(best == null)
             best = currentBest;
@@ -466,10 +460,10 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         //The states that are not in the close list
         for (ALSSLRTAStarNode node : openList) {
             toOpen = node.getNode();
-           // openSet.add(toOpen);
+
             if(!closeList.contains(toOpen)) {
                 openNotInCloseSet.add(toOpen);
-  //              System.out.println(toOpen+" F - "+getFValue(node));
+
             }
         }
 
@@ -534,9 +528,26 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param predecessor - The predecessor
      * @return - True IFF the state is valid
      */
-    private boolean isStateValid(ALSSLRTAStarNode node,Set<Prefix> solutions,ALSSLRTAStarNode predecessor)
+    private Set<Agent> isStateValid(ALSSLRTAStarNode node,Set<Prefix> solutions,ALSSLRTAStarNode predecessor)
     {
-        return checkForCollisions( node, solutions) && checkForSwipes( node, predecessor,solutions);
+        Set<Agent> problematicAgent = new HashSet<>();
+        Agent agentToAdd = checkForCollisions( node, solutions);
+        if(agent.getId() == 244 && PerformanceTracker.getInstance().getNumberOFIteration() == 11)
+        {
+            System.out.println(agentToAdd);
+        }
+        if(agentToAdd!=null)
+            problematicAgent.add(agentToAdd);
+        agentToAdd = checkForSwipes( node, predecessor,solutions);
+        if(agentToAdd!=null)
+            problematicAgent.add(agentToAdd);
+        if(agent.getId() == 244 && PerformanceTracker.getInstance().getNumberOFIteration() == 11)
+        {
+            System.out.println(agentToAdd);
+            System.out.println(node);
+
+        }
+        return problematicAgent;
     }
     /**
      * This function will return if the state is valid
@@ -557,24 +568,29 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param predecessor - The predecessor
      * @return - True IFF the agent will not swipe with other agents
      */
-    private boolean checkForSwipes(ALSSLRTAStarNode node,ALSSLRTAStarNode predecessor, Set<Prefix> solutions) {
+    private Agent checkForSwipes(ALSSLRTAStarNode node,ALSSLRTAStarNode predecessor, Set<Prefix> solutions) {
 
 
         int timeStamp = node.getTimeStamp();
         if(timeStamp == 0)
-            return true;
+            return null;
         Node actualNode = node.getNode();
         Node prevNode = predecessor.getNode();
         for(Prefix sol : solutions)
         {
             if(sol.getNodeAt(timeStamp).equals(prevNode)) {
                 if(sol.getNodeAt(timeStamp-1).equals(actualNode))
-                    return false;
+                    return sol.getAgent();
             }
         }
-        return true;
+        return null;
 
     }
+
+    public Node getCurrentState() {
+        return currentState;
+    }
+
     /**
      * This function will return if in this state the agent will not swipe with other agents
      * @param node - The given state
@@ -605,29 +621,21 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      * @param solutions - The prev solutions
      * @return - True IFF the agent will not collide with other agents
      */
-    private boolean checkForCollisions(ALSSLRTAStarNode node, Set<Prefix> solutions) {
+    private Agent checkForCollisions(ALSSLRTAStarNode node, Set<Prefix> solutions) {
         int timeStamp = node.getTimeStamp();
         Node actualNode = node.getNode();
 
         for(Prefix sol : solutions)
         {
-            /*if(agent.getId() == 26 && sol.getAgent().getId() == 79)
-                System.out.println();*/
-            try {
-                if(sol.getNodeAt(timeStamp).equals(actualNode))
-                    return false;
+            if(sol.getNodeAt(timeStamp).equals(actualNode)) {
+
+                    return sol.getAgent();
             }
-            catch (Exception e)
-                {
-                    // TODO: 22/03/2020 why null? 
-                e.printStackTrace();
-                System.out.println(agent);
-                throw e;
-            }
+
 
         }
 
-        return true;
+        return null;
     }
     /**
      * This function will return if in this state the agent will not collide with other agents
@@ -746,9 +754,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      */
     private void addToOpenList(ALSSLRTAStarNode node,PriorityQueue<ALSSLRTAStarNode> openList)
     {
-     /*   int [] o = {181,110};
-        if(agent.getId() == 6 && PerformanceTracker.getInstance().getNumberOFIteration() == 50 && node.getNode().equals(new Node(o)))
-            System.out.println();*/
+
         if(!this.inQueue.contains(node))
         {
             this.inQueue.add(node);
@@ -770,9 +776,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     {
 
         ALSSLRTAStarNode node = openList.poll();
-       // int [] o = {182,111};
-        /*if(agent.getId() == 6 && PerformanceTracker.getInstance().getNumberOFIteration() == 50 && node.getNode().equals(new Node(o)))
-            System.out.println();*/
+
         this.inQueue.remove(node);
         return node;
     }
@@ -844,26 +848,58 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         @Override
         public int compare(ALSSLRTAStarNode node1, ALSSLRTAStarNode node2) {
 
+            if(PerformanceTracker.getInstance().getNumberOFIteration() == 200 && agent.getId() == 318) {
+                int maxDigitNum = 14;
+                long numberReducer = (long)Math.pow(10,maxDigitNum);
+                double f1 = ((long)(getFValue(node1)*numberReducer))/numberReducer;
+                double f2 = ((long)(getFValue(node2)*numberReducer))/numberReducer;
 
-            if(agent.getId() == 6 && PerformanceTracker.getInstance().getNumberOFIteration() == 50) {
-               /*int [] o1 = {183,112};
-                int [] o2 = {183,110};
-                if(node1.getNode().equals(new Node(o1)) &&node2.getNode().equals(new Node(o2)))
-                {
-                    System.out.println(node1+"F - "+getFValue(node1)+"G - "+getGValue(node1)+"H - "+getHValue(node1));
-                    System.out.println(node2+"F - "+getFValue(node2)+"G - "+getGValue(node2)+"H - "+getHValue(node2));
-                    System.out.println();
+                //double f2 = getFValue(node2);
+
+                if(f1<f2) {
+                    System.out.println(node1+" is less than "+node2 +" because "+node1 +" has less F val");
+                    System.out.println("F1 - "+getFValue(node1));
+                    System.out.println("F2 - "+getFValue(node2));
+                    return -1;
                 }
-                if(node2.getNode().equals(new Node(o1)) &&node1.getNode().equals(new Node(o2)))
-                {
-                    System.out.println(node1+"F - "+getFValue(node1)+"G - "+getGValue(node1)+"H - "+getHValue(node1));
-                    System.out.println(node2+"F - "+getFValue(node2)+"G - "+getGValue(node2)+"H - "+getHValue(node2));
-                    System.out.println();
+                if(f1>f2) {
+                    System.out.println(node1+" is more than "+node2 +" because "+node2 +" has less F val");
+                    System.out.println("F1 - "+getFValue(node1));
+                    System.out.println("F2 - "+getFValue(node2));
+                    return 1;
                 }
-                System.out.println();
-                System.out.println(node1+"F - "+getFValue(node1)+"G - "+getGValue(node1)+"H - "+getHValue(node1));
-                System.out.println(node2+"F - "+getFValue(node2)+"G - "+getGValue(node2)+"H - "+getHValue(node2));
-                System.out.println();*/
+
+                //The F value is equal
+
+                boolean isGoal1 = isGoal(node1.getNode());
+                boolean isGoal2 = isGoal(node2.getNode());
+                if(isGoal1 && ! isGoal2) {
+                    System.out.println(node1+" is less than "+node2 +" because "+node1 +" is the goal node");
+
+                    return -1;
+                }
+
+                if(!isGoal1 && isGoal2) {
+                    System.out.println(node1+" is more than "+node2 +" because "+node2 +" is the goal node");
+                    return 1;
+                }
+
+                boolean isSameAsBack1 = getPredecessor(node1).getNode().equals(node1.getNode());
+                boolean isSameAsBack2 = getPredecessor(node2).getNode().equals(node2.getNode());
+
+                if(!isSameAsBack1 && isSameAsBack2) {
+                    System.out.println(node1+" is less than "+node2 +" because "+node2 +" is the same as the predecessor");
+                    return -1;
+                }
+
+                if(isSameAsBack1 && !isSameAsBack2) {
+                    System.out.println(node1+" is more than "+node2 +" because "+node1 +" is the same as the predecessor");
+                    return 1;
+                }
+                int timeStamp1 = node1.getTimeStamp();
+                int timeStamp2 = node2.getTimeStamp();
+                System.out.println("Time stamp differences");
+                return timeStamp1 - timeStamp2;
 
             }
             int maxDigitNum = 14;
@@ -919,13 +955,78 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     public class AStartFValueUpdatedNodeComparator extends AStartFValueNodeComparator
     {
         private int prefixSize;
-        public AStartFValueUpdatedNodeComparator(int prefixSize)
+        private ALSSLRTAStar alsslrtaStar;
+        public AStartFValueUpdatedNodeComparator(int prefixSize,ALSSLRTAStar alsslrtaStar)
         {
             this.prefixSize = prefixSize;
+            this.alsslrtaStar = alsslrtaStar;
         }
         @Override
         public int compare(ALSSLRTAStarNode node1, ALSSLRTAStarNode node2) {
+            if(PerformanceTracker.getInstance().getNumberOFIteration() == 200 && agent.getId() == 318) {
 
+                int t1 = node1.getTimeStamp();
+                int t2 = node2.getTimeStamp();
+
+                if(t2<prefixSize - 1 && t1==prefixSize-1) {
+                    System.out.println(node1+" is less than "+node2 +" because "+node1 +" is a last action");
+                    return -1;
+
+                }
+                if(t1<prefixSize - 1 && t2==prefixSize-1) {
+                    System.out.println(node1+" is more than "+node2 +" because "+node2 +" is a last action");
+                    return 1;
+                }
+                boolean isUpdated1 = isNodeUpdated(node1.getNode());
+                boolean isUpdated2 = isNodeUpdated(node2.getNode());
+
+                if(!isUpdated1 && isUpdated2) {
+                    System.out.println(node1+" is less than "+node2 +" because "+node1 +" is not updated");
+                    return -1;
+                }
+
+                if(isUpdated1 && !isUpdated2) {
+                    System.out.println(node1+" is more than "+node2 +" because "+node2 +" is not updated");
+                    return 1;
+                }
+
+           /*     boolean isTheSameState1 = node1.getNode().equals(this.alsslrtaStar.currentState);
+                boolean isTheSameState2 = node2.getNode().equals(this.alsslrtaStar.currentState);
+
+                if(!isTheSameState1 && isTheSameState2)
+                {
+                    System.out.println(node1+" is less than "+node2 +" because "+node2 +" is the same state");
+                    return -1;
+                }
+
+                if(isTheSameState1 && !isTheSameState2)
+                {
+                    System.out.println(node1+" is more than "+node2 +" because "+node1 +" is the same state");
+                    return 1;
+                }*/
+                int superScore = super.compare(node1,node2);
+                if(superScore!=0)
+                {
+                    System.out.println(node1+" "+ node2+" superScore "+ superScore);
+                    return superScore;
+                }
+
+                double h1 = getHValue(node1);
+                double h2 = getHValue(node2);
+
+                if(h1<h2)
+                {
+                    System.out.println(node1+" is less than "+node2 +" because "+node1 +" has less H val");
+                    return -1;
+                }
+                if(h1>h2)
+                {
+                    System.out.println(node1+" is more than "+node2 +" because "+node2 +" has less H val");
+                    return 1;
+                }
+                System.out.println(node1+" "+node2+" are equal");
+                return 0;
+            }
             int t1 = node1.getTimeStamp();
             int t2 = node2.getTimeStamp();
 
@@ -941,7 +1042,20 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
             if(isUpdated1 && !isUpdated2)
                 return 1;
+           /* boolean isTheSameState1 = node1.getNode().equals(this.alsslrtaStar.currentState);
+            boolean isTheSameState2 = node2.getNode().equals(this.alsslrtaStar.currentState);
 
+            if(!isTheSameState1 && isTheSameState2)
+            {
+             //   System.out.println(node1+" is less than "+node2 +" because "+node2 +" is the same state");
+                return -1;
+            }
+
+            if(isTheSameState1 && !isTheSameState2)
+            {
+             //   System.out.println(node1+" is more than "+node2 +" because "+node1 +" is the same state");
+                return 1;
+            }*/
             int superScore = super.compare(node1,node2);
             if(superScore!=0)
                 return superScore;

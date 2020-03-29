@@ -141,7 +141,7 @@ public class SolutionChecker {
                     {
                         if(prefix2!=prefix && prefix2.getNodeAt(i).equals(prefix.getNodeAt(i)))
                         {
-                            System.out.println("Agent "+prefix.getAgent().getId()+" and Agent "+prefix2.getAgent().getId()+" collided at "+prefix.getNodeAt(i));
+                            System.out.println("Agent "+prefix.getAgent().getId()+" and Agent "+prefix2.getAgent().getId()+" collided at "+prefix.getNodeAt(i)+" at "+i);
                             return false;
                         }
                     }

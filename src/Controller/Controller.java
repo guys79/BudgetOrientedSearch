@@ -27,7 +27,7 @@ public class Controller {
         int type = 1;
         int prefixLength = 5;
         int numOfAgents = 350;
-        int budgetPerAgent = 150;
+        int budgetPerAgent = 1000;
         int totalBudget = numOfAgents * budgetPerAgent;
 
         Agent.restNumOfAgents();

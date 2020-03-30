@@ -18,11 +18,16 @@ public class EqualPriorityPolicy implements IPriorityPolicy{
         for (Agent agent : agents)
         {
             if(current.get(agent).equals(agent.getGoal()))
-                distribution.put(agent,2.0);
-            else
                 distribution.put(agent,1.0);
+            else
+                distribution.put(agent,2.0);
 
         }
         return distribution;
+    }
+
+    @Override
+    public String toString() {
+        return "EqualPriorityPolicy";
     }
 }

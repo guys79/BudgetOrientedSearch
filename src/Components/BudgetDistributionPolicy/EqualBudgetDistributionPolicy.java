@@ -31,4 +31,8 @@ public class EqualBudgetDistributionPolicy implements IBudgetDistributionPolicy 
     }
 
 
+    @Override
+    public String toString() {
+        return "EqualBudgetDistributionPolicy";
+    }
 }

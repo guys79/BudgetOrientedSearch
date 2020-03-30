@@ -111,7 +111,7 @@ public class View {
             toSetScene = false;
         }
         if(toSetScene)
-            controller.init(this.scenNum);
+            controller.performSingleRun(this.scenNum);
     }
     public void draw(){
         timeText.setText("t = "+time.getValue());
@@ -220,8 +220,6 @@ public class View {
                 context.setFill(entry.getValue().getKey());
                 if(markedAgent != -1 && markedAgent != agent.getId())
                 {
-                    if(agent.getId() == 318)
-                        System.out.println("?????????");
                     context.setFill(Color.GRAY);
 
                 }
@@ -232,8 +230,7 @@ public class View {
             }
             else
             {
-                if(entry.getValue().getValue().getId() == 318)
-                    System.out.println("?????????");
+
                 context.setFill(Color.GRAY);
                 context.fillOval(pos[1] * cellWidth, pos[0] * cellHeight, cellWidth, cellHeight);
             }

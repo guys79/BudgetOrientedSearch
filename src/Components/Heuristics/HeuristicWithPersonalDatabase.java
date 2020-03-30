@@ -28,6 +28,12 @@ public class HeuristicWithPersonalDatabase  implements IHeuristic{
         this.preCompute = false;
     }
 
+    @Override
+    public String toString() {
+        return "HeuristicWithPersonalDatabase{" +
+                "heuristic=" + heuristic +
+                '}';
+    }
 
     @Override
     public double getHeuristic(Node node, Node dest) {

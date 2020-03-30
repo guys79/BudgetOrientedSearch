@@ -28,4 +28,9 @@ public class OctileGridFunction implements Components.CostFunction.ICostFunction
             return Math.sqrt(2);
         return Double.MAX_VALUE;
     }
+
+    @Override
+    public String toString() {
+        return "OctileGridFunction";
+    }
 }

@@ -88,10 +88,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             return new Triplet<>(null,remainBudget,problematicAgents);
         }
 
-        if(PerformanceTracker.getInstance().getNumberOFIteration()==200 && agent.getId() == 318)
-        {
-             System.out.println("best");
-        }
+
         //Get the best Node
         ALSSLRTAStarNode best = getBestState(openList,prefixSize);
 
@@ -264,10 +261,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                     }
                     else
                     {
-                       /* if(prefixSize - 2 == currentTimeStamp)
-                        {
-                            notValidLeafStatesAndPredecessors.put(neighbor,current);
-                        }*/
+
                        problematicAgent.addAll(problematicAgentForState);
                     }
 
@@ -508,7 +502,6 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                         hValThrpughCurrent = hVal + this.costFunction.getCost(current, neighbor);
                         if (hNeighbor > hValThrpughCurrent) {
                             setHValue(neighbor, hValThrpughCurrent);
-                           // System.out.println("hello");
                             toDelete.remove(neighbor);
                             openListOrderedByHVal.add(neighbor);
                         }
@@ -532,21 +525,12 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     {
         Set<Agent> problematicAgent = new HashSet<>();
         Agent agentToAdd = checkForCollisions( node, solutions);
-        if(agent.getId() == 244 && PerformanceTracker.getInstance().getNumberOFIteration() == 11)
-        {
-            System.out.println(agentToAdd);
-        }
+
         if(agentToAdd!=null)
             problematicAgent.add(agentToAdd);
         agentToAdd = checkForSwipes( node, predecessor,solutions);
         if(agentToAdd!=null)
             problematicAgent.add(agentToAdd);
-        if(agent.getId() == 244 && PerformanceTracker.getInstance().getNumberOFIteration() == 11)
-        {
-            System.out.println(agentToAdd);
-            System.out.println(node);
-
-        }
         return problematicAgent;
     }
     /**
@@ -848,60 +832,6 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         @Override
         public int compare(ALSSLRTAStarNode node1, ALSSLRTAStarNode node2) {
 
-            if(PerformanceTracker.getInstance().getNumberOFIteration() == 200 && agent.getId() == 318) {
-                int maxDigitNum = 14;
-                long numberReducer = (long)Math.pow(10,maxDigitNum);
-                double f1 = ((long)(getFValue(node1)*numberReducer))/numberReducer;
-                double f2 = ((long)(getFValue(node2)*numberReducer))/numberReducer;
-
-                //double f2 = getFValue(node2);
-
-                if(f1<f2) {
-                    System.out.println(node1+" is less than "+node2 +" because "+node1 +" has less F val");
-                    System.out.println("F1 - "+getFValue(node1));
-                    System.out.println("F2 - "+getFValue(node2));
-                    return -1;
-                }
-                if(f1>f2) {
-                    System.out.println(node1+" is more than "+node2 +" because "+node2 +" has less F val");
-                    System.out.println("F1 - "+getFValue(node1));
-                    System.out.println("F2 - "+getFValue(node2));
-                    return 1;
-                }
-
-                //The F value is equal
-
-                boolean isGoal1 = isGoal(node1.getNode());
-                boolean isGoal2 = isGoal(node2.getNode());
-                if(isGoal1 && ! isGoal2) {
-                    System.out.println(node1+" is less than "+node2 +" because "+node1 +" is the goal node");
-
-                    return -1;
-                }
-
-                if(!isGoal1 && isGoal2) {
-                    System.out.println(node1+" is more than "+node2 +" because "+node2 +" is the goal node");
-                    return 1;
-                }
-
-                boolean isSameAsBack1 = getPredecessor(node1).getNode().equals(node1.getNode());
-                boolean isSameAsBack2 = getPredecessor(node2).getNode().equals(node2.getNode());
-
-                if(!isSameAsBack1 && isSameAsBack2) {
-                    System.out.println(node1+" is less than "+node2 +" because "+node2 +" is the same as the predecessor");
-                    return -1;
-                }
-
-                if(isSameAsBack1 && !isSameAsBack2) {
-                    System.out.println(node1+" is more than "+node2 +" because "+node1 +" is the same as the predecessor");
-                    return 1;
-                }
-                int timeStamp1 = node1.getTimeStamp();
-                int timeStamp2 = node2.getTimeStamp();
-                System.out.println("Time stamp differences");
-                return timeStamp1 - timeStamp2;
-
-            }
             int maxDigitNum = 14;
             long numberReducer = (long)Math.pow(10,maxDigitNum);
             double f1 = ((long)(getFValue(node1)*numberReducer))/numberReducer;
@@ -963,70 +893,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         }
         @Override
         public int compare(ALSSLRTAStarNode node1, ALSSLRTAStarNode node2) {
-            if(PerformanceTracker.getInstance().getNumberOFIteration() == 200 && agent.getId() == 318) {
 
-                int t1 = node1.getTimeStamp();
-                int t2 = node2.getTimeStamp();
-
-                if(t2<prefixSize - 1 && t1==prefixSize-1) {
-                    System.out.println(node1+" is less than "+node2 +" because "+node1 +" is a last action");
-                    return -1;
-
-                }
-                if(t1<prefixSize - 1 && t2==prefixSize-1) {
-                    System.out.println(node1+" is more than "+node2 +" because "+node2 +" is a last action");
-                    return 1;
-                }
-                boolean isUpdated1 = isNodeUpdated(node1.getNode());
-                boolean isUpdated2 = isNodeUpdated(node2.getNode());
-
-                if(!isUpdated1 && isUpdated2) {
-                    System.out.println(node1+" is less than "+node2 +" because "+node1 +" is not updated");
-                    return -1;
-                }
-
-                if(isUpdated1 && !isUpdated2) {
-                    System.out.println(node1+" is more than "+node2 +" because "+node2 +" is not updated");
-                    return 1;
-                }
-
-           /*     boolean isTheSameState1 = node1.getNode().equals(this.alsslrtaStar.currentState);
-                boolean isTheSameState2 = node2.getNode().equals(this.alsslrtaStar.currentState);
-
-                if(!isTheSameState1 && isTheSameState2)
-                {
-                    System.out.println(node1+" is less than "+node2 +" because "+node2 +" is the same state");
-                    return -1;
-                }
-
-                if(isTheSameState1 && !isTheSameState2)
-                {
-                    System.out.println(node1+" is more than "+node2 +" because "+node1 +" is the same state");
-                    return 1;
-                }*/
-                int superScore = super.compare(node1,node2);
-                if(superScore!=0)
-                {
-                    System.out.println(node1+" "+ node2+" superScore "+ superScore);
-                    return superScore;
-                }
-
-                double h1 = getHValue(node1);
-                double h2 = getHValue(node2);
-
-                if(h1<h2)
-                {
-                    System.out.println(node1+" is less than "+node2 +" because "+node1 +" has less H val");
-                    return -1;
-                }
-                if(h1>h2)
-                {
-                    System.out.println(node1+" is more than "+node2 +" because "+node2 +" has less H val");
-                    return 1;
-                }
-                System.out.println(node1+" "+node2+" are equal");
-                return 0;
-            }
             int t1 = node1.getTimeStamp();
             int t2 = node2.getTimeStamp();
 
@@ -1042,20 +909,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
             if(isUpdated1 && !isUpdated2)
                 return 1;
-           /* boolean isTheSameState1 = node1.getNode().equals(this.alsslrtaStar.currentState);
-            boolean isTheSameState2 = node2.getNode().equals(this.alsslrtaStar.currentState);
 
-            if(!isTheSameState1 && isTheSameState2)
-            {
-             //   System.out.println(node1+" is less than "+node2 +" because "+node2 +" is the same state");
-                return -1;
-            }
-
-            if(isTheSameState1 && !isTheSameState2)
-            {
-             //   System.out.println(node1+" is more than "+node2 +" because "+node1 +" is the same state");
-                return 1;
-            }*/
             int superScore = super.compare(node1,node2);
             if(superScore!=0)
                 return superScore;
@@ -1087,6 +941,11 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                 return 1;
             return 0;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ALSSLRTAStar";
     }
 }
 

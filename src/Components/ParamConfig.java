@@ -53,7 +53,7 @@ public class ParamConfig {
                 priorityPolicy = new EqualPriorityPolicy();
                 budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = true;
+                this.backtrack = false;
                 double limitInSeconds = 3;
                 this.tineLimitPerAgentInMs = (long) (1000 * limitInSeconds);
                 break;
@@ -64,6 +64,8 @@ public class ParamConfig {
                 priorityPolicy = null;
                 budgetDistributionPolicy = null;
                 searchAlgorithm = null;
+                backtrack = null;
+                tineLimitPerAgentInMs = null;
         }
         if(checkIfNull())
             throw new UnsupportedOperationException("Some of the params are null in ParamConfig Class");
@@ -168,5 +170,21 @@ public class ParamConfig {
      */
     public IPriorityPolicy getPriorityPolicy() {
         return priorityPolicy;
+    }
+
+    @Override
+    public String toString() {
+        return "ParamConfig{" +
+                "type=" + type +
+                ", costFunction=" + costFunction +
+                ", heuristic=" + heuristic +
+                ", budgetDistributionPolicy=" + budgetDistributionPolicy +
+                ", priorityPolicy=" + priorityPolicy +
+                ", searchAlgorithm=" + searchAlgorithm +
+                ", numOfDimensions=" + numOfDimensions +
+                ", numberOfAxisLegalToMoveInOneTurn=" + numberOfAxisLegalToMoveInOneTurn +
+                ", tineLimitPerAgentInMs=" + tineLimitPerAgentInMs +
+                ", backtrack=" + backtrack +
+                '}';
     }
 }

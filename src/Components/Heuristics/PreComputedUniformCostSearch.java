@@ -15,6 +15,11 @@ public class PreComputedUniformCostSearch extends HeuristicWithPersonalDatabase
 
     private Map<Node, Double> costs;
 
+    @Override
+    public String toString() {
+        return super.toString()+" PreComputedUniformCostSearch";
+    }
+
     /**
      * This constructor
      *

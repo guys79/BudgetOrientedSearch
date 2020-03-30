@@ -11,16 +11,14 @@ public class PerformanceTracker {
     private long preCompute;
     private long overAllSearch;
     private int numOfPreComputedAgents;
+    private boolean complete;
 
     /**
      * The constructor of the class
      */
     private PerformanceTracker()
     {
-        this.numberOFIteration = 0;
-        this.numOfPreComputedAgents = 0;
-        this.preCompute = 0;
-        this.overAllSearch = 0;
+        reset();
     }
 
     /**
@@ -75,5 +73,22 @@ public class PerformanceTracker {
 
     public int getNumOfPreComputedAgents() {
         return numOfPreComputedAgents;
+    }
+
+    public void setComplete(boolean complete) {
+        this.complete = complete;
+    }
+
+    public boolean isComplete() {
+        return complete;
+    }
+
+    public void reset()
+    {
+        this.complete = false;
+        this.numberOFIteration = 0;
+        this.numOfPreComputedAgents = 0;
+        this.preCompute = 0;
+        this.overAllSearch = 0;
     }
 }

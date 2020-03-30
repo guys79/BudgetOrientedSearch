@@ -53,11 +53,21 @@ public class ParamConfig {
                 priorityPolicy = new EqualPriorityPolicy();
                 budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = false;
+                this.backtrack = true;
                 double limitInSeconds = 3;
                 this.tineLimitPerAgentInMs = (long) (1000 * limitInSeconds);
                 break;
-
+            case 2:
+                costFunction = new OctileGridFunction();
+                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
+                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
+                priorityPolicy = new EqualPriorityPolicy();
+                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
+                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
+                this.backtrack = false;
+                limitInSeconds = 3;
+                this.tineLimitPerAgentInMs = (long) (1000 * limitInSeconds);
+                break;
             default:
                 costFunction = null;
                 heuristic = null;
@@ -176,15 +186,15 @@ public class ParamConfig {
     public String toString() {
         return "ParamConfig{" +
                 "type=" + type +
-                ", costFunction=" + costFunction +
-                ", heuristic=" + heuristic +
-                ", budgetDistributionPolicy=" + budgetDistributionPolicy +
-                ", priorityPolicy=" + priorityPolicy +
-                ", searchAlgorithm=" + searchAlgorithm +
-                ", numOfDimensions=" + numOfDimensions +
-                ", numberOfAxisLegalToMoveInOneTurn=" + numberOfAxisLegalToMoveInOneTurn +
-                ", tineLimitPerAgentInMs=" + tineLimitPerAgentInMs +
-                ", backtrack=" + backtrack +
+                "\n costFunction=" + costFunction +
+                "\n heuristic=" + heuristic +
+                "\n budgetDistributionPolicy=" + budgetDistributionPolicy +
+                "\n priorityPolicy=" + priorityPolicy +
+                "\n searchAlgorithm=" + searchAlgorithm +
+                "\n numOfDimensions=" + numOfDimensions +
+                "\n numberOfAxisLegalToMoveInOneTurn=" + numberOfAxisLegalToMoveInOneTurn +
+                "\n tineLimitPerAgentInMs=" + tineLimitPerAgentInMs +
+                "\n backtrack=" + backtrack +
                 '}';
     }
 }

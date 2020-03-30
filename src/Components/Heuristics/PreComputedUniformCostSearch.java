@@ -17,7 +17,7 @@ public class PreComputedUniformCostSearch extends HeuristicWithPersonalDatabase
 
     @Override
     public String toString() {
-        return super.toString()+" PreComputedUniformCostSearch";
+        return "PreComputedUniformCostSearch";
     }
 
     /**

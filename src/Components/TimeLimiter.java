@@ -7,6 +7,11 @@ public class TimeLimiter {
     private long timeLimitInMs;//Time limit
     private boolean timeEnded;//Did the time limit reached its limit?
     private Timer timer;
+    private long start;
+    private long end;
+
+
+
     /**
      * The constructor
      * @param timeLimitInMs - The time limit in ms
@@ -29,9 +34,13 @@ public class TimeLimiter {
      */
     public void start()
     {
-       this.timer = new Timer();
-
-       timer.schedule(
+       start(this.timeLimitInMs);
+    }
+    private void start(long timeLimitInMs)
+    {
+        this.timer = new Timer();
+        start = System.currentTimeMillis();
+        timer.schedule(
                 new java.util.TimerTask() {
                     @Override
                     public void run() {
@@ -39,12 +48,35 @@ public class TimeLimiter {
                         System.out.println(String.format("The task has reached its time limit (%d)", timeLimitInMs));
                     }
                 },
-                this.timeLimitInMs
+                timeLimitInMs
         );
+       // System.out.println("started with "+timeLimitInMs);
     }
-
     public void stop()
     {
        this.timer.cancel();
+
+    }
+    public void addMS(long addition)
+    {
+       end = System.currentTimeMillis();
+       long timePassed = end - start;
+       long timeRemain = this.timeLimitInMs - timePassed;
+
+       long newTime = timeRemain+addition;
+
+       if(newTime<0)
+       {
+            timeEnded = true;
+            return;
+       }
+       if(timeRemain < 0)
+       {
+           newTime = addition;
+       }
+
+       start(newTime);
+
+
     }
 }

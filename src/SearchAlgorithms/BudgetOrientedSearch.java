@@ -67,6 +67,10 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         while (!isFinished(currentPaths.values(),iterationNumber))
         {
             iterationNumber++;
+            if(iterationNumber == 2)
+            {
+                this.timeLimiter.addMS(PerformanceTracker.getInstance().getPreCompute());
+            }
             PerformanceTracker.getInstance().addIteration();
 
             System.out.println("Start "+iterationNumber);
@@ -106,9 +110,10 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
         if(prefixes.contains(null)) {
             System.out.println("failed - couldn't find a path");
+            this.timeLimiter.stop();
             return true;
         }
-        if(this.timeLimiter.isTimeEnded())
+        if(this.timeLimiter.isTimeEnded() && PerformanceTracker.getInstance().getNumberOFIteration() !=1)
         {
             System.out.println("failed - couldn't finish on time");
             return true;
@@ -116,6 +121,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         if(!SolutionChecker.getInstance().checkSolution(prefixes,iterationNumber))
         {
             System.out.println("failed - the solution is not valid");
+            this.timeLimiter.stop();
             return true;
         }
 
@@ -131,7 +137,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             }
 
         }
-
+        this.timeLimiter.stop();
         PerformanceTracker.getInstance().setComplete(true);
         System.out.println("Success!");
         return true;

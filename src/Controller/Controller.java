@@ -23,21 +23,22 @@ public class Controller {
     {
         this.view = view;
         this.view.setController(this);
-        //performSingleRun(3,1,5,500,1000,"lak303d",false);
-        performTest();
+        // TODO: 05/04/2020 why did the agent didn't move
+        performSingleRun(3,1,5,400,1000,"den520d",false);
+       // performTest();
     }
 
-
+//46881
 
     private void performTest() {
         this.res = new ArrayList<>();
         int [] types = {1,2};
         int [] scenNumbers = {1,2,3,4,5,6,7};
         int [] prefixLengths = {5};
-        String [] mapNames = {"Berlin_1_256","brc202d","lak303d"};
+        String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
         int [] budgetPerAgent = {1000};
-        int [] numOfAgents = {500};
-        //int [] numOfAgents = {50,100,200,300,500};
+        //int [] numOfAgents = {500};
+        int [] numOfAgents = {50,100,200,300};
        /* int[] types = {1, 2};
         int[] scenNumbers = {1, 2};
         int[] prefixLengths = {5};
@@ -134,11 +135,20 @@ public class Controller {
         IMultiAgentSearchAlgorithm searchAlgorithm = new BudgetOrientedSearch();
 
 
-        //Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);  long before = System.currentTimeMillis();
-        long before = System.currentTimeMillis();
-        Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
-        long after = System.currentTimeMillis();
-        PerformanceTracker.getInstance().setOverAllSearch(after-before);
+
+        try {
+            //long before = System.currentTimeMillis();
+            //Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
+            Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
+            //long after = System.currentTimeMillis();
+            //PerformanceTracker.getInstance().setOverAllSearch(after-before);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Asdasda");
+            PerformanceTracker.getInstance().setOverAllSearch(Long.MAX_VALUE);
+            PerformanceTracker.getInstance().setComplete(false);
+        }
 
 
 

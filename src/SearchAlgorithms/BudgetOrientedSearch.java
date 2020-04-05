@@ -260,8 +260,10 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             return;
         }
         Agent minPriorityAgent = findMinPriorityAgent(problematicAgents);
+        System.out.println("The problematic agent is "+agent);
         if(minPriorityAgent == null)
         {
+
             System.out.println("There are no agents that are not backtracking");
             return;
         }

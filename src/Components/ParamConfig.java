@@ -43,7 +43,7 @@ public class ParamConfig {
      */
     public void configParamsWithType(int type) {
         this.type = type;
-
+        System.out.println("New config");
         switch (type)
         {
             case 1:

@@ -275,7 +275,7 @@ public class Problem {
         int [][] grid = new int[height][width];
 
         for(int i=0;i<height;i++){
-            for(int j=0;j<height;j++){
+            for(int j=0;j<width;j++){
                 if(this.validLocations.contains(i+","+j))
                     grid[i][j] = 1;
                 else

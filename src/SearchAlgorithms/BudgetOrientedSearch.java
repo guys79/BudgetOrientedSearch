@@ -26,8 +26,9 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private Set<Agent> agents;
     private int budgetPool;
     private boolean backtracking;
+    private int lookahead;
     private int prefixSize;
-    private TimeLimiter timeLimiter;
+   // private TimeLimiter timeLimiter;
     private PriorityQueue <Agent> prioritizedAgents;
     private Set<Agent> preformingBackTrack;
 
@@ -44,12 +45,13 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         this.agents = Problem.getInstance().getAgents();
         this.searchAlgorithm = ParamConfig.getInstance().getSearchAlgorithm();
         this.backtracking = ParamConfig.getInstance().getBacktrack();
+        this.lookahead = ParamConfig.getInstance().getLookahead();
         this.prefixSize = Problem.getInstance().getPrefix();
     }
     @Override
     public Map<Agent, Prefix> getSolution() {
-        this.timeLimiter = new TimeLimiter(Problem.getInstance().getNumOfAgents()*ParamConfig.getInstance().getTineLimitPerAgentInMs());
-        timeLimiter.start();
+       // this.timeLimiter = new TimeLimiter(Problem.getInstance().getNumOfAgents()*ParamConfig.getInstance().getTineLimitPerAgentInMs());
+       // timeLimiter.start();
         Map<Agent,Node> currentLocation = new HashMap<>();
         Map<Agent,Prefix> currentPaths = new HashMap<>();
         //Setting the start node as the current
@@ -67,10 +69,10 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         while (!isFinished(currentPaths.values(),iterationNumber))
         {
             iterationNumber++;
-            if(iterationNumber == 2)
-            {
-                this.timeLimiter.addMS(PerformanceTracker.getInstance().getPreCompute());
-            }
+           // if(iterationNumber == 2)
+        //    {
+         //       this.timeLimiter.addMS(PerformanceTracker.getInstance().getPreCompute());
+         //   }
             PerformanceTracker.getInstance().addIteration();
 
             System.out.println("Start "+iterationNumber);
@@ -110,18 +112,18 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
         if(prefixes.contains(null)) {
             System.out.println("failed - couldn't find a path");
-            this.timeLimiter.stop();
+          //  this.timeLimiter.stop();
             return true;
         }
-        if(this.timeLimiter.isTimeEnded() && PerformanceTracker.getInstance().getNumberOFIteration() !=1)
+        /*if(this.timeLimiter.isTimeEnded() && PerformanceTracker.getInstance().getNumberOFIteration() !=1)
         {
             System.out.println("failed - couldn't finish on time");
             return true;
-        }
+        }*/
         if(!SolutionChecker.getInstance().checkSolution(prefixes,iterationNumber))
         {
             System.out.println("failed - the solution is not valid");
-            this.timeLimiter.stop();
+           // this.timeLimiter.stop();
             return true;
         }
 
@@ -137,7 +139,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             }
 
         }
-        this.timeLimiter.stop();
+ //       this.timeLimiter.stop();
         PerformanceTracker.getInstance().setComplete(true);
         System.out.println("Success!");
         return true;
@@ -346,7 +348,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
      */
     private Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget,Set<Prefix> solutions)
     {
-        return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize);
+        return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize,lookahead);
     }
 
 

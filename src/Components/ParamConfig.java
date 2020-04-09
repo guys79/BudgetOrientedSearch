@@ -29,6 +29,7 @@ public class ParamConfig {
     private final int numberOfAxisLegalToMoveInOneTurn = 2;//The number of axis that the agent can move simultaneously in a single move
     private Long tineLimitPerAgentInMs;
     private Boolean backtrack;
+    private Integer lookahead;
 
 
     /**
@@ -48,6 +49,7 @@ public class ParamConfig {
         {
             case 1:
                 costFunction = new OctileGridFunction();
+                lookahead = 6;
                 //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
                 heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
                 priorityPolicy = new EqualPriorityPolicy();
@@ -64,6 +66,7 @@ public class ParamConfig {
                 priorityPolicy = new EqualPriorityPolicy();
                 budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
+                lookahead = 5;
                 this.backtrack = false;
                 limitInSeconds = 3;
                 this.tineLimitPerAgentInMs = (long) (1000 * limitInSeconds);
@@ -75,6 +78,7 @@ public class ParamConfig {
                 budgetDistributionPolicy = null;
                 searchAlgorithm = null;
                 backtrack = null;
+                lookahead = null;
                 tineLimitPerAgentInMs = null;
         }
         if(checkIfNull())
@@ -87,7 +91,7 @@ public class ParamConfig {
      */
     private boolean checkIfNull()
     {
-        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm ==null|| tineLimitPerAgentInMs == null || backtrack == null;
+        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm ==null|| tineLimitPerAgentInMs == null || backtrack == null || lookahead == null;
     }
 
     /**
@@ -107,6 +111,14 @@ public class ParamConfig {
      */
     public long getTineLimitPerAgentInMs() {
         return tineLimitPerAgentInMs;
+    }
+
+    /**
+     * This function will get the lookahed
+     * @return  lookahead
+     */
+    public Integer getLookahead() {
+        return lookahead;
     }
 
     /**

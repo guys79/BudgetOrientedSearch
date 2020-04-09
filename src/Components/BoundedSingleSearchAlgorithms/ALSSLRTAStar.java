@@ -23,6 +23,8 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     private Set <ALSSLRTAStarNode> inQueue;//The nodes that are in the open list
     private ALSSLRTAStarNode currentBest;//The current best node
     private Node currentState;
+    private int prefixSize;
+    private int lookahead;
 
     /**
      * The constructor of the class
@@ -40,13 +42,14 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     }
 
     @Override
-    public Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions,int prefixSize) {
+    public Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions,int prefixSize,int lookahead) {
 
         this.agent = agent;
         this.nodeToGValue = new HashMap<>();
         this.goal = this.agent.getGoal();
-
+        this.lookahead = lookahead;
         this.predMap = new HashMap<>();
+        this.prefixSize = prefixSize;
         this.inQueue = new HashSet<>();
         currentBest = null;
         this.currentState = current;
@@ -106,7 +109,8 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         //Assemble prefix
         while(nodeInPath != null)
         {
-            pathNodes.add(0,nodeInPath.getNode());
+            if(nodeInPath.getTimeStamp() <prefixSize)
+                pathNodes.add(0,nodeInPath.getNode());
             nodeInPath = getPredecessor(nodeInPath);
         }
 
@@ -169,36 +173,37 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         double pathCostFromCurrentToNeighbor;//The path cost from the current node through the dequeued node to the neighbor
         double currentGValue;//The G value of the dequeued node
         int currentTimeStamp;//The time stamp of the dequeued node
-        int sizePrev;//The size of the close set before adding the dequeued node
-        int sizeAfter;//The size of the close set after adding the dequeued node
+     //   int sizePrev;//The size of the close set before adding the dequeued node
+     //   int sizeAfter;//The size of the close set after adding the dequeued node
         ALSSLRTAStarNode neighborNode;//The neighbor of the dequeued node
         Set<ALSSLRTAStarNode> rest = new HashSet<>();//The nodes with timestamp of prefix - 1 that were dequeued from the open list and can still be candidates for the best state
-        int restSize = 0;//The sze of unique states in the openList (and rest set)
-        ALSSLRTAStarNode lastNode = null;//The unique node
-        int numOfOccur;//The number of occurrences of the node in the open list (different times)
-        Map<Node,Node> notValidLeafStatesAndPredecessors = new HashMap<>();//All the states with timeStamp = prefixLength - 1 that are not valid (conflicted with other agents)
+       // int restSize = 0;//The sze of unique states in the openList (and rest set)
+     //   ALSSLRTAStarNode lastNode = null;//The unique node
+       // int numOfOccur;//The number of occurrences of the node in the open list (different times)
+       // Map<Node,Node> notValidLeafStatesAndPredecessors = new HashMap<>();//All the states with timeStamp = prefixLength - 1 that are not valid (conflicted with other agents)
         Set<Agent> problematicAgent = new HashSet<>();
         //While:
         //1. The open list is not empty
         //2. The number of expansions is smaller than the budget (while there is still remaining budget)
         //3. While the unique states in the open list and the close list are not the same
-        while(openList.size()>0 && expansions<budget && (restSize = getUniqueOpenSize(openListMap,rest)) !=closed.size())
+        while(openList.size()>0 && expansions<budget)
+        //while(openList.size()>0 && expansions<budget && (restSize = getUniqueOpenSize(openListMap,rest)) !=closed.size())
         {
 
 
 
             currentNode = dequeueOpenList(openList);//Dequeue a node from the open list (Minimal F value)
 
-            numOfOccur = openListMap.get(currentNode.getNode());//Get the number of occurrences of the node in the open list
+        //    numOfOccur = openListMap.get(currentNode.getNode());//Get the number of occurrences of the node in the open list
 
             //Remove node from open list
-            if(numOfOccur == 1)
-                openListMap.remove(currentNode.getNode());
-            else
-            {
-                numOfOccur--;
-                openListMap.put(currentNode.getNode(),numOfOccur);
-            }
+       //     if(numOfOccur == 1)
+        //        openListMap.remove(currentNode.getNode());
+          //  else
+           // {
+            //    numOfOccur--;
+             //   openListMap.put(currentNode.getNode(),numOfOccur);
+           // }
 
             //Add to the number of expansions +1
             expansions++;
@@ -210,21 +215,24 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             }
 
             //Add to close list
-            sizePrev = closed.size();
+        //    sizePrev = closed.size();
             closed.add(currentNode.getNode());
-            sizeAfter = closed.size();
+      //      sizeAfter = closed.size();
 
-            if(sizeAfter>sizePrev)//If the size of the close list has changed
-                lastNode = currentNode;
+  //          if(sizeAfter>sizePrev)//If the size of the close list has changed
+    //            lastNode = currentNode;
 
 
             //Expend node
             //Will not develop further than the prefix size
-            if(currentTimeStamp < prefixSize-1) {
+            if(currentTimeStamp < lookahead - 1) {
 
                 neighbors = currentNode.getNode().expend();//Expand nodes
                 currentGValue = getGValue(currentNode);//Get the g value of the current node
-
+                if(PerformanceTracker.getInstance().getNumberOFIteration() ==14 && agent.getId() == 268)
+                {
+                        System.out.println();
+                }
                 //For each neighbor
                 for (Node neighbor : neighbors) {
 
@@ -247,7 +255,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                             //Insert neighbor into open
                             addToOpenList(neighborNode, openList);
 
-                            if(!openListMap.containsKey(neighbor))
+      /*                      if(!openListMap.containsKey(neighbor))
                                 openListMap.put(neighbor,1);
                             else
                             {
@@ -255,7 +263,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                                 openListMap.put(neighbor,numOfOccur);
 
                             }
-
+*/
                         }
 
                     }
@@ -280,11 +288,11 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
 
         //If the while stopped because the unique states in the open list and the close list ARE the same
-        if(restSize == closed.size())
+       /* if(restSize == closed.size())
         {
 
             closed.remove(lastNode.getNode());
-        }
+        }*/
 
         //Add the rest nodes to the open list
         for(ALSSLRTAStarNode node : rest)
@@ -424,8 +432,9 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      */
     private ALSSLRTAStarNode getBestState(PriorityQueue<ALSSLRTAStarNode> openList, int prefixSize)
     {
+
         ALSSLRTAStarNode best;
-        PriorityQueue<ALSSLRTAStarNode> heap = new PriorityQueue<>(new AStartFValueUpdatedNodeComparator(prefixSize,this));
+        PriorityQueue<ALSSLRTAStarNode> heap = new PriorityQueue<>(new AStartFValueUpdatedNodeComparator(prefixSize));
         heap.addAll(openList);
 
         best = heap.poll();
@@ -433,6 +442,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             best = currentBest;
         else
             openList.remove(best);
+
         return best;
     }
 
@@ -523,6 +533,9 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
      */
     private Set<Agent> isStateValid(ALSSLRTAStarNode node,Set<Prefix> solutions,ALSSLRTAStarNode predecessor)
     {
+        int timeStamp = node.getTimeStamp();
+        if(timeStamp>=this.prefixSize && timeStamp <= lookahead)
+            return new HashSet<>();
         Set<Agent> problematicAgent = new HashSet<>();
         Agent agentToAdd = checkForCollisions( node, solutions);
 
@@ -885,11 +898,9 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     public class AStartFValueUpdatedNodeComparator extends AStartFValueNodeComparator
     {
         private int prefixSize;
-        private ALSSLRTAStar alsslrtaStar;
-        public AStartFValueUpdatedNodeComparator(int prefixSize,ALSSLRTAStar alsslrtaStar)
+        public AStartFValueUpdatedNodeComparator(int prefixSize)
         {
             this.prefixSize = prefixSize;
-            this.alsslrtaStar = alsslrtaStar;
         }
         @Override
         public int compare(ALSSLRTAStarNode node1, ALSSLRTAStarNode node2) {

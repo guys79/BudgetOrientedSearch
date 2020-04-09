@@ -24,7 +24,8 @@ public class Controller {
         this.view = view;
         this.view.setController(this);
         // TODO: 05/04/2020 why did the agent didn't move
-        performSingleRun(3,1,5,400,1000,"den520d",false);
+        performSingleRun(13,1,6,300,1000,"lak303d",false);
+
        // performTest();
     }
 

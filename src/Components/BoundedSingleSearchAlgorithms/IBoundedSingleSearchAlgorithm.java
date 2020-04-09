@@ -14,5 +14,5 @@ import java.util.Set;
  * The set of conflicted agents
  */
 public interface IBoundedSingleSearchAlgorithm {
-    public Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions, int prefixSize);
+    public Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions, int prefixSize, int lookahead);
 }

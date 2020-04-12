@@ -23,23 +23,27 @@ public class Controller {
     {
         this.view = view;
         this.view.setController(this);
-        // TODO: 05/04/2020 why did the agent didn't move
-        performSingleRun(13,1,6,300,1000,"lak303d",false);
+      //  String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n"};
+       // for(String map : mapNames)
+            performSingleRun(2,2,6,400,400,"lt_gallowstemplar_n",false,5);
 
-       // performTest();
+       //performTest();
     }
 
 //46881
 
     private void performTest() {
         this.res = new ArrayList<>();
-        int [] types = {1,2};
-        int [] scenNumbers = {1,2,3,4,5,6,7};
-        int [] prefixLengths = {5};
-        String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
-        int [] budgetPerAgent = {1000};
+        int [] types = {1,2,3};
+        int [] scenNumbers = {1,2,3};
+        int [] prefixLengths = {4,5,6};
+ //       String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
+        String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n","ost003d"};
+
+        int [] budgetPerAgent = {100,300,500};
+        int [] lookaheads = {4,5,6};
         //int [] numOfAgents = {500};
-        int [] numOfAgents = {50,100,200,300};
+        int [] numOfAgents = {100,300,400};
        /* int[] types = {1, 2};
         int[] scenNumbers = {1, 2};
         int[] prefixLengths = {5};
@@ -55,9 +59,13 @@ public class Controller {
                 for (int scenarioNum : scenNumbers) {
                     for (int numOfAgent : numOfAgents) {
                         for (int prefixLength : prefixLengths) {
-                            for (int budget : budgetPerAgent) {
-
-                                performSingleRun(scenarioNum, type, prefixLength, numOfAgent, budget, mapName, true);
+                            for (int lookahead : lookaheads) {
+                                if (lookahead >= prefixLength) {
+                                    for (int budget : budgetPerAgent) {
+                                        System.out.println(String.format("type - %d, mapName - %s, scenarioNum - %d, numOfAgent - %d, prefixLength - %d, lookahead - %d, budgetPerAgent - %d" ,type,mapName,scenarioNum,numOfAgent,prefixLength,lookahead,budget));
+                                        performSingleRun(scenarioNum, type, prefixLength, numOfAgent, budget, mapName, true, lookahead);
+                                    }
+                                }
                             }
                         }
                     }
@@ -113,11 +121,11 @@ public class Controller {
 
     }
 
-    public void performSingleRun(int scenNum)
+    public void performSingleRun(int scenNum,int lookahead)
     {
-        performSingleRun(scenNum,1,5,500,1000,"lak303d",false);
+        performSingleRun(scenNum,1,5,500,1000,"lak303d",false,lookahead);
     }
-    private void performSingleRun(int scenNum , int type, int prefixLength, int numOfAgents, int budgetPerAgent,String mapName,boolean save)
+    private void performSingleRun(int scenNum , int type, int prefixLength, int numOfAgents, int budgetPerAgent,String mapName,boolean save,int lookahead)
     {
 
         int scenario = scenNum;
@@ -126,7 +134,7 @@ public class Controller {
         Agent.restNumOfAgents();
         Node.restNumOfNodes();
 
-        Problem.getInstance().setNewProblem(mapName, scenario, type, prefixLength, totalBudget, numOfAgents);
+        Problem.getInstance().setNewProblem(mapName, scenario, type, prefixLength, totalBudget, numOfAgents,lookahead);
         PerformanceTracker.getInstance().reset();
 
         Set<Agent> agents = Problem.getInstance().getAgents();
@@ -138,7 +146,7 @@ public class Controller {
 
 
         try {
-            //long before = System.currentTimeMillis();
+           // long before = System.currentTimeMillis();
             //Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
             Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
             //long after = System.currentTimeMillis();
@@ -146,7 +154,6 @@ public class Controller {
         }
         catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Asdasda");
             PerformanceTracker.getInstance().setOverAllSearch(Long.MAX_VALUE);
             PerformanceTracker.getInstance().setComplete(false);
         }

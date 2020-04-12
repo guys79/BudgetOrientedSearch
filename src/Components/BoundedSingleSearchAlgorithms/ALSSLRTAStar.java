@@ -136,6 +136,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                     conflicted = getConflictedAgents(nodeToAdd,size-1,solutions,nodeToAdd);
                 }
                 problematicAgents.addAll(conflicted);*/
+
                 Triplet<Prefix,Integer,Set<Agent>> sol = new Triplet<>(null,remainBudget,problematicAgents);
                 return sol;
             }
@@ -215,27 +216,18 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             }
 
             //Add to close list
-        //    sizePrev = closed.size();
             closed.add(currentNode.getNode());
-      //      sizeAfter = closed.size();
-
-  //          if(sizeAfter>sizePrev)//If the size of the close list has changed
-    //            lastNode = currentNode;
 
 
             //Expend node
             //Will not develop further than the prefix size
-            if(currentTimeStamp < lookahead - 1) {
+            if(currentTimeStamp < lookahead - 1 || lookahead == -1) {
 
                 neighbors = currentNode.getNode().expend();//Expand nodes
                 currentGValue = getGValue(currentNode);//Get the g value of the current node
-                if(PerformanceTracker.getInstance().getNumberOFIteration() ==14 && agent.getId() == 268)
-                {
-                        System.out.println();
-                }
+
                 //For each neighbor
                 for (Node neighbor : neighbors) {
-
                     neighborNode = new ALSSLRTAStarNode(neighbor, currentTimeStamp + 1);
 
                     Set<Agent> problematicAgentForState = isStateValid(neighborNode,solutions,currentNode);
@@ -255,15 +247,6 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                             //Insert neighbor into open
                             addToOpenList(neighborNode, openList);
 
-      /*                      if(!openListMap.containsKey(neighbor))
-                                openListMap.put(neighbor,1);
-                            else
-                            {
-                                numOfOccur = openListMap.get(neighbor) + 1;
-                                openListMap.put(neighbor,numOfOccur);
-
-                            }
-*/
                         }
 
                     }
@@ -279,6 +262,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             }
             else
             {
+
                 //Add node to the rest set
                 rest.add(currentNode);
 
@@ -534,7 +518,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
     private Set<Agent> isStateValid(ALSSLRTAStarNode node,Set<Prefix> solutions,ALSSLRTAStarNode predecessor)
     {
         int timeStamp = node.getTimeStamp();
-        if(timeStamp>=this.prefixSize && timeStamp <= lookahead)
+        if(timeStamp>=this.prefixSize && (timeStamp <= lookahead || lookahead ==-1))
             return new HashSet<>();
         Set<Agent> problematicAgent = new HashSet<>();
         Agent agentToAdd = checkForCollisions( node, solutions);

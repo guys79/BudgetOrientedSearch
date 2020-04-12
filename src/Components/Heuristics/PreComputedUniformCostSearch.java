@@ -66,7 +66,6 @@ public class PreComputedUniformCostSearch extends HeuristicWithPersonalDatabase
         }
 
         //If we couldn't find the node
-        System.out.println(costs.size());
         return costs;
 
     }

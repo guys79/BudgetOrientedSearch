@@ -31,6 +31,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
    // private TimeLimiter timeLimiter;
     private PriorityQueue <Agent> prioritizedAgents;
     private Set<Agent> preformingBackTrack;
+    private boolean performDeepLookahead;
 
     /**
      * The constructor of the class
@@ -45,8 +46,9 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         this.agents = Problem.getInstance().getAgents();
         this.searchAlgorithm = ParamConfig.getInstance().getSearchAlgorithm();
         this.backtracking = ParamConfig.getInstance().getBacktrack();
-        this.lookahead = ParamConfig.getInstance().getLookahead();
+        this.lookahead = Problem.getInstance().getLookahead();
         this.prefixSize = Problem.getInstance().getPrefix();
+        this.performDeepLookahead = ParamConfig.getInstance().getPerformDeepLookahead();
     }
     @Override
     public Map<Agent, Prefix> getSolution() {
@@ -166,17 +168,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         Prefix solutionForAgent;
         while(prioritizedAgents.size()>0)
         {
-        /*   if(PerformanceTracker.getInstance().getNumberOFIteration() == 200)
-            {
-                int [] s = {124,127};// TODO: 29/03/2020 Check the behavior of agent 318 
-                int [] e = {36,171};
-                Node stratn = new Node(s);
-                Node endn = new Node(e);
-                currAgent = new Agent(stratn,endn,318);
-            }
-            else {
-               currAgent = prioritizedAgents.poll();
-           }*/
+
             currAgent = prioritizedAgents.poll();
             currentLoc = currentLocation.get(currAgent);
 
@@ -211,7 +203,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
 
         }
-
+        System.out.println("After use - "+budgetPool);
 
 
         return solution;
@@ -348,6 +340,8 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
      */
     private Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget,Set<Prefix> solutions)
     {
+        if(performDeepLookahead)
+            this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize,-1);
         return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize,lookahead);
     }
 

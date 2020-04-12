@@ -27,9 +27,8 @@ public class ParamConfig {
     private static ParamConfig instance;//The instance
     private final int numOfDimensions=2;//The number of dimensions;
     private final int numberOfAxisLegalToMoveInOneTurn = 2;//The number of axis that the agent can move simultaneously in a single move
-    private Long tineLimitPerAgentInMs;
     private Boolean backtrack;
-    private Integer lookahead;
+    private Boolean performDeepLookahead;
 
 
     /**
@@ -49,15 +48,13 @@ public class ParamConfig {
         {
             case 1:
                 costFunction = new OctileGridFunction();
-                lookahead = 6;
                 //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
                 heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
                 priorityPolicy = new EqualPriorityPolicy();
                 budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = true;
-                double limitInSeconds = 3;
-                this.tineLimitPerAgentInMs = (long) (1000 * limitInSeconds);
+                this.backtrack = false;
+                performDeepLookahead = true;
                 break;
             case 2:
                 costFunction = new OctileGridFunction();
@@ -66,10 +63,19 @@ public class ParamConfig {
                 priorityPolicy = new EqualPriorityPolicy();
                 budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                lookahead = 5;
+                this.backtrack = true;
+                performDeepLookahead = false;
+                break;
+
+            case 3:
+                costFunction = new OctileGridFunction();
+                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
+                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
+                priorityPolicy = new EqualPriorityPolicy();
+                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
+                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
                 this.backtrack = false;
-                limitInSeconds = 3;
-                this.tineLimitPerAgentInMs = (long) (1000 * limitInSeconds);
+                performDeepLookahead = false;
                 break;
             default:
                 costFunction = null;
@@ -78,8 +84,7 @@ public class ParamConfig {
                 budgetDistributionPolicy = null;
                 searchAlgorithm = null;
                 backtrack = null;
-                lookahead = null;
-                tineLimitPerAgentInMs = null;
+                performDeepLookahead =null;
         }
         if(checkIfNull())
             throw new UnsupportedOperationException("Some of the params are null in ParamConfig Class");
@@ -91,7 +96,7 @@ public class ParamConfig {
      */
     private boolean checkIfNull()
     {
-        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm ==null|| tineLimitPerAgentInMs == null || backtrack == null || lookahead == null;
+        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm ==null|| backtrack == null || performDeepLookahead == null;
     }
 
     /**
@@ -105,21 +110,7 @@ public class ParamConfig {
         return instance;
     }
 
-    /**
-     * This function will return the time limit for search pre agent
-     * @return - The time limit for search pre agent
-     */
-    public long getTineLimitPerAgentInMs() {
-        return tineLimitPerAgentInMs;
-    }
 
-    /**
-     * This function will get the lookahed
-     * @return  lookahead
-     */
-    public Integer getLookahead() {
-        return lookahead;
-    }
 
     /**
      * This function will return the bounded search algorithm
@@ -194,19 +185,22 @@ public class ParamConfig {
         return priorityPolicy;
     }
 
+    public Boolean getPerformDeepLookahead() {
+        return performDeepLookahead;
+    }
+
     @Override
     public String toString() {
         return "ParamConfig{" +
                 "type=" + type +
-                "\n costFunction=" + costFunction +
-                "\n heuristic=" + heuristic +
-                "\n budgetDistributionPolicy=" + budgetDistributionPolicy +
-                "\n priorityPolicy=" + priorityPolicy +
-                "\n searchAlgorithm=" + searchAlgorithm +
-                "\n numOfDimensions=" + numOfDimensions +
-                "\n numberOfAxisLegalToMoveInOneTurn=" + numberOfAxisLegalToMoveInOneTurn +
-                "\n tineLimitPerAgentInMs=" + tineLimitPerAgentInMs +
-                "\n backtrack=" + backtrack +
+                ", costFunction=" + costFunction +
+                ", heuristic=" + heuristic +
+                ", budgetDistributionPolicy=" + budgetDistributionPolicy +
+                ", priorityPolicy=" + priorityPolicy +
+                ", searchAlgorithm=" + searchAlgorithm +
+                ", numOfDimensions=" + numOfDimensions +
+                ", numberOfAxisLegalToMoveInOneTurn=" + numberOfAxisLegalToMoveInOneTurn +
+                ", backtrack=" + backtrack +
                 '}';
     }
 }

@@ -22,6 +22,7 @@ public class Problem {
     private static Problem instance;//The instance og Problem
     private HashSet<String> validLocations;//The valid locations in the map
     private int numOfAgents; // The number of agents
+    private  int lookahead;
 
 
     /**
@@ -51,13 +52,14 @@ public class Problem {
      * @param totalBudget - The total amount of budget of all of the agents in each iteration@param totalBudget
      * @param numOfAgents - The number of agents
      */
-    public void setNewProblem(String mapName, int scenario, int type,int prefix,int totalBudget,int numOfAgents)
+    public void setNewProblem(String mapName, int scenario, int type,int prefix,int totalBudget,int numOfAgents, int lookahead)
     {
         this.mapName = mapName;
         this.scenario = scenario;
         filePaths = System.getProperty("user.dir")+"\\Resources";
         this.numOfAgents = numOfAgents;
         this.type = type;
+        this.lookahead = lookahead;
         this.totalBudget = totalBudget;
         this.prefix = prefix;
         this.agents = new HashSet<>();
@@ -193,6 +195,10 @@ public class Problem {
      */
     public String getMapName() {
         return mapName;
+    }
+
+    public int getLookahead() {
+        return lookahead;
     }
 
     /**

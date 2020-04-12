@@ -2,6 +2,7 @@ package View;
 
 import Components.Agent;
 import Components.Prefix;
+import Components.Problem;
 import Controller.Controller;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -111,7 +112,7 @@ public class View {
             toSetScene = false;
         }
         if(toSetScene)
-            controller.performSingleRun(this.scenNum);
+            controller.performSingleRun(this.scenNum, Problem.getInstance().getLookahead());
     }
     public void draw(){
         timeText.setText("t = "+time.getValue());

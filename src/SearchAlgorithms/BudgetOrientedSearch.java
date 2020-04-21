@@ -32,6 +32,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private PriorityQueue <Agent> prioritizedAgents;
     private Set<Agent> preformingBackTrack;
     private boolean performDeepLookahead;
+    private Map<Agent, Integer> amountOfBacktracks;
 
     /**
      * The constructor of the class
@@ -49,6 +50,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         this.lookahead = Problem.getInstance().getLookahead();
         this.prefixSize = Problem.getInstance().getPrefix();
         this.performDeepLookahead = ParamConfig.getInstance().getPerformDeepLookahead();
+        this.amountOfBacktracks = new HashMap<>();
     }
     @Override
     public Map<Agent, Prefix> getSolution() {
@@ -117,11 +119,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
           //  this.timeLimiter.stop();
             return true;
         }
-        /*if(this.timeLimiter.isTimeEnded() && PerformanceTracker.getInstance().getNumberOFIteration() !=1)
-        {
-            System.out.println("failed - couldn't finish on time");
-            return true;
-        }*/
+
         if(!SolutionChecker.getInstance().checkSolution(prefixes,iterationNumber))
         {
             System.out.println("failed - the solution is not valid");
@@ -135,7 +133,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             //If there is still an agent that is not in its goal node
             if(!prefix.getNodeAt(prefix.getSize()-1).equals(prefix.getAgent().getGoal())) {
 
-               // System.out.println("Agent "+prefix.getAgent().getId()+" didn't finish");
+               // System.out.println("Agent "+prefix.getAgent().getId()+" didn't finish he is here - "+prefix.getNodeAt(prefix.getSize()-1)+" instead of here - "+prefix.getAgent().getGoal());
 
                 return false;
             }
@@ -155,8 +153,8 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private Set<Prefix> getPrefixForIteration(Map<Agent,Node> currentLocation)
     {
         this.budgetPool = 0;
-        this.budgetsForAgents = this.budgetDistributionPolicy.getBudgetDistribution(agents,totalBudget);
-        this.prioritiesForAgents = this.priorityPolicy.getPriorityDistribution(agents,currentLocation);
+        this.budgetsForAgents = this.budgetDistributionPolicy.getBudgetDistribution(agents,totalBudget,amountOfBacktracks);
+        this.prioritiesForAgents = this.priorityPolicy.getPriorityDistribution(agents,currentLocation,this.amountOfBacktracks);
         Set<Prefix> solution = new HashSet<>();
 
         prioritizedAgents = new PriorityQueue<>(new PriorityCompareAgents(this.prioritiesForAgents));
@@ -248,6 +246,12 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
      * @param solutions
      */
     private void preformBacktrack(Agent agent, Set<Agent> problematicAgents, Set<Prefix> solutions) {
+
+        if(this.amountOfBacktracks.containsKey(agent))
+            this.amountOfBacktracks.put(agent,this.amountOfBacktracks.get(agent)+1);
+        else
+            this.amountOfBacktracks.put(agent,1);
+
         if(problematicAgents.size() == 0)
         {
             System.out.println("There are no other agents");

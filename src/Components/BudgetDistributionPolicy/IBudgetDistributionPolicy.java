@@ -16,5 +16,5 @@ public interface IBudgetDistributionPolicy {
      * @param totalBudget - The total amount of budget for all of the agents
      * @return - A dictionary where the key is the agent and the value is the budget of the agent
      */
-    public Map<Agent,Integer> getBudgetDistribution(Set<Agent> agents, int totalBudget);
+    public Map<Agent,Integer> getBudgetDistribution(Set<Agent> agents, int totalBudget,Map<Agent,Integer> amountOfBacktracks);
 }

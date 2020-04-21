@@ -221,6 +221,7 @@ public class View {
                 context.setFill(entry.getValue().getKey());
                 if(markedAgent != -1 && markedAgent != agent.getId())
                 {
+
                     context.setFill(Color.GRAY);
 
                 }

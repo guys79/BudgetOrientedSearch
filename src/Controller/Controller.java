@@ -25,23 +25,24 @@ public class Controller {
         this.view.setController(this);
       //  String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n"};
        // for(String map : mapNames)
-            performSingleRun(2,2,6,400,400,"lt_gallowstemplar_n",false,5);
+           // performSingleRun(1,3,4,100,50,"lak303d",false,4);
 
-       //performTest();
+       performTest();
     }
 
-//46881
+
 
     private void performTest() {
         this.res = new ArrayList<>();
-        int [] types = {1,2,3};
+        int [] types = {3,4,5,6};
         int [] scenNumbers = {1,2,3};
         int [] prefixLengths = {4,5,6};
  //       String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
         String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n","ost003d"};
 
-        int [] budgetPerAgent = {100,300,500};
-        int [] lookaheads = {4,5,6};
+        int [] budgetPerAgent = {50,100,150};
+        //int [] lookaheads = {4,5,6};
+        int [] lookaheads = {6};
         //int [] numOfAgents = {500};
         int [] numOfAgents = {100,300,400};
        /* int[] types = {1, 2};
@@ -51,7 +52,7 @@ public class Controller {
         int[] numOfAgents = {10};
         String[] mapNames = {"Berlin_1_256", "brc202d"};*/
         //String result = String.format("%d,&s,%d,%d,&d,%d,%d,%d,%d,%f,%f" , type,mapName,scenNum,numOfAgents,prefixLength,budgetPerAgent,complete,searchTimeOnly,numOfIter,averageSearchTimeForAgents,averageSearchTimeForIteration);
-        String headline = "type,Map,Scenario number,Number of agents,Prefix length,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration";
+        String headline = "type,Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration";
         res.add(headline);
         String folderLocation = System.getProperty("user.dir") + "\\Resources\\Test";
         for (int type : types) {
@@ -63,7 +64,7 @@ public class Controller {
                                 if (lookahead >= prefixLength) {
                                     for (int budget : budgetPerAgent) {
                                         System.out.println(String.format("type - %d, mapName - %s, scenarioNum - %d, numOfAgent - %d, prefixLength - %d, lookahead - %d, budgetPerAgent - %d" ,type,mapName,scenarioNum,numOfAgent,prefixLength,lookahead,budget));
-                                        performSingleRun(scenarioNum, type, prefixLength, numOfAgent, budget, mapName, true, lookahead);
+                                        performSingleRun(scenarioNum, type, prefixLength, numOfAgent, budget, mapName, true, prefixLength);// TODO: 20/04/2020 change lookahed value
                                     }
                                 }
                             }
@@ -146,11 +147,11 @@ public class Controller {
 
 
         try {
-           // long before = System.currentTimeMillis();
-            //Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
-            Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
-            //long after = System.currentTimeMillis();
-            //PerformanceTracker.getInstance().setOverAllSearch(after-before);
+            long before = System.currentTimeMillis();
+            Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
+          //Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
+           long after = System.currentTimeMillis();
+           PerformanceTracker.getInstance().setOverAllSearch(after-before);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -166,13 +167,13 @@ public class Controller {
         System.out.println("Pre computing time " + preCompute + " ms ," + preCompute / 1000.0 + " s");
         System.out.println("Over all time " + overAllTime + " ms ," + overAllTime / 1000.0 + " s");
         System.out.println("Search Time time " + searchTimeOnly + " ms ," + searchTimeOnly / 1000.0 + " s");
-        System.out.println("Search Time time per agent " + ((searchTimeOnly*1.0/numOfAgents)) + " ms ," + searchTimeOnly / 1000.0 + " s");
+        System.out.println("Search Time time per agent " + ((searchTimeOnly*1.0/numOfAgents)) + " ms ," + ((searchTimeOnly*1.0/numOfAgents)) / 1000.0 + " s");
 
         if(save)
-            saveResults(scenNum,type,prefixLength,numOfAgents,budgetPerAgent,mapName);
+            saveResults(scenNum,type,prefixLength,numOfAgents,budgetPerAgent,mapName,lookahead);
     }
 
-    private void saveResults(int scenNum , int type, int prefixLength, int numOfAgents, int budgetPerAgent,String mapName)
+    private void saveResults(int scenNum , int type, int prefixLength, int numOfAgents, int budgetPerAgent,String mapName,int lookahead)
     {
         int complete = 0;
         if(PerformanceTracker.getInstance().isComplete())
@@ -183,7 +184,7 @@ public class Controller {
         double averageSearchTimeForIteration = (searchTimeOnly*1.0)/numOfIter;
         double averageSearchTimeForAgents = (searchTimeOnly*1.0)/numOfAgents;
 
-        String result = String.format("%d,%s,%d,%d,%d,%d,%d,%d,%d,%s,%s" , type,mapName,scenNum,numOfAgents,prefixLength,budgetPerAgent,complete,searchTimeOnly,numOfIter,averageSearchTimeForAgents,averageSearchTimeForIteration);
+        String result = String.format("%d,%s,%d,%d,%d,%d,%d,%d,%d,%d,%s,%s" , type,mapName,scenNum,numOfAgents,prefixLength,lookahead,budgetPerAgent,complete,searchTimeOnly,numOfIter,averageSearchTimeForAgents,averageSearchTimeForIteration);
         this.res.add(result);
 
     }

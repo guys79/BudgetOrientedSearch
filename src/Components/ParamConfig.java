@@ -2,6 +2,7 @@ package Components;
 
 import Components.BoundedSingleSearchAlgorithms.ALSSLRTAStar;
 import Components.BoundedSingleSearchAlgorithms.IBoundedSingleSearchAlgorithm;
+import Components.BudgetDistributionPolicy.BudgetBacktrackingFavorPolicy;
 import Components.BudgetDistributionPolicy.EqualBudgetDistributionPolicy;
 import Components.BudgetDistributionPolicy.IBudgetDistributionPolicy;
 import Components.CostFunction.ICostFunction;
@@ -12,6 +13,7 @@ import Components.Heuristics.PreComputedUniformCostSearch;
 import Components.Heuristics.PureOctileDistance;
 import Components.PriorityPolicy.EqualPriorityPolicy;
 import Components.PriorityPolicy.IPriorityPolicy;
+import Components.PriorityPolicy.PriorityBacktrackingFavorPolicy;
 
 /**
  * This class is responsible to configure the search algorithm with the params
@@ -77,6 +79,37 @@ public class ParamConfig {
                 this.backtrack = false;
                 performDeepLookahead = false;
                 break;
+            case 4:
+                costFunction = new OctileGridFunction();
+                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
+                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
+                priorityPolicy = new EqualPriorityPolicy();
+                budgetDistributionPolicy = new BudgetBacktrackingFavorPolicy();
+                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
+                this.backtrack = true;
+                performDeepLookahead = false;
+                break;
+            case 5:
+                costFunction = new OctileGridFunction();
+                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
+                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
+                priorityPolicy = new PriorityBacktrackingFavorPolicy();
+                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
+                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
+                this.backtrack = true;
+                performDeepLookahead = false;
+                break;
+            case 6:
+                costFunction = new OctileGridFunction();
+                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
+                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
+                priorityPolicy = new PriorityBacktrackingFavorPolicy();
+                budgetDistributionPolicy = new BudgetBacktrackingFavorPolicy();
+                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
+                this.backtrack = true;
+                performDeepLookahead = false;
+                break;
+
             default:
                 costFunction = null;
                 heuristic = null;

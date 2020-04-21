@@ -892,32 +892,47 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             int t1 = node1.getTimeStamp();
             int t2 = node2.getTimeStamp();
 
-            if(t2<prefixSize - 1 && t1==prefixSize-1)
+            if (t2 < prefixSize - 1 && t1 >= prefixSize - 1) {
+
                 return -1;
-           if(t1<prefixSize - 1 && t2==prefixSize-1)
-               return 1;
-           boolean isUpdated1 = isNodeUpdated(node1.getNode());
-           boolean isUpdated2 = isNodeUpdated(node2.getNode());
+            }
+            if (t1 < prefixSize - 1 && t2 >= prefixSize - 1) {
 
-           if(!isUpdated1 && isUpdated2)
-               return -1;
-
-            if(isUpdated1 && !isUpdated2)
                 return 1;
+            }
+            boolean isUpdated1 = isNodeUpdated(node1.getNode());
+            boolean isUpdated2 = isNodeUpdated(node2.getNode());
 
-            int superScore = super.compare(node1,node2);
-            if(superScore!=0)
+            if (!isUpdated1 && isUpdated2) {
+
+                return -1;
+            }
+            if (isUpdated1 && !isUpdated2) {
+
+                return 1;
+            }
+
+            int superScore = super.compare(node1, node2);
+            if (superScore != 0) {
+
                 return superScore;
+            }
 
             double h1 = getHValue(node1);
             double h2 = getHValue(node2);
 
-            if(h1<h2)
+            if (h1 < h2) {
+
                 return -1;
-            if(h1>h2)
+            }
+            if (h1 > h2) {
+
                 return 1;
+            }
+
             return 0;
         }
+
     }
 
     /**

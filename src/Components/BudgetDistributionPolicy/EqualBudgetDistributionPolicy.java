@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public class EqualBudgetDistributionPolicy implements IBudgetDistributionPolicy {
     @Override
-    public Map<Agent, Integer> getBudgetDistribution(Set<Agent> agents, int totalBudget) {
+    public Map<Agent, Integer> getBudgetDistribution(Set<Agent> agents, int totalBudget, Map<Agent, Integer> amountOfBacktracks) {
         Map<Agent, Integer> distribution = new HashMap<>();
         int numOfAgents = agents.size();
         int budgetPerAgent = totalBudget/numOfAgents;
@@ -35,4 +35,5 @@ public class EqualBudgetDistributionPolicy implements IBudgetDistributionPolicy 
     public String toString() {
         return "EqualBudgetDistributionPolicy";
     }
+
 }

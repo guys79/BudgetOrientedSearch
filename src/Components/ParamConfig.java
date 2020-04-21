@@ -99,6 +99,7 @@ public class ParamConfig {
                 this.backtrack = true;
                 performDeepLookahead = false;
                 break;
+
             case 6:
                 costFunction = new OctileGridFunction();
                 //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());

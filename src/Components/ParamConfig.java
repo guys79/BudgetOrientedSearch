@@ -14,6 +14,7 @@ import Components.Heuristics.PureOctileDistance;
 import Components.PriorityPolicy.EqualPriorityPolicy;
 import Components.PriorityPolicy.IPriorityPolicy;
 import Components.PriorityPolicy.PriorityBacktrackingFavorPolicy;
+import Components.PriorityPolicy.RandomPriority;
 
 /**
  * This class is responsible to configure the search algorithm with the params
@@ -31,6 +32,8 @@ public class ParamConfig {
     private final int numberOfAxisLegalToMoveInOneTurn = 2;//The number of axis that the agent can move simultaneously in a single move
     private Boolean backtrack;
     private Boolean performDeepLookahead;
+    private Boolean isSharedBudget;
+
 
 
     /**
@@ -57,59 +60,9 @@ public class ParamConfig {
                 searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
                 this.backtrack = false;
                 performDeepLookahead = true;
-                break;
-            case 2:
-                costFunction = new OctileGridFunction();
-                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
-                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new EqualPriorityPolicy();
-                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = true;
-                performDeepLookahead = false;
+                isSharedBudget = true;
                 break;
 
-            case 3:
-                costFunction = new OctileGridFunction();
-                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
-                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new EqualPriorityPolicy();
-                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = false;
-                performDeepLookahead = false;
-                break;
-            case 4:
-                costFunction = new OctileGridFunction();
-                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
-                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new EqualPriorityPolicy();
-                budgetDistributionPolicy = new BudgetBacktrackingFavorPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = true;
-                performDeepLookahead = false;
-                break;
-            case 5:
-                costFunction = new OctileGridFunction();
-                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
-                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new PriorityBacktrackingFavorPolicy();
-                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = true;
-                performDeepLookahead = false;
-                break;
-
-            case 6:
-                costFunction = new OctileGridFunction();
-                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
-                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new PriorityBacktrackingFavorPolicy();
-                budgetDistributionPolicy = new BudgetBacktrackingFavorPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = true;
-                performDeepLookahead = false;
-                break;
 
             default:
                 costFunction = null;
@@ -119,6 +72,7 @@ public class ParamConfig {
                 searchAlgorithm = null;
                 backtrack = null;
                 performDeepLookahead =null;
+                isSharedBudget = null;
         }
         if(checkIfNull())
             throw new UnsupportedOperationException("Some of the params are null in ParamConfig Class");
@@ -130,7 +84,7 @@ public class ParamConfig {
      */
     private boolean checkIfNull()
     {
-        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm ==null|| backtrack == null || performDeepLookahead == null;
+        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm ==null|| backtrack == null || performDeepLookahead == null || isSharedBudget == null;
     }
 
     /**
@@ -221,6 +175,10 @@ public class ParamConfig {
 
     public Boolean getPerformDeepLookahead() {
         return performDeepLookahead;
+    }
+
+    public Boolean getSharedBudget() {
+        return isSharedBudget;
     }
 
     @Override

@@ -32,6 +32,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private PriorityQueue <Agent> prioritizedAgents;
     private Set<Agent> preformingBackTrack;
     private boolean performDeepLookahead;
+    private boolean isSharedBudget;
     private Map<Agent, Integer> amountOfBacktracks;
 
     /**
@@ -51,13 +52,14 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         this.prefixSize = Problem.getInstance().getPrefix();
         this.performDeepLookahead = ParamConfig.getInstance().getPerformDeepLookahead();
         this.amountOfBacktracks = new HashMap<>();
+        this.isSharedBudget = ParamConfig.getInstance().getSharedBudget();
     }
     @Override
     public Map<Agent, Prefix> getSolution() {
-       // this.timeLimiter = new TimeLimiter(Problem.getInstance().getNumOfAgents()*ParamConfig.getInstance().getTineLimitPerAgentInMs());
-       // timeLimiter.start();
+
         Map<Agent,Node> currentLocation = new HashMap<>();
         Map<Agent,Prefix> currentPaths = new HashMap<>();
+
         //Setting the start node as the current
         for(Agent agent : agents)
         {
@@ -67,16 +69,12 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
         Set<Prefix> givenSolution;
         Agent agent;
-        ParamConfig ins = ParamConfig.getInstance();
         int iterationNumber = 0;
         //Until he search is finished (succeed or failed)
         while (!isFinished(currentPaths.values(),iterationNumber))
         {
             iterationNumber++;
-           // if(iterationNumber == 2)
-        //    {
-         //       this.timeLimiter.addMS(PerformanceTracker.getInstance().getPreCompute());
-         //   }
+
             PerformanceTracker.getInstance().addIteration();
 
             System.out.println("Start "+iterationNumber);
@@ -86,7 +84,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             currentLocation.clear();
             for(Prefix prefixForAgent : givenSolution)
             {
-                //System.out.println(prefixForAgent);
+
                 if(prefixForAgent == null)
                     break;
 
@@ -153,7 +151,11 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private Set<Prefix> getPrefixForIteration(Map<Agent,Node> currentLocation)
     {
         this.budgetPool = 0;
-        this.budgetsForAgents = this.budgetDistributionPolicy.getBudgetDistribution(agents,totalBudget,amountOfBacktracks);
+        if(!isSharedBudget)
+            this.budgetsForAgents = this.budgetDistributionPolicy.getBudgetDistribution(agents,totalBudget,amountOfBacktracks);
+        else
+            this.totalBudget = Problem.getInstance().getTotalBudget();
+
         this.prioritiesForAgents = this.priorityPolicy.getPriorityDistribution(agents,currentLocation,this.amountOfBacktracks);
         Set<Prefix> solution = new HashSet<>();
 
@@ -170,17 +172,31 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             currAgent = prioritizedAgents.poll();
             currentLoc = currentLocation.get(currAgent);
 
-            budget = this.budgetsForAgents.get(currAgent);
+            if(!isSharedBudget)
+                budget = this.budgetsForAgents.get(currAgent);
+            else
+                budget = totalBudget;
             if(budget == -1)//Use Budget pool
             {
-                if(budgetPool == 0)
-                {
-                    //The agents that tries to do backtrack doesn't have budget
-                    System.out.println("The agents that tries to do backtrack doesn't have budget");
-                    return null;
+                if(!isSharedBudget) {
+                    if (budgetPool == 0) {
+                        //The agents that tries to do backtrack doesn't have budget
+                        System.out.println("The agents that tries to do backtrack doesn't have budget");
+                        return null;
+                    }
+                    budget = budgetPool;
+                    budgetPool = 0;
                 }
-                budget = budgetPool;
-                budgetPool = 0;
+                else
+                {
+                    if (totalBudget == 0) {
+                        //The agents that tries to do backtrack doesn't have budget
+                        System.out.println("The agents that tries to do backtrack doesn't have budget");
+                        return null;
+                    }
+                    budget = totalBudget;
+                    totalBudget = 0;
+                }
             }
             //currentLocation.remove(currAgent);
 
@@ -201,7 +217,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
 
         }
-        System.out.println("After use - "+budgetPool);
+        //System.out.println("After use - "+budgetPool);
 
 
         return solution;
@@ -226,10 +242,16 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         int remainingBudget = prefixAndRemainingBudgetPair.getSecond();
         solution = prefixAndRemainingBudgetPair.getFirst();
         Set<Agent> problematicAgents = prefixAndRemainingBudgetPair.getThird();
-        this.budgetPool+=remainingBudget;
+        if(!isSharedBudget)
+            this.budgetPool+=remainingBudget;
+        else
+        {
+            this.totalBudget = remainingBudget;
+        }
+
         boolean didTheAgentSucceeded =  problematicAgents== null;
 
-        if(!didTheAgentSucceeded && backtracking && budgetPool!=0)
+        if(!didTheAgentSucceeded && backtracking && ((budgetPool!=0 && !isSharedBudget) || (isSharedBudget && totalBudget!=0)))
         {
 
             preformBacktrack(agent,problematicAgents,solutions);
@@ -345,7 +367,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget,Set<Prefix> solutions)
     {
         if(performDeepLookahead)
-            this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize,-1);
+            return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize,-1);
         return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize,lookahead);
     }
 

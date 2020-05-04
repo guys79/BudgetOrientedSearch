@@ -25,18 +25,21 @@ public class Controller {
         this.view.setController(this);
       //  String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n"};
        // for(String map : mapNames)
-           // performSingleRun(1,3,4,100,50,"lak303d",false,4);
+         //  this.res = new ArrayList<>();
+       // String headline = "type,Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration";
+        //res.add(headline);
+        performSingleRun(1,1,4,100,500,"lak303d",false,4);
 
-       performTest();
+       //performTest();
     }
 
 
 
     private void performTest() {
-        this.res = new ArrayList<>();
-        int [] types = {3,4,5,6};
+
+        int [] types = {2};
         int [] scenNumbers = {1,2,3};
-        int [] prefixLengths = {4,5,6};
+        int [] prefixLengths = {3,6,9};
  //       String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
         String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n","ost003d"};
 
@@ -52,6 +55,7 @@ public class Controller {
         int[] numOfAgents = {10};
         String[] mapNames = {"Berlin_1_256", "brc202d"};*/
         //String result = String.format("%d,&s,%d,%d,&d,%d,%d,%d,%d,%f,%f" , type,mapName,scenNum,numOfAgents,prefixLength,budgetPerAgent,complete,searchTimeOnly,numOfIter,averageSearchTimeForAgents,averageSearchTimeForIteration);
+        this.res = new ArrayList<>();
         String headline = "type,Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration";
         res.add(headline);
         String folderLocation = System.getProperty("user.dir") + "\\Resources\\Test";
@@ -73,7 +77,7 @@ public class Controller {
                 }
             }
         }
-
+       // performSingleRun(1,3,4,100,50,"lak303d",true,4);
         saveResults(folderLocation, types);
     }
 
@@ -147,11 +151,11 @@ public class Controller {
 
 
         try {
-            long before = System.currentTimeMillis();
-            Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
-          //Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
-           long after = System.currentTimeMillis();
-           PerformanceTracker.getInstance().setOverAllSearch(after-before);
+            //long before = System.currentTimeMillis();
+            //Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
+          Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
+          // long after = System.currentTimeMillis();
+           //PerformanceTracker.getInstance().setOverAllSearch(after-before);
         }
         catch (Exception e) {
             e.printStackTrace();

@@ -283,7 +283,6 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
         {
             addToOpenList(node,openList);
         }
-
         return new Pair<>(budget - expansions,problematicAgent);
 
     }

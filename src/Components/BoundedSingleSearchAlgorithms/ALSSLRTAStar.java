@@ -136,7 +136,8 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                     conflicted = getConflictedAgents(nodeToAdd,size-1,solutions,nodeToAdd);
                 }
                 problematicAgents.addAll(conflicted);*/
-
+                //System.out.println("here");
+              //  System.out.println(isStateValid(nodeToAdd,size-1,solutions,nodeToAdd));
                 Triplet<Prefix,Integer,Set<Agent>> sol = new Triplet<>(null,remainBudget,problematicAgents);
                 return sol;
             }
@@ -210,7 +211,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
             expansions++;
             currentTimeStamp = currentNode.getTimeStamp();
             //If the node is the goal node, stop the search
-            if(isGoal(currentNode.getNode()) && currentTimeStamp == prefixSize-1) {
+            if(isGoal(currentNode.getNode()) && currentTimeStamp >= prefixSize-1) {
                 openList.add(currentNode);
                 return new Pair<>( budget - expansions,problematicAgent);
             }
@@ -630,8 +631,12 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
         for(Prefix sol : solutions)
         {
-            if(sol.getNodeAt(timeStamp).equals(actualNode))
+            if(sol.getNodeAt(timeStamp).equals(actualNode)) {
+               /* System.out.println("collide with "+sol.getAgent());
+                System.out.println(sol);
+                System.out.println(actualNode);*/
                 return false;
+            }
         }
 
         return true;

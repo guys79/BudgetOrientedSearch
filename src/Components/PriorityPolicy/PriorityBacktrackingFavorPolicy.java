@@ -29,4 +29,9 @@ public class PriorityBacktrackingFavorPolicy implements IPriorityPolicy {
         }
         return distribution;
     }
+
+    @Override
+    public String toString() {
+        return "PriorityBacktrackingFavorPolicy";
+    }
 }

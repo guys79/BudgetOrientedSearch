@@ -21,4 +21,8 @@ public class RandomPriority implements IPriorityPolicy {
         }
         return distribution;
     }
+    @Override
+    public String toString() {
+        return "RandomPriority";
+    }
 }

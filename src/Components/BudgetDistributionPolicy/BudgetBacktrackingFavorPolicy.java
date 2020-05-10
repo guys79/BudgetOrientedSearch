@@ -55,4 +55,9 @@ public class BudgetBacktrackingFavorPolicy implements IBudgetDistributionPolicy{
         return budgetDistribution;
 
     }
+
+    @Override
+    public String toString() {
+        return "BudgetBacktrackingFavorPolicy";
+    }
 }

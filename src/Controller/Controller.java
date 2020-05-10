@@ -28,33 +28,25 @@ public class Controller {
          //  this.res = new ArrayList<>();
        // String headline = "type,Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration";
         //res.add(headline);
-        performSingleRun(1,1,4,100,500,"lak303d",false,4);
+         performSingleRun(1,1,4,100,500,"lak303d",false,4);
 
-       //performTest();
+      // performTest();
     }
 
 
 
     private void performTest() {
 
-        int [] types = {2};
+        int [] types = {1,2,3,4,5,6,7,8};
         int [] scenNumbers = {1,2,3};
         int [] prefixLengths = {3,6,9};
  //       String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
         String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n","ost003d"};
 
         int [] budgetPerAgent = {50,100,150};
-        //int [] lookaheads = {4,5,6};
-        int [] lookaheads = {6};
-        //int [] numOfAgents = {500};
+        int [] lookaheads = {3,6,9};
         int [] numOfAgents = {100,300,400};
-       /* int[] types = {1, 2};
-        int[] scenNumbers = {1, 2};
-        int[] prefixLengths = {5};
-        int[] budgetPerAgent = {1000};
-        int[] numOfAgents = {10};
-        String[] mapNames = {"Berlin_1_256", "brc202d"};*/
-        //String result = String.format("%d,&s,%d,%d,&d,%d,%d,%d,%d,%f,%f" , type,mapName,scenNum,numOfAgents,prefixLength,budgetPerAgent,complete,searchTimeOnly,numOfIter,averageSearchTimeForAgents,averageSearchTimeForIteration);
+
         this.res = new ArrayList<>();
         String headline = "type,Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration";
         res.add(headline);
@@ -65,10 +57,10 @@ public class Controller {
                     for (int numOfAgent : numOfAgents) {
                         for (int prefixLength : prefixLengths) {
                             for (int lookahead : lookaheads) {
-                                if (lookahead >= prefixLength) {
+                                if (lookahead == prefixLength) {
                                     for (int budget : budgetPerAgent) {
                                         System.out.println(String.format("type - %d, mapName - %s, scenarioNum - %d, numOfAgent - %d, prefixLength - %d, lookahead - %d, budgetPerAgent - %d" ,type,mapName,scenarioNum,numOfAgent,prefixLength,lookahead,budget));
-                                        performSingleRun(scenarioNum, type, prefixLength, numOfAgent, budget, mapName, true, prefixLength);// TODO: 20/04/2020 change lookahed value
+                                        performSingleRun(scenarioNum, type, prefixLength, numOfAgent, budget, mapName, true, lookahead);
                                     }
                                 }
                             }
@@ -151,11 +143,12 @@ public class Controller {
 
 
         try {
-            //long before = System.currentTimeMillis();
-            //Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
-          Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
-          // long after = System.currentTimeMillis();
-           //PerformanceTracker.getInstance().setOverAllSearch(after-before);
+
+            Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
+            /*long before = System.currentTimeMillis();
+            Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
+            long after = System.currentTimeMillis();
+            PerformanceTracker.getInstance().setOverAllSearch(after-before);*/
         }
         catch (Exception e) {
             e.printStackTrace();

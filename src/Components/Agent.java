@@ -10,6 +10,7 @@ public class Agent {
     private int id;//The id of the agent
     private Node start;//The start node
     private Node goal;//The goal node
+    private int numOfBadPoints;//The number of bad points
 
     /**
      * The constructor of the agent
@@ -22,6 +23,7 @@ public class Agent {
         numberOfExistingAgents++;
         this.start = start;
         this.goal = goal;
+        this.numOfBadPoints=0;
 
     }
     public Agent(Node start, Node goal,int id) {
@@ -31,6 +33,22 @@ public class Agent {
         this.start = start;
         this.goal = goal;
 
+    }
+
+    /**
+     * This function will add a bad point to the agent
+     */
+    public void addBadPoint()
+    {
+        this.numOfBadPoints++;
+    }
+
+    /**
+     * This function will return the number of bad points
+     * @return - The number of bad points
+     */
+    public int getNumOfBadPoints() {
+        return numOfBadPoints;
     }
 
     public static void restNumOfAgents()

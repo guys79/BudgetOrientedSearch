@@ -24,31 +24,49 @@ public class Controller {
         this.view = view;
         this.view.setController(this);
       //  String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n"};
-       // for(String map : mapNames)
-         //  this.res = new ArrayList<>();
-       // String headline = "type,Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration";
-        //res.add(headline);
-         performSingleRun(1,1,4,100,500,"lak303d",false,4);
 
-      // performTest();
+      /*  this.res = new ArrayList<>();
+        String headline = "type,Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration";
+        res.add(headline);
+        for(int type = 1; type<=8;type++) {
+
+           performSingleRun(1, type, 6, 200, 500, "lak303d", false, 6);
+       }*/
+       // performSingleRun(1, 1, 6, 200, 500, "lak303d", false, 6);
+       performTest();
     }
 
 
 
     private void performTest() {
-
+        /*
         int [] types = {1,2,3,4,5,6,7,8};
-        int [] scenNumbers = {1,2,3};
+        int [] scenNumbers = {1,2};
         int [] prefixLengths = {3,6,9};
  //       String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
-        String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n","ost003d"};
+        String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n"};
 
         int [] budgetPerAgent = {50,100,150};
         int [] lookaheads = {3,6,9};
-        int [] numOfAgents = {100,300,400};
+        int [] numOfAgents = {100,250,400};*/
+        int [] types = {1};
+        int [] scenNumbers = {1};
+        int [] prefixLengths = {6};
+        //       String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
+        String [] mapNames = {"lak303d"};
+
+        int [] budgetPerAgent = {50};
+        int [] lookaheads = {6};
+        int [] numOfAgents = {100};
 
         this.res = new ArrayList<>();
-        String headline = "type,Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration";
+        String headline = "";
+        Map<String,String> params = ParamConfig.getInstance().getParams();
+        for(String param : params.keySet())
+        {
+            headline+=param+",";
+        }
+        headline += "Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration";
         res.add(headline);
         String folderLocation = System.getProperty("user.dir") + "\\Resources\\Test";
         for (int type : types) {
@@ -144,11 +162,11 @@ public class Controller {
 
         try {
 
-            Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
-            /*long before = System.currentTimeMillis();
+           // Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
+            long before = System.currentTimeMillis();
             Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
             long after = System.currentTimeMillis();
-            PerformanceTracker.getInstance().setOverAllSearch(after-before);*/
+            PerformanceTracker.getInstance().setOverAllSearch(after-before);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -180,8 +198,15 @@ public class Controller {
         long searchTimeOnly = PerformanceTracker.getInstance().getSearchTimeNeto();
         double averageSearchTimeForIteration = (searchTimeOnly*1.0)/numOfIter;
         double averageSearchTimeForAgents = (searchTimeOnly*1.0)/numOfAgents;
-
-        String result = String.format("%d,%s,%d,%d,%d,%d,%d,%d,%d,%d,%s,%s" , type,mapName,scenNum,numOfAgents,prefixLength,lookahead,budgetPerAgent,complete,searchTimeOnly,numOfIter,averageSearchTimeForAgents,averageSearchTimeForIteration);
+        Map<String,String> params = ParamConfig.getInstance().getParams();
+        String result = "";
+        String header = this.res.get(0);
+        String [] paramNames = header.split(",");
+        for(int i=0;i<params.size();i++)
+        {
+            result+=""+params.get(paramNames[i])+",";
+        }
+        result += String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%s,%s" ,mapName,scenNum,numOfAgents,prefixLength,lookahead,budgetPerAgent,complete,searchTimeOnly,numOfIter,averageSearchTimeForAgents,averageSearchTimeForIteration);
         this.res.add(result);
 
     }

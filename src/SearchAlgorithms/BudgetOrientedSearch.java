@@ -2,11 +2,9 @@ package SearchAlgorithms;
 
 import Components.*;
 import Components.BoundedSingleSearchAlgorithms.IBoundedSingleSearchAlgorithm;
-import Components.BudgetDistributionPolicy.IBudgetDistributionPolicy;
+import Components.BudgetDIstributionPolicy.IBudgetDistributionPolicy;
 import Components.Heuristics.IHeuristic;
 import Components.PriorityPolicy.IPriorityPolicy;
-import javafx.util.Pair;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -115,6 +113,11 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         if(prefixes.contains(null)) {
             System.out.println("failed - couldn't find a path");
           //  this.timeLimiter.stop();
+            return true;
+        }
+
+        if(PerformanceTracker.getInstance().getNumberOFIteration() == 10000) {
+            System.out.println("Max iteration allowed");
             return true;
         }
 
@@ -253,7 +256,6 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
         if(!didTheAgentSucceeded && backtracking && ((budgetPool!=0 && !isSharedBudget) || (isSharedBudget && totalBudget!=0)))
         {
-
             preformBacktrack(agent,problematicAgents,solutions);
         }
 

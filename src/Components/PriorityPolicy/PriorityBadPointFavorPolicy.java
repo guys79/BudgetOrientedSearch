@@ -8,21 +8,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * This class represents a priority policy where the agents get the same priority
- */
-public class EqualPriorityPolicy implements IPriorityPolicy{
+public class PriorityBadPointFavorPolicy implements IPriorityPolicy {
 
     @Override
-    public Map<Agent, Double> getPriorityDistribution(Set<Agent> agents, Map<Agent, Node> current,Map<Agent, Integer> amountOfBacktracks) {
+    public Map<Agent, Double> getPriorityDistribution(Set<Agent> agents, Map<Agent, Node> current, Map<Agent, Integer> amountOfBacktracks) {
         Map<Agent, Double> distribution = new HashMap<>();
+        int amountBacktrackForAgent;
         boolean isGoalLessPriority = ParamConfig.getInstance().getGoalLessPriority();
         for (Agent agent : agents)
         {
-            if(current.get(agent).equals(agent.getGoal()) && isGoalLessPriority)
+            if(current.get(agent).equals(agent.getGoal()) & isGoalLessPriority)
                 distribution.put(agent,1.0);
-            else
-                distribution.put(agent,2.0);
+            else {
+
+                distribution.put(agent, 2d + agent.getNumOfBadPoints());
+            }
 
         }
         return distribution;
@@ -30,6 +30,6 @@ public class EqualPriorityPolicy implements IPriorityPolicy{
 
     @Override
     public String toString() {
-        return "EqualPriorityPolicy";
+        return "PriorityBadPointFavorPolicy";
     }
 }

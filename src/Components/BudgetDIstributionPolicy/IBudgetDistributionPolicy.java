@@ -1,4 +1,4 @@
-package Components.BudgetDistributionPolicy;
+package Components.BudgetDIstributionPolicy;
 
 import Components.Agent;
 

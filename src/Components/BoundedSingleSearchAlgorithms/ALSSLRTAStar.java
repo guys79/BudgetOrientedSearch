@@ -271,6 +271,13 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
         }
 
+        //could not fund states to be on?
+        if(openList.size() == 0)
+            agent.addBadPoint();
+        if(budget == expansions)
+            agent.addBadPoint();
+
+
 
         //If the while stopped because the unique states in the open list and the close list ARE the same
        /* if(restSize == closed.size())

@@ -51,6 +51,7 @@ public class Agent {
         return numOfBadPoints;
     }
 
+    public void resetBadPoints() {numOfBadPoints=0;}
     public static void restNumOfAgents()
     {
         numberOfExistingAgents = 0;

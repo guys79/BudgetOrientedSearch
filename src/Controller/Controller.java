@@ -10,15 +10,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Controller {
 
     private View view;
     private List<String> res;
+    private String headline;
     public Controller(View view)
     {
         this.view = view;
@@ -32,53 +30,63 @@ public class Controller {
 
            performSingleRun(1, type, 6, 200, 500, "lak303d", false, 6);
        }*/
-       // performSingleRun(1, 1, 6, 200, 500, "lak303d", false, 6);
+       // performSingleRun(1, 2, 2, 100, 1000, "lt_gallowstemplar_n", false, 2);
        performTest();
     }
 
 
 
     private void performTest() {
+
         /*
-        int [] types = {1,2,3,4,5,6,7,8};
+        int [] types = {1,2,3,4,5,6,7};
         int [] scenNumbers = {1,2};
         int [] prefixLengths = {3,6,9};
- //       String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
-        String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n"};
-
+        String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
         int [] budgetPerAgent = {50,100,150};
         int [] lookaheads = {3,6,9};
-        int [] numOfAgents = {100,250,400};*/
+        int [] numOfAgents = {400};*/
+
+
         int [] types = {1};
         int [] scenNumbers = {1};
-        int [] prefixLengths = {6};
-        //       String [] mapNames = {"Berlin_1_256","brc202d","lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
-        String [] mapNames = {"lak303d"};
-
-        int [] budgetPerAgent = {50};
-        int [] lookaheads = {6};
-        int [] numOfAgents = {100};
+        int [] prefixLengths = {3,6,9};
+        int [] budgetPerAgent = {50,100,150};
+        String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
+        //String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n","ost003d"};
+        int [] lookaheads = {2,3,5};
+        int [] numOfAgents = {400};
 
         this.res = new ArrayList<>();
-        String headline = "";
+        this.headline = "";
         Map<String,String> params = ParamConfig.getInstance().getParams();
         for(String param : params.keySet())
         {
             headline+=param+",";
         }
-        headline += "Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration";
+        headline += "Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration, Sum of costs";
         res.add(headline);
         String folderLocation = System.getProperty("user.dir") + "\\Resources\\Test";
         for (int type : types) {
             for (String mapName : mapNames) {
+               String dirPath = System.getProperty("user.dir")+"\\Resources"+"\\Scenarios\\"+mapName;
+                File file = new File(dirPath);
+                int size = Math.min(15,file.listFiles().length);
+                scenNumbers = new int[size];
+                for(int i=1;i<=size;i++)
+                {
+                    scenNumbers[i-1] = i;
+                }
                 for (int scenarioNum : scenNumbers) {
                     for (int numOfAgent : numOfAgents) {
                         for (int prefixLength : prefixLengths) {
                             for (int lookahead : lookaheads) {
                                 if (lookahead == prefixLength) {
                                     for (int budget : budgetPerAgent) {
-                                        System.out.println(String.format("type - %d, mapName - %s, scenarioNum - %d, numOfAgent - %d, prefixLength - %d, lookahead - %d, budgetPerAgent - %d" ,type,mapName,scenarioNum,numOfAgent,prefixLength,lookahead,budget));
-                                        performSingleRun(scenarioNum, type, prefixLength, numOfAgent, budget, mapName, true, lookahead);
+
+                                            System.out.println(String.format("type - %d, mapName - %s, scenarioNum - %d, numOfAgent - %d, prefixLength - %d, lookahead - %d, budgetPerAgent - %d", type, mapName, scenarioNum, numOfAgent, prefixLength, lookahead, budget));
+                                            performSingleRun(scenarioNum, type, prefixLength, numOfAgent, budget, mapName, true, lookahead);
+
                                     }
                                 }
                             }
@@ -86,24 +94,25 @@ public class Controller {
                     }
                 }
             }
+            saveResults(folderLocation, types,""+type);
         }
        // performSingleRun(1,3,4,100,50,"lak303d",true,4);
-        saveResults(folderLocation, types);
+
     }
 
-    private void saveResults(String folderLocation, int[] types)
+    private void saveResults(String folderLocation, int[] types,String additionalName)
     {
         try {
             saveExplanationTest(folderLocation,types);
-            saveResultsInExcel(folderLocation);
+            saveResultsInExcel(folderLocation,additionalName);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    private void saveResultsInExcel(String folderLocation) throws IOException {
-        String name = "result.csv";
+    private void saveResultsInExcel(String folderLocation,String additionalName) throws IOException {
+        String name = "result_"+additionalName+".csv";
         String path = folderLocation + "\\"+name;
 
 
@@ -117,6 +126,8 @@ public class Controller {
             bufferedWriter.write(line+"\n");
         }
         bufferedWriter.close();
+        this.res.clear();
+        this.res.add(headline);
 
     }
 
@@ -133,6 +144,7 @@ public class Controller {
             bufferedWriter.write(ParamConfig.getInstance().toString()+"\n\n");
         }
         bufferedWriter.close();
+
 
     }
 
@@ -159,20 +171,16 @@ public class Controller {
         IMultiAgentSearchAlgorithm searchAlgorithm = new BudgetOrientedSearch();
 
 
-
+        double sumOfCosts = 0;
         try {
 
-           // Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
+           //Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
             long before = System.currentTimeMillis();
             Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
+            sumOfCosts = sumOfCosts(solutions);
             long after = System.currentTimeMillis();
             PerformanceTracker.getInstance().setOverAllSearch(after-before);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            PerformanceTracker.getInstance().setOverAllSearch(Long.MAX_VALUE);
-            PerformanceTracker.getInstance().setComplete(false);
-        }
+
 
 
 
@@ -183,12 +191,61 @@ public class Controller {
         System.out.println("Over all time " + overAllTime + " ms ," + overAllTime / 1000.0 + " s");
         System.out.println("Search Time time " + searchTimeOnly + " ms ," + searchTimeOnly / 1000.0 + " s");
         System.out.println("Search Time time per agent " + ((searchTimeOnly*1.0/numOfAgents)) + " ms ," + ((searchTimeOnly*1.0/numOfAgents)) / 1000.0 + " s");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if(save)
-            saveResults(scenNum,type,prefixLength,numOfAgents,budgetPerAgent,mapName,lookahead);
+            saveResults(scenNum,type,prefixLength,numOfAgents,budgetPerAgent,mapName,lookahead,sumOfCosts);
     }
 
-    private void saveResults(int scenNum , int type, int prefixLength, int numOfAgents, int budgetPerAgent,String mapName,int lookahead)
+    private double sumOfCosts(Map<Agent, Prefix> solutions)
+    {
+        double sumOfCosts = 0;
+        double pathCost;
+        int prefixLength;
+        boolean isAtGoalLast;
+        Node currentNode;
+        Agent agent;
+        Prefix prefix;
+        Node lastNode = null;
+        //For each solution
+        for(Map.Entry<Agent,Prefix> entry : solutions.entrySet())
+        {
+            agent = entry.getKey();
+            prefix = entry.getValue();
+            prefixLength = prefix.getSize();
+            isAtGoalLast = true;
+            pathCost = 0;
+            for( int i=prefixLength - 1; i>=0; i--)
+            {
+                currentNode = prefix.getNodeAt(i);
+                if(isAtGoalLast) {
+                    if (!agent.getGoal().equals(currentNode)) {
+                        isAtGoalLast = false;
+                        lastNode = agent.getGoal();
+                        pathCost += ParamConfig.getInstance().getCostFunction().getCost(lastNode,currentNode);
+                        lastNode = currentNode;
+                    }
+                }
+                else
+                {
+                    pathCost += ParamConfig.getInstance().getCostFunction().getCost(lastNode,currentNode);
+                    lastNode = currentNode;
+                }
+
+
+
+            }
+
+            sumOfCosts+= pathCost;
+        }
+        return sumOfCosts;
+
+    }
+
+    private void saveResults(int scenNum, int type, int prefixLength, int numOfAgents, int budgetPerAgent, String mapName, int lookahead, double sumOfCosts)
     {
         int complete = 0;
         if(PerformanceTracker.getInstance().isComplete())
@@ -206,7 +263,7 @@ public class Controller {
         {
             result+=""+params.get(paramNames[i])+",";
         }
-        result += String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%s,%s" ,mapName,scenNum,numOfAgents,prefixLength,lookahead,budgetPerAgent,complete,searchTimeOnly,numOfIter,averageSearchTimeForAgents,averageSearchTimeForIteration);
+        result += String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%s,%s,%s" ,mapName,scenNum,numOfAgents,prefixLength-1,lookahead,budgetPerAgent,complete,searchTimeOnly,numOfIter,averageSearchTimeForAgents,averageSearchTimeForIteration,sumOfCosts);
         this.res.add(result);
 
     }

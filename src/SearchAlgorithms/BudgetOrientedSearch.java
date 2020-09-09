@@ -80,6 +80,9 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             givenSolution = this.getPrefixForIteration(currentLocation);
 
             currentLocation.clear();
+            //System.out.println(givenSolution);
+            if(givenSolution == null)
+                break;
             for(Prefix prefixForAgent : givenSolution)
             {
 
@@ -109,6 +112,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
      */
     public boolean isFinished(Collection<Prefix> prefixes, int iterationNumber)
     {
+
 
         if(prefixes.contains(null)) {
             System.out.println("failed - couldn't find a path");
@@ -253,7 +257,8 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         }
 
         boolean didTheAgentSucceeded =  problematicAgents== null;
-
+        if(didTheAgentSucceeded && solution.getNodeAt(solution.getSize()-1).equals(agent.getGoal()))
+            agent.resetBadPoints();
         if(!didTheAgentSucceeded && backtracking && ((budgetPool!=0 && !isSharedBudget) || (isSharedBudget && totalBudget!=0)))
         {
             preformBacktrack(agent,problematicAgents,solutions);

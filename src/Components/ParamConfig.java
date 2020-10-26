@@ -52,72 +52,37 @@ public class ParamConfig {
         System.out.println("New config");
         switch (type)
         {
+
             case 1:
                 costFunction = new OctileGridFunction();
                 //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
                 heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new EqualPriorityPolicy();
-                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
+                priorityPolicy = new PriorityBadPointFavorPolicy();
+                budgetDistributionPolicy = new BudgetExponentialBadpointsFavorPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = false;
-                performDeepLookahead = false;
-                isSharedBudget = false;
-                isGoalLessPriority = true;
-                break;
-            case 2:
-                costFunction = new OctileGridFunction();
-                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
-                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new EqualPriorityPolicy();
-                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = false;
+                this.backtrack = true;
                 performDeepLookahead = false;
                 isSharedBudget = false;
                 isGoalLessPriority = true;
                 break;
 
+            case 2:
+                costFunction = new OctileGridFunction();
+                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
+                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
+                priorityPolicy = new ConstraintPriorityPolicy();
+                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
+                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
+                this.backtrack = true;
+                performDeepLookahead = false;
+                isSharedBudget = false;
+                isGoalLessPriority = true;
+                break;
             case 3:
                 costFunction = new OctileGridFunction();
                 //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
                 heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new RandomPriority();
-                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = true;
-                performDeepLookahead = false;
-                isSharedBudget = false;
-                isGoalLessPriority = true;
-                break;
-            case 4:
-                costFunction = new OctileGridFunction();
-                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
-                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new RandomPriority();
-                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = true;
-                performDeepLookahead = false;
-                isSharedBudget = false;
-                isGoalLessPriority = false;
-                break;
-            case 5:
-                costFunction = new OctileGridFunction();
-                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
-                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new PriorityBadPointFavorPolicy();
-                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = true;
-                performDeepLookahead = false;
-                isSharedBudget = false;
-                isGoalLessPriority = true;
-                break;
-            case 6:
-                costFunction = new OctileGridFunction();
-                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
-                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new EqualPriorityPolicy();
+                priorityPolicy = new ConstraintPriorityPolicy();
                 budgetDistributionPolicy = new BudgetExponentialBadpointsFavorPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
                 this.backtrack = true;
@@ -125,18 +90,7 @@ public class ParamConfig {
                 isSharedBudget = false;
                 isGoalLessPriority = true;
                 break;
-            case 7:
-                costFunction = new OctileGridFunction();
-                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
-                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new PriorityBadPointFavorPolicy();
-                budgetDistributionPolicy = new BudgetExponentialBadpointsFavorPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
-                this.backtrack = true;
-                performDeepLookahead = false;
-                isSharedBudget = false;
-                isGoalLessPriority = true;
-                break;
+
             default:
                 costFunction = null;
                 heuristic = null;

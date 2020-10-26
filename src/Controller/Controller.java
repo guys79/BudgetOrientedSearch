@@ -30,8 +30,8 @@ public class Controller {
 
            performSingleRun(1, type, 6, 200, 500, "lak303d", false, 6);
        }*/
-       // performSingleRun(1, 2, 2, 100, 1000, "lt_gallowstemplar_n", false, 2);
-       performTest();
+        performSingleRun(1, 1, 8, 32, 100, "empty-8-8", false, 8);
+      // performTest();
     }
 
 
@@ -48,14 +48,14 @@ public class Controller {
         int [] numOfAgents = {400};*/
 
 
-        int [] types = {1};
+        int [] types = {1,2,3};
         int [] scenNumbers = {1};
         int [] prefixLengths = {3,6,9};
         int [] budgetPerAgent = {50,100,150};
-        String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n","ost003d","w_woundedcoast"};
+        String [] mapNames = {"empty-8-8"};
         //String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n","ost003d"};
         int [] lookaheads = {2,3,5};
-        int [] numOfAgents = {400};
+        int [] numOfAgents = {6};
 
         this.res = new ArrayList<>();
         this.headline = "";
@@ -174,12 +174,12 @@ public class Controller {
         double sumOfCosts = 0;
         try {
 
-           //Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
-            long before = System.currentTimeMillis();
-            Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
+           Map<Agent, Prefix> solutions = searchAlgorithm.getSolution(view);
+           // long before = System.currentTimeMillis();
+            //Map<Agent, Prefix> solutions = searchAlgorithm.getSolution();
             sumOfCosts = sumOfCosts(solutions);
-            long after = System.currentTimeMillis();
-            PerformanceTracker.getInstance().setOverAllSearch(after-before);
+            //long after = System.currentTimeMillis();
+            //PerformanceTracker.getInstance().setOverAllSearch(after-before);
 
 
 

@@ -32,6 +32,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private boolean performDeepLookahead;
     private boolean isSharedBudget;
     private Map<Agent, Integer> amountOfBacktracks;
+    private Map<Agent,Set<Agent>> conflicted;
 
     /**
      * The constructor of the class
@@ -51,6 +52,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         this.performDeepLookahead = ParamConfig.getInstance().getPerformDeepLookahead();
         this.amountOfBacktracks = new HashMap<>();
         this.isSharedBudget = ParamConfig.getInstance().getSharedBudget();
+        this.conflicted = new HashMap<>();
     }
     @Override
     public Map<Agent, Prefix> getSolution() {
@@ -120,7 +122,8 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             return true;
         }
 
-        if(PerformanceTracker.getInstance().getNumberOFIteration() == 10000) {
+        if(PerformanceTracker.getInstance().getNumberOFIteration() == 100) {
+        //if(PerformanceTracker.getInstance().getNumberOFIteration() == 10000) {
             System.out.println("Max iteration allowed");
             return true;
         }
@@ -135,10 +138,11 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
         for(Prefix prefix :prefixes)
         {
+
             //If there is still an agent that is not in its goal node
             if(!prefix.getNodeAt(prefix.getSize()-1).equals(prefix.getAgent().getGoal())) {
 
-               // System.out.println("Agent "+prefix.getAgent().getId()+" didn't finish he is here - "+prefix.getNodeAt(prefix.getSize()-1)+" instead of here - "+prefix.getAgent().getGoal());
+                System.out.println("Agent "+prefix.getAgent().getId()+" didn't finish he is here - "+prefix.getNodeAt(prefix.getSize()-1)+" instead of here - "+prefix.getAgent().getGoal());
 
                 return false;
             }
@@ -163,7 +167,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         else
             this.totalBudget = Problem.getInstance().getTotalBudget();
 
-        this.prioritiesForAgents = this.priorityPolicy.getPriorityDistribution(agents,currentLocation,this.amountOfBacktracks);
+        this.prioritiesForAgents = this.priorityPolicy.getPriorityDistribution(agents,currentLocation,this.amountOfBacktracks,this.conflicted);
         Set<Prefix> solution = new HashSet<>();
 
         prioritizedAgents = new PriorityQueue<>(new PriorityCompareAgents(this.prioritiesForAgents));
@@ -331,6 +335,32 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         this.preformingBackTrack.add(agent);
         this.preformingBackTrack.add(minPriorityAgent);
 
+        //Check if there is a constraint where min > agent priority-wise
+        //If so, remove the constraint
+        if(this.conflicted.containsKey(minPriorityAgent))
+        {
+            Set<Agent> conflictedForMin = this.conflicted.get(minPriorityAgent);
+            //Remove constraint if exists
+            if(conflictedForMin.contains(agent))
+            {
+                conflictedForMin.remove(agent);
+                if(conflictedForMin.size() == 0)
+                    this.conflicted.remove(minPriorityAgent);
+            }
+        }
+        //Else, add a new constraint
+        else {
+            //Add the conflicted agents to the conflicted map
+            Set<Agent> conflictedForAgent;
+            if (this.conflicted.containsKey(agent))
+                conflictedForAgent = this.conflicted.get(agent);
+            else
+                conflictedForAgent = new HashSet<>();
+
+            conflictedForAgent.add(minPriorityAgent);
+        }
+
+
 
 
 
@@ -373,6 +403,10 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
      */
     private Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget,Set<Prefix> solutions)
     {
+        if(PerformanceTracker.getInstance().getNumberOFIteration() == 6 && agent.getId() == 17)
+        {
+            System.out.println();
+        }
         if(performDeepLookahead)
             return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize,-1);
         return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize,lookahead);

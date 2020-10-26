@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class PriorityBacktrackingFavorPolicy implements IPriorityPolicy {
     @Override
-    public Map<Agent, Double> getPriorityDistribution(Set<Agent> agents, Map<Agent, Node> current,Map<Agent, Integer> amountOfBacktracks) {
+    public Map<Agent, Double> getPriorityDistribution(Set<Agent> agents, Map<Agent, Node> current, Map<Agent, Integer> amountOfBacktracks, Map<Agent, Set<Agent>> conflicted) {
         Map<Agent, Double> distribution = new HashMap<>();
         int amountBacktrackForAgent;
         for (Agent agent : agents)

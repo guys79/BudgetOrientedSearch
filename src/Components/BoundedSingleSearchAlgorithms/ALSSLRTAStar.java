@@ -231,6 +231,8 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
                 for (Node neighbor : neighbors) {
                     neighborNode = new ALSSLRTAStarNode(neighbor, currentTimeStamp + 1);
 
+                    if(agent.getId() == 17 && PerformanceTracker.getInstance().getNumberOFIteration() == 10)
+                        System.out.println();
                     Set<Agent> problematicAgentForState = isStateValid(neighborNode,solutions,currentNode);
                     //Only if the state is valid we will insert is to the open
                     if(problematicAgentForState.size() == 0) {

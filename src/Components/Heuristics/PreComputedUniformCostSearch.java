@@ -1,6 +1,5 @@
 package Components.Heuristics;
 
-import Components.Agent;
 import Components.CostFunction.ICostFunction;
 import Components.Node;
 import Components.ParamConfig;

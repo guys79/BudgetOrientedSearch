@@ -56,16 +56,16 @@ public class Problem {
     {
         this.mapName = mapName;
         this.scenario = scenario;
-        filePaths = System.getProperty("user.dir")+"\\Resources";
+        filePaths = System.getProperty("user.dir")+"/Resources";
         this.numOfAgents = numOfAgents;
         this.type = type;
         this.lookahead = lookahead;
         this.totalBudget = totalBudget;
         this.prefix = prefix;
         this.agents = new HashSet<>();
-        this.mapPath = this.filePaths+"\\Maps\\"+this.mapName+".map";
+        this.mapPath = this.filePaths+"/Maps/"+this.mapName+".map";
         this.validLocations = new HashSet<>();
-        this.scenarioPath = this.filePaths+"\\Scenarios\\"+this.mapName+"\\"+this.mapName+"-"+scenario+".scen";
+        this.scenarioPath = this.filePaths+"/Scenarios/"+this.mapName+"/"+this.mapName+"-"+scenario+".scen";
         ParamConfig.getInstance().configParamsWithType(type);
         this.size = new int[ParamConfig.getInstance().getNumOfDimensions()];
         buildMap();

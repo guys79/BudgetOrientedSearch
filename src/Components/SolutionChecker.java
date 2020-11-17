@@ -162,7 +162,7 @@ public class SolutionChecker {
      */
     private boolean checkSwipes(Collection<Prefix> prefixes,int prefixSize)
     {
-        Map<Node,Agent> nodes;
+        Map<Node, Agent> nodes;
         Map<Node,Agent> newNodes;
         nodes = new HashMap<>();
         for(Prefix prefix : prefixes)

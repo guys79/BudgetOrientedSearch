@@ -1,9 +1,9 @@
 package Components.BoundedSingleSearchAlgorithms;
 
 import Components.*;
+import Components.Agent;
 import Components.CostFunction.ICostFunction;
 import Components.Heuristics.HeuristicWithPersonalDatabase;
-import Components.Heuristics.IHeuristic;
 import javafx.util.Pair;
 
 import java.util.*;

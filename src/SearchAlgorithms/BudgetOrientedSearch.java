@@ -1,8 +1,10 @@
 package SearchAlgorithms;
 
 import Components.*;
+import Components.Agent;
 import Components.BoundedSingleSearchAlgorithms.IBoundedSingleSearchAlgorithm;
 import Components.BudgetDIstributionPolicy.IBudgetDistributionPolicy;
+import Components.FailPolicy.IFailPolicy;
 import Components.Heuristics.IHeuristic;
 import Components.PriorityPolicy.IPriorityPolicy;
 
@@ -31,6 +33,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private Set<Agent> preformingBackTrack;
     private boolean performDeepLookahead;
     private boolean isSharedBudget;
+    private IFailPolicy failPolicy;
     private Map<Agent, Integer> amountOfBacktracks;
     private Map<Agent,Set<Agent>> conflicted;
 
@@ -43,6 +46,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         this.budgetDistributionPolicy = ParamConfig.getInstance().getBudgetDistributionPolicy();
         this.heuristicFunction = ParamConfig.getInstance().getHeuristic();
         this.priorityPolicy = ParamConfig.getInstance().getPriorityPolicy();
+        this.failPolicy = ParamConfig.getInstance().getFailPolicy();
         this.totalBudget = Problem.getInstance().getTotalBudget();
         this.agents = Problem.getInstance().getAgents();
         this.searchAlgorithm = ParamConfig.getInstance().getSearchAlgorithm();
@@ -59,7 +63,6 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
         Map<Agent,Node> currentLocation = new HashMap<>();
         Map<Agent,Prefix> currentPaths = new HashMap<>();
-
         //Setting the start node as the current
         for(Agent agent : agents)
         {
@@ -67,12 +70,32 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             currentPaths.put(agent,new Prefix(agent.getStart(),agent));
         }
 
-        Set<Prefix> givenSolution;
+        Collection<Prefix> givenSolution;
         Agent agent;
         int iterationNumber = 0;
         //Until he search is finished (succeed or failed)
         while (!isFinished(currentPaths.values(),iterationNumber))
         {
+            if(failPolicy.isFinishedAfterFailedIteration())
+            {
+                givenSolution = failPolicy.determineSolution().values();
+                for(Prefix prefixForAgent : givenSolution)
+                {
+
+                    if(prefixForAgent == null)
+                        break;
+
+                    //The agent that the prefix is for
+                    agent = prefixForAgent.getAgent();
+
+                    //Update the current locations
+                    currentLocation.put(agent,prefixForAgent.getNodeAt(prefixForAgent.getSize()-1));
+                    //Update the current paths
+
+                    currentPaths.get(agent).extendPrefix(prefixForAgent);
+                }
+
+            }
             iterationNumber++;
 
             PerformanceTracker.getInstance().addIteration();
@@ -84,7 +107,10 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             currentLocation.clear();
             //System.out.println(givenSolution);
             if(givenSolution == null)
+            {
                 break;
+            }
+
             for(Prefix prefixForAgent : givenSolution)
             {
 
@@ -119,7 +145,10 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         if(prefixes.contains(null)) {
             System.out.println("failed - couldn't find a path");
           //  this.timeLimiter.stop();
-            return true;
+            failPolicy.setDidTheIterationFail(true);
+            if(failPolicy.isFinishedAfterFailedIteration())
+                return true;
+            return false;
         }
 
         if(PerformanceTracker.getInstance().getNumberOFIteration() == 100) {
@@ -131,11 +160,13 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         if(!SolutionChecker.getInstance().checkSolution(prefixes,iterationNumber))
         {
             System.out.println("failed - the solution is not valid");
-           // this.timeLimiter.stop();
-            return true;
+            failPolicy.setDidTheIterationFail(true);
+            if(failPolicy.isFinishedAfterFailedIteration())
+                return true;
+            return false;
         }
 
-
+        failPolicy.setDidTheIterationFail(false);
         for(Prefix prefix :prefixes)
         {
 

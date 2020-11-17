@@ -7,7 +7,6 @@ import Controller.Controller;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -19,7 +18,6 @@ import javafx.scene.text.Text;
 import javafx.util.Pair;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * For rendering the GUI. This class is not fully commented.

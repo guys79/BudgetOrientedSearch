@@ -1,10 +1,10 @@
 package Controller;
 
 import Components.*;
+import Components.Agent;
 import SearchAlgorithms.BudgetOrientedSearch;
 import SearchAlgorithms.IMultiAgentSearchAlgorithm;
 import View.View;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,7 +30,7 @@ public class Controller {
 
            performSingleRun(1, type, 6, 200, 500, "lak303d", false, 6);
        }*/
-        performSingleRun(1, 1, 8, 32, 100, "empty-8-8", false, 8);
+        performSingleRun(1, 1, 8, 55, 100, "empty-8-8", false, 8);
       // performTest();
     }
 

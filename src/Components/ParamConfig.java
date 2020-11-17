@@ -5,6 +5,8 @@ import Components.BoundedSingleSearchAlgorithms.IBoundedSingleSearchAlgorithm;
 import Components.BudgetDIstributionPolicy.*;
 import Components.CostFunction.ICostFunction;
 import Components.CostFunction.OctileGridFunction;
+import Components.FailPolicy.AdditionAttempt;
+import Components.FailPolicy.IFailPolicy;
 import Components.Heuristics.HeuristicWithPersonalDatabase;
 import Components.Heuristics.IHeuristic;
 import Components.Heuristics.PreComputedUniformCostSearch;
@@ -26,6 +28,7 @@ public class ParamConfig {
     private IHeuristic heuristic;//The heuristic function
     private IBudgetDistributionPolicy budgetDistributionPolicy;//The budget distribution policy
     private IPriorityPolicy priorityPolicy;//The priority policy
+    private IFailPolicy failPolicy;//The fail policy
     private IBoundedSingleSearchAlgorithm searchAlgorithm;
     private static ParamConfig instance;//The instance
     private final int numOfDimensions=2;//The number of dimensions;
@@ -64,6 +67,7 @@ public class ParamConfig {
                 performDeepLookahead = false;
                 isSharedBudget = false;
                 isGoalLessPriority = true;
+                failPolicy = AdditionAttempt()
                 break;
 
             case 2:
@@ -101,6 +105,7 @@ public class ParamConfig {
                 performDeepLookahead =null;
                 isSharedBudget = null;
                 isGoalLessPriority = null;
+                failPolicy = null;
         }
         if(checkIfNull())
             throw new UnsupportedOperationException("Some of the params are null in ParamConfig Class");
@@ -112,7 +117,7 @@ public class ParamConfig {
      */
     private boolean checkIfNull()
     {
-        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm ==null|| backtrack == null || performDeepLookahead == null || isSharedBudget == null || this.isGoalLessPriority == null;
+        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm ==null|| backtrack == null || performDeepLookahead == null || isSharedBudget == null || this.isGoalLessPriority == null || this.failPolicy == null;
     }
 
     /**
@@ -250,5 +255,9 @@ public class ParamConfig {
         params.put("isSharedBudget",""+isSharedBudget);
         params.put("isGoalLessPriority",""+isGoalLessPriority);
         return params;
+    }
+
+    public IFailPolicy getFailPolicy() {
+        return this.failPolicy;
     }
 }

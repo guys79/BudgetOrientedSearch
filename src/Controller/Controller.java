@@ -55,7 +55,7 @@ public class Controller {
         String [] mapNames = {"empty-8-8"};
         //String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n","ost003d"};
         int [] lookaheads = {2,3,5};
-        int [] numOfAgents = {6};
+        int [] numOfAgents = {6};//
 
         this.res = new ArrayList<>();
         this.headline = "";

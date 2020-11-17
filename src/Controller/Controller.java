@@ -30,7 +30,7 @@ public class Controller {
 
            performSingleRun(1, type, 6, 200, 500, "lak303d", false, 6);
        }*/
-        performSingleRun(1, 1, 8, 55, 100, "empty-8-8", false, 8);
+        performSingleRun(1, 1, 8, 10, 100, "lak303d", false, 8);
       // performTest();
     }
 

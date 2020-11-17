@@ -1,5 +1,6 @@
 package Components.FailPolicy;
 
+import Components.Node;
 import Components.Prefix;
 import Components.Agent;
 
@@ -7,8 +8,8 @@ import java.util.Map;
 
 public class FailAfterIterationFailure extends AbstractFailPolicy {
 
-    public FailAfterIterationFailure(Map<Agent, Prefix> currentPaths,int prefixSize) {
-        super(currentPaths,prefixSize);
+    public FailAfterIterationFailure() {
+        super();
     }
 
     @Override
@@ -17,7 +18,7 @@ public class FailAfterIterationFailure extends AbstractFailPolicy {
     }
 
     @Override
-    public Map<Agent,Prefix> determineSolution() {
+    public Map<Agent,Prefix> determineSolution(Map<Agent, Node> currentPaths, int prefixSize) {
         return null;
     }
 }

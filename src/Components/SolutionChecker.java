@@ -103,7 +103,8 @@ public class SolutionChecker {
         //Check if the prefix size is as defined
         for(Prefix prefix : prefixes)
         {
-            if(prefix.getSize()!=prefixSize*iterationNumber - (iterationNumber-1)) {
+            //if(prefix.getSize()!=prefixSize*iterationNumber - (iterationNumber-1)) {
+            if (prefix.getSize() != prefixSize) {
                 System.out.println("Wrong prefix size");
                 System.out.println(String.format("should be - %d, in real life - %d",prefixSize*iterationNumber - (iterationNumber-1), prefix.getSize()));
                 return false;

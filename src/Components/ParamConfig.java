@@ -67,7 +67,7 @@ public class ParamConfig {
                 performDeepLookahead = false;
                 isSharedBudget = false;
                 isGoalLessPriority = true;
-                failPolicy = AdditionAttempt()
+                failPolicy = new AdditionAttempt();
                 break;
 
             case 2:

@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AdditionAttempt  extends AbstractFailPolicy{
-    public AdditionAttempt(Map<Agent, Prefix> currentPaths,int prefixSize) {
-        super(currentPaths,prefixSize);
+    public AdditionAttempt() {
+        super();
     }
 
     @Override
@@ -21,19 +21,19 @@ public class AdditionAttempt  extends AbstractFailPolicy{
     }
 
     @Override
-    public Map<Agent, Prefix> determineSolution() {
+    public Map<Agent, Prefix> determineSolution(Map<Agent, Node> currentPaths,int prefixSize) {
         Map<Agent, Prefix> sol = new HashMap<>();
 
         Agent agent;
         Node currNode;
         Prefix agentSol;
         List<Node> nodes;
-        for(Map.Entry<Agent,Prefix> agent_prefix : this.currentPaths.entrySet())
+        for(Map.Entry<Agent,Node> agent_prefix : currentPaths.entrySet())
         {
             agent = agent_prefix.getKey();
-            currNode = agent_prefix.getValue().getNodeAt(agent_prefix.getValue().getSize()-1);
+            currNode = agent_prefix.getValue();
             nodes = new ArrayList<>();
-            for (int i=0; i<this.prefixSize;i++)
+            for (int i=0; i<prefixSize;i++)
             {
                 nodes.add(currNode);
             }

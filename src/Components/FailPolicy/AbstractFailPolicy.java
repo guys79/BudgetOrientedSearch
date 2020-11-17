@@ -7,14 +7,11 @@ import java.util.Map;
 
 public abstract class AbstractFailPolicy implements IFailPolicy {
     protected boolean didTheIterationFail;
-    protected Map<Agent,Prefix> currentPaths;
-    protected int prefixSize;
 
 
-    public AbstractFailPolicy(Map<Agent, Prefix> currentPaths,int prefixSize)
+    public AbstractFailPolicy()
     {
-        this.prefixSize = prefixSize;
-        this.currentPaths = currentPaths;
+
         didTheIterationFail = false;
     }
 

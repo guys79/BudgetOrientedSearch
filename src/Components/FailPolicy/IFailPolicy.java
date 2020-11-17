@@ -1,5 +1,6 @@
 package Components.FailPolicy;
 
+import Components.Node;
 import Components.Prefix;
 import Components.Agent;
 
@@ -12,6 +13,6 @@ public interface IFailPolicy {
 
     public boolean isFinishedAfterFailedIteration();
     public boolean didTheIterationFail();
-    public Map<Agent,Prefix> determineSolution();
+    public Map<Agent,Prefix> determineSolution(Map<Agent, Node> currentPaths, int prefixSize);
     public void setDidTheIterationFail(boolean stat);
 }

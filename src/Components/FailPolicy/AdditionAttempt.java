@@ -10,7 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This fail policy determines that in case of a failure, all the agents will stay in their current location
+ */
 public class AdditionAttempt  extends AbstractFailPolicy{
+    /**
+     * The empty constructor
+     */
     public AdditionAttempt() {
         super();
     }

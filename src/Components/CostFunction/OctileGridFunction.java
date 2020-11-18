@@ -6,6 +6,9 @@ import Components.Node;
  */
 public class OctileGridFunction implements Components.CostFunction.ICostFunction {
 
+    /**
+     * The empty constructor
+     */
     public OctileGridFunction() {
     }
 

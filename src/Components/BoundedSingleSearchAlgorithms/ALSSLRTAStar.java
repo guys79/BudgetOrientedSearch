@@ -41,6 +41,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
     }
 
+
     @Override
     public Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions,int prefixSize,int lookahead) {
 
@@ -574,6 +575,10 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm
 
     }
 
+    /**
+     * This function will return the current node
+     * @return - The current node
+     */
     public Node getCurrentState() {
         return currentState;
     }

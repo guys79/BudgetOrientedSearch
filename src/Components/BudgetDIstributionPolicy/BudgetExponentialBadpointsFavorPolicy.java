@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This class represents the "Bad Point" favor Budget Distribution policy
+ */
 public class BudgetExponentialBadpointsFavorPolicy implements IBudgetDistributionPolicy{
     @Override
     public Map<Agent, Integer> getBudgetDistribution(Set<Agent> agents, int totalBudget, Map<Agent, Integer> amountOfBacktracks) {

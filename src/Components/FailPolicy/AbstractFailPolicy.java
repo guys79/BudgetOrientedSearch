@@ -1,14 +1,15 @@
 package Components.FailPolicy;
 
-import Components.Prefix;
-import Components.Agent;
 
-import java.util.Map;
-
+/**
+ * This interface represents am abstract Fail policy - what to do in case of a failed iteration
+ */
 public abstract class AbstractFailPolicy implements IFailPolicy {
-    protected boolean didTheIterationFail;
+    protected boolean didTheIterationFail; // True IFF the last iteration has failed
 
-
+    /**
+     * The constructor of the class
+     */
     public AbstractFailPolicy()
     {
 
@@ -20,6 +21,7 @@ public abstract class AbstractFailPolicy implements IFailPolicy {
         return didTheIterationFail;
     }
 
+    @Override
     public void setDidTheIterationFail(boolean didTheIterationFail) {
         this.didTheIterationFail = didTheIterationFail;
     }

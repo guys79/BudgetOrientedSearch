@@ -8,6 +8,9 @@ import View.View;
 
 import java.util.Map;
 
+/**
+ * This class represents an abstract Nulti Agent Search Algorithm
+ */
 public abstract class AbstractMultiAgentSearchAlgorithm implements IMultiAgentSearchAlgorithm {
 
     private View view;

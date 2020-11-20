@@ -92,11 +92,6 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
             failPolicy.setDidTheIterationFail(false);
             givenSolution = this.getPrefixForIteration(currentLocation);
-
-            if(iterationNumber == 18)
-            {
-                System.out.println();
-            }
             //System.out.println(givenSolution);
             if(givenSolution == null)
             {
@@ -122,6 +117,12 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         return currentPaths;
     }
 
+    /**
+     * This function will ass the prefixes to the agent's solutions
+     * @param givenSolution - The given prefixes
+     * @param currentLocation - The current locations of the agents
+     * @param currentPaths - The solution so far
+     */
     private void addPrefixToAgent(Collection <Prefix>givenSolution,  Map<Agent,Node> currentLocation,Map<Agent,Prefix> currentPaths)
     {
         Agent agent;

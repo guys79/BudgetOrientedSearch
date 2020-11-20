@@ -36,7 +36,7 @@ public class Controller {
 
            performSingleRun(1, type, 6, 200, 500, "lak303d", false, 6);
        }*/
-        performSingleRun(1, 1, 8, 10, 100, "lak303d", false, 8);
+        performSingleRun(1, 1, 8, 1000, 100, "lak303d", false, 8);
       // performTest();
     }
 
@@ -152,9 +152,9 @@ public class Controller {
     }
 
     /**
-     * This function will create the explenation file
-     * @param folderLocation
-     * @param types
+     * This function will create the explanation file
+     * @param folderLocation - The folder's location
+     * @param types - The array of types
      * @throws IOException
      */
     private void saveExplanationTest(String folderLocation, int[] types) throws IOException {
@@ -174,10 +174,27 @@ public class Controller {
 
     }
 
+    /**
+     * This function will preform a single run
+     * @param scenNum - The scenario number
+     * @param lookahead - The lookahead
+     */
     public void performSingleRun(int scenNum,int lookahead)
     {
         performSingleRun(scenNum,1,5,500,1000,"lak303d",false,lookahead);
     }
+
+    /**
+     * This function will preform a single run
+     * @param scenNum - The scenario number
+     * @param type - The Algorithm type
+     * @param prefixLength - The prefix's length
+     * @param numOfAgents - The number of agents
+     * @param budgetPerAgent - The budget per agent
+     * @param mapName - The map name
+     * @param save - True IFF we want to save the results
+     * @param lookahead - The lookahead
+     */
     private void performSingleRun(int scenNum , int type, int prefixLength, int numOfAgents, int budgetPerAgent,String mapName,boolean save,int lookahead)
     {
 
@@ -226,6 +243,11 @@ public class Controller {
             saveResults(scenNum,type,prefixLength,numOfAgents,budgetPerAgent,mapName,lookahead,sumOfCosts);
     }
 
+    /**
+     * This function will calculate the sumOfCosts of the given paths
+     * @param solutions - The solution
+     * @return - The Sum Of Costs
+     */
     private double sumOfCosts(Map<Agent, Prefix> solutions)
     {
         double sumOfCosts = 0;
@@ -271,6 +293,17 @@ public class Controller {
 
     }
 
+    /**
+     * This function will save the results
+     * @param scenNum - The scenario number
+     * @param type - The given algorithm type
+     * @param prefixLength - Tjhe prefix's length
+     * @param numOfAgents -The number of agents
+     * @param budgetPerAgent - The budget per agent
+     * @param mapName - The map number
+     * @param lookahead - The lookahead
+     * @param sumOfCosts - The Sum Of Costs
+     */
     private void saveResults(int scenNum, int type, int prefixLength, int numOfAgents, int budgetPerAgent, String mapName, int lookahead, double sumOfCosts)
     {
         int complete = 0;

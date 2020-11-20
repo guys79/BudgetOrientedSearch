@@ -5,6 +5,8 @@ import Components.BoundedSingleSearchAlgorithms.IBoundedSingleSearchAlgorithm;
 import Components.BudgetDIstributionPolicy.*;
 import Components.CostFunction.ICostFunction;
 import Components.CostFunction.OctileGridFunction;
+import Components.ExcessBudgetPolicy.IBacktrackPolicy;
+import Components.ExcessBudgetPolicy.minPriorityAgent;
 import Components.FailPolicy.AdditionAttempt;
 import Components.FailPolicy.IFailPolicy;
 import Components.Heuristics.HeuristicWithPersonalDatabase;
@@ -36,6 +38,7 @@ public class ParamConfig {
     private Boolean backtrack;
     private Boolean performDeepLookahead;
     private Boolean isSharedBudget;
+    private IBacktrackPolicy backtrackPolicy;
     private Boolean isGoalLessPriority;
 
 
@@ -68,6 +71,7 @@ public class ParamConfig {
                 isSharedBudget = false;
                 isGoalLessPriority = true;
                 failPolicy = new AdditionAttempt();
+                this.backtrackPolicy = new minPriorityAgent();
                 break;
 
             case 2:
@@ -117,7 +121,7 @@ public class ParamConfig {
      */
     private boolean checkIfNull()
     {
-        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm ==null|| backtrack == null || performDeepLookahead == null || isSharedBudget == null || this.isGoalLessPriority == null || this.failPolicy == null;
+        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm ==null|| backtrack == null || performDeepLookahead == null || isSharedBudget == null || this.isGoalLessPriority == null || this.failPolicy == null || this.backtrackPolicy ==null;
     }
 
     /**
@@ -275,5 +279,13 @@ public class ParamConfig {
      */
     public IFailPolicy getFailPolicy() {
         return this.failPolicy;
+    }
+
+    /**
+     * This function will return the backtrack policy
+     * @return - The backtrack policy
+     */
+    public IBacktrackPolicy getBacktrackPolicy() {
+        return this.backtrackPolicy;
     }
 }

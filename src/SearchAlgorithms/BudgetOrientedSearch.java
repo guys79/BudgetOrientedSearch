@@ -4,6 +4,7 @@ import Components.*;
 import Components.Agent;
 import Components.BoundedSingleSearchAlgorithms.IBoundedSingleSearchAlgorithm;
 import Components.BudgetDIstributionPolicy.IBudgetDistributionPolicy;
+import Components.ExcessBudgetPolicy.IBacktrackPolicy;
 import Components.FailPolicy.IFailPolicy;
 import Components.Heuristics.IHeuristic;
 import Components.PriorityPolicy.IPriorityPolicy;
@@ -36,6 +37,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private IFailPolicy failPolicy;
     private Map<Agent, Integer> amountOfBacktracks;
     private Map<Agent,Set<Agent>> conflicted;
+    private IBacktrackPolicy backtrackPolicy;
 
     /**
      * The constructor of the class
@@ -56,6 +58,8 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         this.performDeepLookahead = ParamConfig.getInstance().getPerformDeepLookahead();
         this.amountOfBacktracks = new HashMap<>();
         this.isSharedBudget = ParamConfig.getInstance().getSharedBudget();
+        this.backtrackPolicy = ParamConfig.getInstance().getBacktrackPolicy();
+
         this.conflicted = new HashMap<>();
     }
     @Override
@@ -307,135 +311,17 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
   //          agent.resetBadPoints();
         if(!didTheAgentSucceeded && backtracking && ((budgetPool!=0 && !isSharedBudget) || (isSharedBudget && totalBudget!=0)))
         {
-            preformBacktrack(agent,problematicAgents,solutions);
+            this.backtrackPolicy.preformBacktrack(agent,problematicAgents,solutions,amountOfBacktracks,failPolicy,prioritizedAgents,prioritiesForAgents,preformingBackTrack,conflicted,budgetsForAgents);
         }
 
 
         return solution;
     }
 
-    /**
-     * This function will preform backtracking
-     * @param agent - The problematic agent
-     * @param problematicAgents
-     * @param solutions
-     */
-    private void preformBacktrack(Agent agent, Set<Agent> problematicAgents, Set<Prefix> solutions) {
-
-        if(this.amountOfBacktracks.containsKey(agent))
-            this.amountOfBacktracks.put(agent,this.amountOfBacktracks.get(agent)+1);
-        else
-            this.amountOfBacktracks.put(agent,1);
-
-        if(problematicAgents.size() == 0)
-        {
-            failPolicy.setDidTheIterationFail(true);
-            System.out.println("There are no other agents");
-            return;
-        }
-        Agent minPriorityAgent = findMinPriorityAgent(problematicAgents);
-        System.out.println("The problematic agent is "+agent);
-        if(minPriorityAgent == null)
-        {
-            failPolicy.setDidTheIterationFail(true);
-            System.out.println("There are no agents that are not backtracking");
-            return;
-        }
-        double newPriorityForAgent, newPriorityForProblematicAgent;
-        if(this.prioritizedAgents.size() == 0)
-        {
-            newPriorityForAgent = 1;
-            newPriorityForProblematicAgent = 0;
-
-        }
-        else
-        {
-            Agent nextAgent = this.prioritizedAgents.peek();
-            double nextAgentPriority = this.prioritiesForAgents.get(nextAgent);
-            newPriorityForAgent = nextAgentPriority + 2;
-            newPriorityForProblematicAgent = nextAgentPriority + 1;
-
-        }
-
-        this.prioritiesForAgents.put(agent,newPriorityForAgent);
-        this.prioritiesForAgents.put(minPriorityAgent,newPriorityForProblematicAgent);
-        this.prioritizedAgents.add(agent);
-        this.prioritizedAgents.add(minPriorityAgent);
-
-
-        this.budgetsForAgents.put(agent,-1);
-        this.budgetsForAgents.put(minPriorityAgent,-1);
-        Prefix toDelete = null;
-        for(Prefix sol : solutions)
-        {
-            if(sol.getAgent().equals(minPriorityAgent))
-            {
-                toDelete = sol;
-                break;
-            }
-        }
-        solutions.remove(toDelete);
-        this.preformingBackTrack.add(agent);
-        this.preformingBackTrack.add(minPriorityAgent);
-
-        //Check if there is a constraint where min > agent priority-wise
-        //If so, remove the constraint
-        if(this.conflicted.containsKey(minPriorityAgent))
-        {
-            Set<Agent> conflictedForMin = this.conflicted.get(minPriorityAgent);
-            //Remove constraint if exists
-            if(conflictedForMin.contains(agent))
-            {
-                conflictedForMin.remove(agent);
-                if(conflictedForMin.size() == 0)
-                    this.conflicted.remove(minPriorityAgent);
-            }
-        }
-        //Else, add a new constraint
-        else {
-            //Add the conflicted agents to the conflicted map
-            Set<Agent> conflictedForAgent;
-            if (this.conflicted.containsKey(agent))
-                conflictedForAgent = this.conflicted.get(agent);
-            else
-                conflictedForAgent = new HashSet<>();
-
-            conflictedForAgent.add(minPriorityAgent);
-            this.conflicted.put(agent,conflictedForAgent);
-        }
 
 
 
 
-
-    }
-
-
-
-
-    /**
-     * This function will return the agent with the minimal priority out of the agents that
-     * @param problematicAgents - The set of problematic agents
-     * @return - The agent with the minimum priority
-     */
-    private Agent findMinPriorityAgent(Set<Agent> problematicAgents) {
-
-        double minPriority = Double.MAX_VALUE;
-        Agent minPriorityAgent = null;
-        double agentPriority;
-        for(Agent agent : problematicAgents)
-        {
-            agentPriority = this.prioritiesForAgents.get(agent);
-            if(agentPriority< minPriority)
-            {
-                if(!this.preformingBackTrack.contains(agent)) {
-                    minPriority = agentPriority;
-                    minPriorityAgent = agent;
-                }
-            }
-        }
-        return minPriorityAgent;
-    }
 
     /**
      * This function will use a search algorithm to determine the prefix for the agent

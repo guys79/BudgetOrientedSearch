@@ -213,10 +213,18 @@ public class ParamConfig {
         return priorityPolicy;
     }
 
+    /**
+     * This function will return true IFF the algorithm will preform deep lookahead
+     * @return True IFF the algorithm will preform deep lookahead
+     */
     public Boolean getPerformDeepLookahead() {
         return performDeepLookahead;
     }
 
+    /**
+     * This function will return true IFF the algorithm will use the shared budget mechanism
+     * @return - True IFF the algorithm will use the shared budget mechanism
+     */
     public Boolean getSharedBudget() {
         return isSharedBudget;
     }
@@ -239,6 +247,10 @@ public class ParamConfig {
                 '}';
     }
 
+    /**
+     *  This function will return the parameters and their values
+     * @return - The parameters and value
+     */
     public Map<String,String> getParams()
     {
         Map<String,String> params = new HashMap<>();
@@ -257,6 +269,10 @@ public class ParamConfig {
         return params;
     }
 
+    /**
+     * This function will return the Fail policy
+     * @return - The fail policy
+     */
     public IFailPolicy getFailPolicy() {
         return this.failPolicy;
     }

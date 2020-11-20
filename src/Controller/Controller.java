@@ -18,6 +18,11 @@ public class Controller {
     private View view;
     private List<String> res;
     private String headline;
+
+    /**
+     * The constructor of the class
+     * @param view - The View component
+     */
     public Controller(View view)
     {
         this.view = view;
@@ -36,7 +41,9 @@ public class Controller {
     }
 
 
-
+    /**
+     * This function will preform a test
+     */
     private void performTest() {
 
         /*
@@ -101,6 +108,12 @@ public class Controller {
 
     }
 
+    /**
+     * This function will save the results in the given folder location
+     * @param folderLocation - The folder's location
+     * @param types - The array of types
+     * @param additionalName - The additional name
+     */
     private void saveResults(String folderLocation, int[] types,String additionalName)
     {
         try {
@@ -112,6 +125,12 @@ public class Controller {
 
     }
 
+    /**
+     * This function will save the results in CSV form
+     * @param folderLocation - The folder's location
+     * @param additionalName - The additional name
+     * @throws IOException
+     */
     private void saveResultsInExcel(String folderLocation,String additionalName) throws IOException {
         String name = "result_"+additionalName+".csv";
         String path = folderLocation + "\\"+name;
@@ -132,6 +151,12 @@ public class Controller {
 
     }
 
+    /**
+     * This function will create the explenation file
+     * @param folderLocation
+     * @param types
+     * @throws IOException
+     */
     private void saveExplanationTest(String folderLocation, int[] types) throws IOException {
         String name = "Explanation.txt";
         String path = folderLocation + "\\"+name;

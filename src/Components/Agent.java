@@ -26,6 +26,13 @@ public class Agent {
         this.numOfBadPoints=0;
 
     }
+
+    /**
+     * The constructor
+     * @param start - The start node
+     * @param goal - The goL node
+     * @param id - The id of the agent
+     */
     public Agent(Node start, Node goal,int id) {
 
         this.id = id;

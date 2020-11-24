@@ -220,7 +220,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
 
                 //For each neighbor
                 for (Node neighbor : neighbors) {
-                    neighborNode = new ALSSLRTAStarNode(neighbor, currentTimeStamp + 1);
+                    neighborNode = new ALSSLRTAStarNode(neighbor, currentTimeStamp + 1,currentNode);
                     Set<Agent> problematicAgentForState = isStateValid(neighborNode, solutions, currentNode);
                     //Only if the state is valid we will insert is to the open
                     if (problematicAgentForState.size() == 0) {
@@ -275,6 +275,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
         for (ALSSLRTAStarNode node : rest) {
             addToOpenList(node, openList);
         }
+        agent.setLeaves(rest);
         return new Pair<>(budget - expansions, problematicAgent);
 
     }
@@ -500,9 +501,12 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
      * @param predecessor - The predecessor
      * @return - True IFF the state is valid
      */
-    private Set<Agent> isStateValid(ALSSLRTAStarNode node, Set<Prefix> solutions, ALSSLRTAStarNode predecessor) {
+    public static Set<Agent> isStateValid(ALSSLRTAStarNode node, Set<Prefix> solutions, ALSSLRTAStarNode predecessor) {
         int timeStamp = node.getTimeStamp();
-        if (timeStamp >= this.prefixSize && (timeStamp <= lookahead || lookahead == -1))
+        int prefixSize = Problem.getInstance().getPrefix();
+        int lookahead = Problem.getInstance().getLookahead();
+
+        if (timeStamp >= prefixSize && (timeStamp <= lookahead || lookahead == -1))
             return new HashSet<>();
         Set<Agent> problematicAgent = new HashSet<>();
         Agent agentToAdd = checkForCollisions(node, solutions);
@@ -536,7 +540,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
      * @param predecessor - The predecessor
      * @return - True IFF the agent will not swipe with other agents
      */
-    private Agent checkForSwipes(ALSSLRTAStarNode node, ALSSLRTAStarNode predecessor, Set<Prefix> solutions) {
+    public static Agent checkForSwipes(ALSSLRTAStarNode node, ALSSLRTAStarNode predecessor, Set<Prefix> solutions) {
 
 
         int timeStamp = node.getTimeStamp();
@@ -595,7 +599,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
      * @param solutions - The prev solutions
      * @return - True IFF the agent will not collide with other agents
      */
-    private Agent checkForCollisions(ALSSLRTAStarNode node, Set<Prefix> solutions) {
+    public static Agent checkForCollisions(ALSSLRTAStarNode node, Set<Prefix> solutions) {
         int timeStamp = node.getTimeStamp();
         Node actualNode = node.getNode();
 

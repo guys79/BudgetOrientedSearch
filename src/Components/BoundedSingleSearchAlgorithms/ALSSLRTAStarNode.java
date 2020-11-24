@@ -11,6 +11,7 @@ public class ALSSLRTAStarNode {
 
     private Node node;//The represented node
     private int timeStamp;//The time stamp
+    private ALSSLRTAStarNode parent;//The parent
 
 
     /**
@@ -22,6 +23,16 @@ public class ALSSLRTAStarNode {
     public ALSSLRTAStarNode(Node node, int timeStamp) {
         this.node = node;
         this.timeStamp = timeStamp;
+    }
+
+    public ALSSLRTAStarNode(Node node, int timeStamp, ALSSLRTAStarNode parent) {
+        this.node = node;
+        this.timeStamp = timeStamp;
+        this.parent = parent;
+    }
+
+    public ALSSLRTAStarNode getParent() {
+        return parent;
     }
 
     /**

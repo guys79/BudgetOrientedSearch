@@ -1,6 +1,9 @@
 package Components;
 
+import Components.BoundedSingleSearchAlgorithms.ALSSLRTAStarNode;
+
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * This class represents an agent
@@ -11,6 +14,9 @@ public class Agent {
     private Node start;//The start node
     private Node goal;//The goal node
     private int numOfBadPoints;//The number of bad points
+    private Set<ALSSLRTAStarNode> leaves;
+    private Set<Agent> problematicAgents;
+
 
     /**
      * The constructor of the agent
@@ -25,6 +31,8 @@ public class Agent {
         this.start = start;
         this.goal = goal;
         this.numOfBadPoints = 0;
+        this.leaves = null;
+        this.problematicAgents = null;
 
     }
 
@@ -38,10 +46,42 @@ public class Agent {
     public Agent(Node start, Node goal, int id) {
 
         this.id = id;
-
+        this.leaves = null;
         this.start = start;
         this.goal = goal;
+        this.problematicAgents = null;
 
+    }
+
+    /**
+     * This function will set the problematic agents for this agent inn this iteration
+     * @param problematicAgents - The problematic agent
+     */
+    public void setProblematicAgents(Set<Agent> problematicAgents) {
+        this.problematicAgents = problematicAgents;
+    }
+
+    /**
+     * This function will return the problematic agents for this agent in this iteration
+     * @return - The problematic agents for this agent in this iteration
+     */
+    public Set<Agent> getProblematicAgents() {
+        return problematicAgents;
+    }
+
+    /**
+     * This function will set the leaves from the search tree
+     */
+    public void setLeaves(Set<ALSSLRTAStarNode> leaves) {
+        this.leaves = leaves;
+    }
+
+    /**
+     * This function will get the leaves from the search tree
+     * @return  - The leaves from the search tree
+     */
+    public Set<ALSSLRTAStarNode> getLeaves() {
+        return leaves;
     }
 
     /**

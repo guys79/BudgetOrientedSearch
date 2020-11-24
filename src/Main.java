@@ -1,4 +1,5 @@
 import Components.*;
+import Components.ExcessBudgetPolicy.GraphBasedAgent;
 import Controller.Controller;
 import SearchAlgorithms.BudgetOrientedSearch;
 import SearchAlgorithms.IMultiAgentSearchAlgorithm;
@@ -39,6 +40,8 @@ public class Main extends Application {
         primaryStage.show();
 
         Controller controller = new Controller(view);
+
+
 
     }
 }

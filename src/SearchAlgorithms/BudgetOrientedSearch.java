@@ -284,6 +284,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         int remainingBudget = prefixAndRemainingBudgetPair.getSecond();
         solution = prefixAndRemainingBudgetPair.getFirst();
         Set<Agent> problematicAgents = prefixAndRemainingBudgetPair.getThird();
+        agent.setProblematicAgents(problematicAgents);
         if (!isSharedBudget)
             this.budgetPool += remainingBudget;
         else {

@@ -11,10 +11,11 @@ import java.util.Set;
 public interface IBudgetDistributionPolicy {
 
     /**
-     * This fnction will return the distribution of the total budget over all of the agents
-     * @param agents - The given agents
+     * This function will return the distribution of the total budget over all of the agents
+     *
+     * @param agents      - The given agents
      * @param totalBudget - The total amount of budget for all of the agents
      * @return - A dictionary where the key is the agent and the value is the budget of the agent
      */
-    public Map<Agent,Integer> getBudgetDistribution(Set<Agent> agents, int totalBudget,Map<Agent,Integer> amountOfBacktracks);
+    public Map<Agent, Integer> getBudgetDistribution(Set<Agent> agents, int totalBudget, Map<Agent, Integer> amountOfBacktracks);
 }

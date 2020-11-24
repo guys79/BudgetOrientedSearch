@@ -9,8 +9,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-public class PreComputedUniformCostSearch extends HeuristicWithPersonalDatabase
-{
+public class PreComputedUniformCostSearch extends HeuristicWithPersonalDatabase {
 
     private Map<Node, Double> costs;
 
@@ -38,12 +37,11 @@ public class PreComputedUniformCostSearch extends HeuristicWithPersonalDatabase
         PriorityQueue<Node> priorityQueue = new PriorityQueue<>(new UniformCostSearch.UniformCostSearchNodeComparator(costs));
 
         //Putting the start state in the priority queue with the value of 0
-        putInQueue(priorityQueue,costs,dest,0);
+        putInQueue(priorityQueue, costs, dest, 0);
 
         Node current;
         //While the queue is not empty
-        while(priorityQueue.size()>0)
-        {
+        while (priorityQueue.size() > 0) {
             //Dequeue the node
             current = priorityQueue.poll();
 
@@ -53,11 +51,10 @@ public class PreComputedUniformCostSearch extends HeuristicWithPersonalDatabase
             double newCost;
 
             //Add all the neighbors that we have not reached to yet
-            for (Node neigh : neighbors)
-            {
+            for (Node neigh : neighbors) {
                 //If we have not reached the neighbor before
-                if(!costs.containsKey(neigh)) {
-                    newCost = currCost + costFunction.getCost(current,neigh);
+                if (!costs.containsKey(neigh)) {
+                    newCost = currCost + costFunction.getCost(current, neigh);
                     putInQueue(priorityQueue, costs, neigh, newCost);
                 }
             }
@@ -71,14 +68,14 @@ public class PreComputedUniformCostSearch extends HeuristicWithPersonalDatabase
 
     /**
      * This function will put a node in the queue and update its cost
+     *
      * @param priorityQueue - The given priority queue
-     * @param costs - The given costs map
-     * @param node - The given node
-     * @param cost - The given cost
+     * @param costs         - The given costs map
+     * @param node          - The given node
+     * @param cost          - The given cost
      */
-    private void putInQueue(PriorityQueue<Node> priorityQueue,Map<Node,Double> costs,Node node,double cost)
-    {
-        costs.put(node,cost);
+    private void putInQueue(PriorityQueue<Node> priorityQueue, Map<Node, Double> costs, Node node, double cost) {
+        costs.put(node, cost);
         priorityQueue.add(node);
     }
 }

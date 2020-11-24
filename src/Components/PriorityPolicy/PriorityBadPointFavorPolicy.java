@@ -15,10 +15,9 @@ public class PriorityBadPointFavorPolicy implements IPriorityPolicy {
         Map<Agent, Double> distribution = new HashMap<>();
         int amountBacktrackForAgent;
         boolean isGoalLessPriority = ParamConfig.getInstance().getGoalLessPriority();
-        for (Agent agent : agents)
-        {
-            if(current.get(agent).equals(agent.getGoal()) & isGoalLessPriority)
-                distribution.put(agent,1.0);
+        for (Agent agent : agents) {
+            if (current.get(agent).equals(agent.getGoal()) & isGoalLessPriority)
+                distribution.put(agent, 1.0);
             else {
 
                 distribution.put(agent, 2d + agent.getNumOfBadPoints());

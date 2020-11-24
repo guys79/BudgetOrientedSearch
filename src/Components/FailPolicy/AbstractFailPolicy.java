@@ -10,8 +10,7 @@ public abstract class AbstractFailPolicy implements IFailPolicy {
     /**
      * The constructor of the class
      */
-    public AbstractFailPolicy()
-    {
+    public AbstractFailPolicy() {
 
         didTheIterationFail = false;
     }

@@ -16,17 +16,17 @@ public class PerformanceTracker {
     /**
      * The constructor of the class
      */
-    private PerformanceTracker()
-    {
+    private PerformanceTracker() {
         reset();
     }
 
     /**
      * This function will return the instance
+     *
      * @return - The instance
      */
     public static PerformanceTracker getInstance() {
-        if(instance == null)
+        if (instance == null)
             instance = new PerformanceTracker();
         return instance;
     }
@@ -34,13 +34,13 @@ public class PerformanceTracker {
     /**
      * This function will add 1 to the number of iterations
      */
-    public void addIteration()
-    {
+    public void addIteration() {
         this.numberOFIteration++;
     }
 
     /**
      * This function will return the number of iterations
+     *
      * @return - The number of iterations
      */
     public int getNumberOFIteration() {
@@ -49,6 +49,7 @@ public class PerformanceTracker {
 
     /**
      * This function will add to the pre-computation time
+     *
      * @param preCompute - The amount to add
      */
     public void addPreCompute(long preCompute) {
@@ -57,6 +58,7 @@ public class PerformanceTracker {
 
     /**
      * This function will set the overall search time
+     *
      * @param overAllSearch - The overall search time
      */
     public void setOverAllSearch(long overAllSearch) {
@@ -65,6 +67,7 @@ public class PerformanceTracker {
 
     /**
      * This function will return the overall search time
+     *
      * @return - The overall search time
      */
     public long getOverAllSearch() {
@@ -73,6 +76,7 @@ public class PerformanceTracker {
 
     /**
      * This function will return the pre-computation time
+     *
      * @return - The pre-computation time
      */
     public long getPreCompute() {
@@ -81,6 +85,7 @@ public class PerformanceTracker {
 
     /**
      * This function will return the search time neto
+     *
      * @return - Neto search time
      */
     public long getSearchTimeNeto() {
@@ -96,6 +101,7 @@ public class PerformanceTracker {
 
     /**
      * This function will return the number of pre - computed agents
+     *
      * @return - The number of pre - computed agents
      */
     public int getNumOfPreComputedAgents() {
@@ -104,6 +110,7 @@ public class PerformanceTracker {
 
     /**
      * This function will set the completion status
+     *
      * @param complete - The completion status
      */
     public void setComplete(boolean complete) {
@@ -112,6 +119,7 @@ public class PerformanceTracker {
 
     /**
      * This function will return the completion status
+     *
      * @return - The completion status
      */
     public boolean isComplete() {
@@ -121,8 +129,7 @@ public class PerformanceTracker {
     /**
      * Thus function will reset the parameters of the class
      */
-    public void reset()
-    {
+    public void reset() {
         this.complete = false;
         this.numberOFIteration = 0;
         this.numOfPreComputedAgents = 0;

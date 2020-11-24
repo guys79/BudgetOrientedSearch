@@ -14,54 +14,59 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
+<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/10.0.1"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
     <columnConstraints>
-        <ColumnConstraints />
+        <ColumnConstraints/>
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints />
+        <RowConstraints/>
     </rowConstraints>
     <BorderPane>
         <center>
-            <Canvas fx:id="canvas" height="650.0" width="1000.0" BorderPane.alignment="CENTER" />
+            <Canvas fx:id="canvas" height="650.0" width="1000.0" BorderPane.alignment="CENTER"/>
         </center>
         <bottom>
             <GridPane prefHeight="38.0" style="-fx-background-color: #d2cbd2" BorderPane.alignment="CENTER">
                 <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Text fx:id="timeText" strokeType="OUTSIDE" strokeWidth="0.0" text="t = 0" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+                <Text fx:id="timeText" strokeType="OUTSIDE" strokeWidth="0.0" text="t = 0" GridPane.columnIndex="2"
+                      GridPane.halignment="CENTER">
                     <font>
-                        <Font name="System Bold" size="14.0" />
+                        <Font name="System Bold" size="14.0"/>
                     </font>
                 </Text>
-                <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#timeForward" prefHeight="48.0" prefWidth="266.0" text="&gt;" GridPane.columnIndex="4" GridPane.rowSpan="2">
+                <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#timeForward" prefHeight="48.0"
+                        prefWidth="266.0" text="&gt;" GridPane.columnIndex="4" GridPane.rowSpan="2">
                     <font>
-                        <Font name="System Bold" size="18.0" />
+                        <Font name="System Bold" size="18.0"/>
                     </font>
                 </Button>
-                <Button fx:id="nextButton" mnemonicParsing="false" onAction="#unMark" prefHeight="48.0" prefWidth="266.0" text="Un Mark" GridPane.columnIndex="5" GridPane.rowSpan="2">
+                <Button fx:id="nextButton" mnemonicParsing="false" onAction="#unMark" prefHeight="48.0"
+                        prefWidth="266.0" text="Un Mark" GridPane.columnIndex="5" GridPane.rowSpan="2">
                     <font>
-                        <Font name="System Bold" size="18.0" />
+                        <Font name="System Bold" size="18.0"/>
                     </font>
                 </Button>
                 <Slider fx:id="slider" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1">
                     <GridPane.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" />
+                        <Insets bottom="5.0" left="5.0" right="5.0"/>
                     </GridPane.margin>
                 </Slider>
-                <Button fx:id="backButton" layoutX="544.0" layoutY="10.0" mnemonicParsing="false" onAction="#timeBackward" prefHeight="48.0" prefWidth="266.0" text="&lt;" GridPane.rowSpan="2">
+                <Button fx:id="backButton" layoutX="544.0" layoutY="10.0" mnemonicParsing="false"
+                        onAction="#timeBackward" prefHeight="48.0" prefWidth="266.0" text="&lt;" GridPane.rowSpan="2">
                     <font>
-                        <Font name="System Bold" size="18.0" />
+                        <Font name="System Bold" size="18.0"/>
                     </font>
                 </Button>
             </GridPane>
@@ -69,41 +74,45 @@
         <top>
             <GridPane BorderPane.alignment="CENTER">
                 <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    <RowConstraints/>
 
                 </rowConstraints>
                 <children>
-                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Enter scenario number" GridPane.columnSpan="1" GridPane.rowIndex="1" GridPane.rowSpan="1">
+                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Enter scenario number" GridPane.columnSpan="1"
+                          GridPane.rowIndex="1" GridPane.rowSpan="1">
                         <font>
-                            <Font name="System Bold" size="30.0" />
+                            <Font name="System Bold" size="30.0"/>
                         </font>
                     </Text>
-                    <TextField fx:id="acenNumber" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="320.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <TextField fx:id="acenNumber" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                               minWidth="-Infinity" prefHeight="25.0" prefWidth="320.0" GridPane.columnIndex="1"
+                               GridPane.rowIndex="1">
                         <GridPane.margin>
-                            <Insets />
+                            <Insets/>
                         </GridPane.margin>
                     </TextField>
-                    <Button fx:id="scen_btn" mnemonicParsing="false" onAction="#setScenario" prefHeight="25.0" prefWidth="320.0" text="Enter" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                    <Button fx:id="scen_btn" mnemonicParsing="false" onAction="#setScenario" prefHeight="25.0"
+                            prefWidth="320.0" text="Enter" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
                 </children>
             </GridPane>
         </top>
         <left>
             <GridPane prefWidth="200.0" BorderPane.alignment="CENTER">
                 <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
 
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
                 <children>
 
@@ -111,59 +120,70 @@
                         <items>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="98.0">
                                 <children>
-                                    <Text layoutX="24.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter X">
+                                    <Text layoutX="24.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                                          text="Enter X">
                                         <font>
-                                            <Font name="System Bold" size="15.0" />
+                                            <Font name="System Bold" size="15.0"/>
                                         </font>
                                     </Text>
                                 </children>
                             </AnchorPane>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                 <children>
-                                    <TextField fx:id="enter_x_textField" layoutX="-7.0" layoutY="26.0" prefHeight="25.0" prefWidth="105.0" />
+                                    <TextField fx:id="enter_x_textField" layoutX="-7.0" layoutY="26.0" prefHeight="25.0"
+                                               prefWidth="105.0"/>
                                 </children>
                             </AnchorPane>
                         </items>
                     </SplitPane>
 
 
-                    <Button fx:id="mark_btn" alignment="TOP_CENTER" onAction="#markButton" prefHeight="52.0" prefWidth="100.0" text="Mark" GridPane.columnSpan="1" GridPane.rowIndex="3">
+                    <Button fx:id="mark_btn" alignment="TOP_CENTER" onAction="#markButton" prefHeight="52.0"
+                            prefWidth="100.0" text="Mark" GridPane.columnSpan="1" GridPane.rowIndex="3">
                         <opaqueInsets>
-                            <Insets />
-                        </opaqueInsets></Button>
-                    <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" GridPane.rowIndex="1">
+                            <Insets/>
+                        </opaqueInsets>
+                    </Button>
+                    <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0"
+                               GridPane.rowIndex="1">
                         <items>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="98.0">
                                 <children>
-                                    <Text layoutX="24.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Y">
+                                    <Text layoutX="24.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                                          text="Enter Y">
                                         <font>
-                                            <Font name="System Bold" size="15.0" />
+                                            <Font name="System Bold" size="15.0"/>
                                         </font>
                                     </Text>
                                 </children>
                             </AnchorPane>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                 <children>
-                                    <TextField fx:id="enter_y_textField" layoutX="-7.0" layoutY="26.0" prefHeight="25.0" prefWidth="105.0" />
+                                    <TextField fx:id="enter_y_textField" layoutX="-7.0" layoutY="26.0" prefHeight="25.0"
+                                               prefWidth="105.0"/>
                                 </children>
                             </AnchorPane>
                         </items>
                     </SplitPane>
-               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="98.0" GridPane.rowIndex="2">
-                  <children>
-                     <Text layoutX="24.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Mark Agent">
-                        <font>
-                           <Font name="System Bold" size="15.0" />
-                        </font>
-                     </Text>
-                     <TextField fx:id="mark_agent_id" layoutX="7.0" layoutY="106.0" prefHeight="25.0" prefWidth="105.0" />
-                     <Button fx:id="mark_agent_btn" alignment="TOP_CENTER" layoutX="10.0" layoutY="146.0" onAction="#markAgent" prefHeight="52.0" prefWidth="100.0" text="Mark Agent">
-                        <opaqueInsets>
-                           <Insets />
-                        </opaqueInsets>
-                     </Button>
-                  </children>
-               </AnchorPane>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="98.0"
+                                GridPane.rowIndex="2">
+                        <children>
+                            <Text layoutX="24.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                                  text="Mark Agent">
+                                <font>
+                                    <Font name="System Bold" size="15.0"/>
+                                </font>
+                            </Text>
+                            <TextField fx:id="mark_agent_id" layoutX="7.0" layoutY="106.0" prefHeight="25.0"
+                                       prefWidth="105.0"/>
+                            <Button fx:id="mark_agent_btn" alignment="TOP_CENTER" layoutX="10.0" layoutY="146.0"
+                                    onAction="#markAgent" prefHeight="52.0" prefWidth="100.0" text="Mark Agent">
+                                <opaqueInsets>
+                                    <Insets/>
+                                </opaqueInsets>
+                            </Button>
+                        </children>
+                    </AnchorPane>
 
                 </children>
             </GridPane>

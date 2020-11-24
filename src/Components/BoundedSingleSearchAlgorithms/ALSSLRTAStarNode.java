@@ -13,20 +13,20 @@ public class ALSSLRTAStarNode {
     private int timeStamp;//The time stamp
 
 
-
     /**
      * The constructor of the class
-     * @param node - The given node
+     *
+     * @param node      - The given node
      * @param timeStamp - The time stamp
      */
-    public ALSSLRTAStarNode(Node node,int timeStamp)
-    {
+    public ALSSLRTAStarNode(Node node, int timeStamp) {
         this.node = node;
         this.timeStamp = timeStamp;
     }
 
     /**
      * This function will return the time stamp
+     *
      * @return - The time stamp
      */
     public int getTimeStamp() {
@@ -35,6 +35,7 @@ public class ALSSLRTAStarNode {
 
     /**
      * This function will return the node
+     *
      * @return - The node
      */
     public Node getNode() {
@@ -44,7 +45,7 @@ public class ALSSLRTAStarNode {
 
     @Override
     public String toString() {
-        return node +" time = "+this.timeStamp;
+        return node + " time = " + this.timeStamp;
     }
 
     @Override

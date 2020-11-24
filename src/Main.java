@@ -12,16 +12,13 @@ import sun.misc.Perf;
 
 import java.util.*;
 
-public class Main  extends Application{
+public class Main extends Application {
 
     public static void main(String[] args)
 
     {
         launch(args);
     }
-
-
-
 
 
     @Override
@@ -34,11 +31,11 @@ public class Main  extends Application{
         Parent root = fxmlLoader.load(getClass().getResource(path).openStream());
         View view = fxmlLoader.getController();
         primaryStage.setTitle("BOS");
-        double ratio = 975/1600.0;
+        double ratio = 975 / 1600.0;
         double width = 1200;
-        double height = width*ratio;
+        double height = width * ratio;
 
-        primaryStage.setScene(new Scene(root, width,height ));
+        primaryStage.setScene(new Scene(root, width, height));
         primaryStage.show();
 
         Controller controller = new Controller(view);

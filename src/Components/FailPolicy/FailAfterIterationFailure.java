@@ -24,7 +24,7 @@ public class FailAfterIterationFailure extends AbstractFailPolicy {
     }
 
     @Override
-    public Map<Agent,Prefix> determineSolution(Map<Agent, Node> currentPaths, int prefixSize) {
+    public Map<Agent, Prefix> determineSolution(Map<Agent, Node> currentPaths, int prefixSize) {
         return null;
     }
 }

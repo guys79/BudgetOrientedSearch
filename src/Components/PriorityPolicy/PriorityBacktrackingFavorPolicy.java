@@ -12,18 +12,17 @@ public class PriorityBacktrackingFavorPolicy implements IPriorityPolicy {
     public Map<Agent, Double> getPriorityDistribution(Set<Agent> agents, Map<Agent, Node> current, Map<Agent, Integer> amountOfBacktracks, Map<Agent, Set<Agent>> conflicted) {
         Map<Agent, Double> distribution = new HashMap<>();
         int amountBacktrackForAgent;
-        for (Agent agent : agents)
-        {
-            if(current.get(agent).equals(agent.getGoal()))
-                distribution.put(agent,1.0);
+        for (Agent agent : agents) {
+            if (current.get(agent).equals(agent.getGoal()))
+                distribution.put(agent, 1.0);
             else {
-                if(amountOfBacktracks.containsKey(agent))
+                if (amountOfBacktracks.containsKey(agent))
                     amountBacktrackForAgent = amountOfBacktracks.get(agent);
                 else
                     amountBacktrackForAgent = 0;
 
-                double backtrackBonus = 2 - Math.pow(0.5,amountBacktrackForAgent);
-                distribution.put(agent, 2.0*backtrackBonus);
+                double backtrackBonus = 2 - Math.pow(0.5, amountBacktrackForAgent);
+                distribution.put(agent, 2.0 * backtrackBonus);
             }
 
         }

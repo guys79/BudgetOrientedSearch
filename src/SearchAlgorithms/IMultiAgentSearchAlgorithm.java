@@ -18,6 +18,7 @@ public interface IMultiAgentSearchAlgorithm {
 
     /**
      * This function will search for a path for each agent
+     *
      * @param view - The view
      */
     public Map<Agent, Prefix> getSolution(View view);

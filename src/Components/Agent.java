@@ -14,8 +14,9 @@ public class Agent {
 
     /**
      * The constructor of the agent
+     *
      * @param start - The start node
-     * @param goal - The goal node
+     * @param goal  - The goal node
      */
     public Agent(Node start, Node goal) {
 
@@ -23,17 +24,18 @@ public class Agent {
         numberOfExistingAgents++;
         this.start = start;
         this.goal = goal;
-        this.numOfBadPoints=0;
+        this.numOfBadPoints = 0;
 
     }
 
     /**
      * The constructor
+     *
      * @param start - The start node
-     * @param goal - The goL node
-     * @param id - The id of the agent
+     * @param goal  - The goL node
+     * @param id    - The id of the agent
      */
-    public Agent(Node start, Node goal,int id) {
+    public Agent(Node start, Node goal, int id) {
 
         this.id = id;
 
@@ -45,34 +47,37 @@ public class Agent {
     /**
      * This function will add a bad point to the agent
      */
-    public void addBadPoint()
-    {
+    public void addBadPoint() {
         this.numOfBadPoints++;
     }
 
     /**
      * This function will return the number of bad points
+     *
      * @return - The number of bad points
      */
     public int getNumOfBadPoints() {
         return numOfBadPoints;
     }
 
-    public void resetBadPoints() {numOfBadPoints=0;}
-    public static void restNumOfAgents()
-    {
+    public void resetBadPoints() {
+        numOfBadPoints = 0;
+    }
+
+    public static void restNumOfAgents() {
         numberOfExistingAgents = 0;
     }
+
     /**
      * The empty constructor
      */
-    public Agent()
-    {
-        this(null,null);
+    public Agent() {
+        this(null, null);
     }
 
     /**
      * This function will nreturn the number of existing agents
+     *
      * @return - The number of existing agents
      */
     public static int getNumberOfExistingAgents() {
@@ -81,6 +86,7 @@ public class Agent {
 
     /**
      * This function will return the id of the agent
+     *
      * @return - The id of the agent
      */
     public int getId() {
@@ -89,6 +95,7 @@ public class Agent {
 
     /**
      * This funcion will set the agent's id
+     *
      * @param id - The agent's id
      */
     public void setId(int id) {
@@ -97,6 +104,7 @@ public class Agent {
 
     /**
      * This function will return the start node
+     *
      * @return - The start node
      */
     public Node getStart() {
@@ -105,6 +113,7 @@ public class Agent {
 
     /**
      * This function will set the start node
+     *
      * @param start - The start node
      */
     public void setStart(Node start) {
@@ -113,6 +122,7 @@ public class Agent {
 
     /**
      * This function will return the goal njode
+     *
      * @return - The goal node
      */
     public Node getGoal() {
@@ -121,6 +131,7 @@ public class Agent {
 
     /**
      * This function will set the goal node
+     *
      * @param goal - The goal node
      */
     public void setGoal(Node goal) {
@@ -145,7 +156,7 @@ public class Agent {
 
     @Override
     public String toString() {
-        String str = "agent id "+id +" start - "+start +" goal - "+goal;
+        String str = "agent id " + id + " start - " + start + " goal - " + goal;
         return str;
     }
 }

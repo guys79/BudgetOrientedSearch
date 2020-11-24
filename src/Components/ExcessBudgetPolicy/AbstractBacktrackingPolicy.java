@@ -11,36 +11,31 @@ import java.util.Set;
 
 public abstract class AbstractBacktrackingPolicy implements IBacktrackPolicy {
     @Override
-    public void preformBacktrack(Agent agent, Set<Agent> problematicAgents, Set<Prefix> solutions, Map<Agent, Integer>  amountOfBacktracks,
-                                 IFailPolicy failPolicy, PriorityQueue<Agent> prioritizedAgents, Map<Agent,Double> prioritiesForAgents, Set<Agent> preformingBackTrack, Map<Agent,Set<Agent>> conflicted, Map<Agent,Integer> budgetsForAgents) {
-        if(amountOfBacktracks.containsKey(agent))
-            amountOfBacktracks.put(agent,amountOfBacktracks.get(agent)+1);
+    public void preformBacktrack(Agent agent, Set<Agent> problematicAgents, Set<Prefix> solutions, Map<Agent, Integer> amountOfBacktracks,
+                                 IFailPolicy failPolicy, PriorityQueue<Agent> prioritizedAgents, Map<Agent, Double> prioritiesForAgents, Set<Agent> preformingBackTrack, Map<Agent, Set<Agent>> conflicted, Map<Agent, Integer> budgetsForAgents) {
+        if (amountOfBacktracks.containsKey(agent))
+            amountOfBacktracks.put(agent, amountOfBacktracks.get(agent) + 1);
         else
-            amountOfBacktracks.put(agent,1);
+            amountOfBacktracks.put(agent, 1);
 
-        if(problematicAgents.size() == 0)
-        {
+        if (problematicAgents.size() == 0) {
             failPolicy.setDidTheIterationFail(true);
             System.out.println("There are no other agents");
             return;
         }
-        Agent chosenAgent = this.getChosenAgent(problematicAgents,prioritiesForAgents,preformingBackTrack);
-        System.out.println("The problematic agent is "+agent);
-        if(chosenAgent == null)
-        {
+        Agent chosenAgent = this.getChosenAgent(problematicAgents, prioritiesForAgents, preformingBackTrack, solutions);
+        System.out.println("The problematic agent is " + agent);
+        if (chosenAgent == null) {
             failPolicy.setDidTheIterationFail(true);
             System.out.println("There are no agents that are not backtracking");
             return;
         }
         double newPriorityForAgent, newPriorityForProblematicAgent;
-        if(prioritizedAgents.size() == 0)
-        {
+        if (prioritizedAgents.size() == 0) {
             newPriorityForAgent = 1;
             newPriorityForProblematicAgent = 0;
 
-        }
-        else
-        {
+        } else {
             Agent nextAgent = prioritizedAgents.peek();
             double nextAgentPriority = prioritiesForAgents.get(nextAgent);
             newPriorityForAgent = nextAgentPriority + 2;
@@ -48,19 +43,17 @@ public abstract class AbstractBacktrackingPolicy implements IBacktrackPolicy {
 
         }
 
-        prioritiesForAgents.put(agent,newPriorityForAgent);
-        prioritiesForAgents.put(chosenAgent,newPriorityForProblematicAgent);
+        prioritiesForAgents.put(agent, newPriorityForAgent);
+        prioritiesForAgents.put(chosenAgent, newPriorityForProblematicAgent);
         prioritizedAgents.add(agent);
         prioritizedAgents.add(chosenAgent);
 
 
-        budgetsForAgents.put(agent,-1);
-        budgetsForAgents.put(chosenAgent,-1);
+        budgetsForAgents.put(agent, -1);
+        budgetsForAgents.put(chosenAgent, -1);
         Prefix toDelete = null;
-        for(Prefix sol : solutions)
-        {
-            if(sol.getAgent().equals(chosenAgent))
-            {
+        for (Prefix sol : solutions) {
+            if (sol.getAgent().equals(chosenAgent)) {
                 toDelete = sol;
                 break;
             }
@@ -71,14 +64,12 @@ public abstract class AbstractBacktrackingPolicy implements IBacktrackPolicy {
 
         //Check if there is a constraint where min > agent priority-wise
         //If so, remove the constraint
-        if(conflicted.containsKey(chosenAgent))
-        {
+        if (conflicted.containsKey(chosenAgent)) {
             Set<Agent> conflictedForMin = conflicted.get(chosenAgent);
             //Remove constraint if exists
-            if(conflictedForMin.contains(agent))
-            {
+            if (conflictedForMin.contains(agent)) {
                 conflictedForMin.remove(agent);
-                if(conflictedForMin.size() == 0)
+                if (conflictedForMin.size() == 0)
                     conflicted.remove(chosenAgent);
             }
         }
@@ -92,17 +83,19 @@ public abstract class AbstractBacktrackingPolicy implements IBacktrackPolicy {
                 conflictedForAgent = new HashSet<>();
 
             conflictedForAgent.add(chosenAgent);
-            conflicted.put(agent,conflictedForAgent);
+            conflicted.put(agent, conflictedForAgent);
         }
 
     }
 
     /**
      * This funnction will choose the agent to perform backtrack with
-     * @param problematicAgents - The problematic agents
+     *
+     * @param problematicAgents   - The problematic agents
      * @param prioritiesForAgents - Map - key - agent, val - budget for agent
      * @param preformingBackTrack - number of agents that are currently preforming backtrack
+     * @param solutions           - The solutions so far
      * @return - The problematic agents
      */
-    protected abstract Agent getChosenAgent(Set<Agent> problematicAgents,Map<Agent,Double>prioritiesForAgents,Set<Agent> preformingBackTrack);
+    protected abstract Agent getChosenAgent(Set<Agent> problematicAgents, Map<Agent, Double> prioritiesForAgents, Set<Agent> preformingBackTrack, Set<Prefix> solutions);
 }

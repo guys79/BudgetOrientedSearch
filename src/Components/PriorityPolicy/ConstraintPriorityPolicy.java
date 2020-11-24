@@ -8,37 +8,32 @@ import java.util.*;
 public class ConstraintPriorityPolicy implements IPriorityPolicy {
     @Override
     public Map<Agent, Double> getPriorityDistribution(Set<Agent> agents, Map<Agent, Node> current, Map<Agent, Integer> amountOfBacktracks, Map<Agent, Set<Agent>> conflicted) {
-        List<Agent> agentsOrder = topolgicalSort(agents,  conflicted);
-        Map<Agent,Double> mapOfPriority = new HashMap<>();
-        for(int i = 0; i<agentsOrder.size();i++)
-        {
+        List<Agent> agentsOrder = topolgicalSort(agents, conflicted);
+        Map<Agent, Double> mapOfPriority = new HashMap<>();
+        for (int i = 0; i < agentsOrder.size(); i++) {
             Agent agent = agentsOrder.get(i);
-            if(current.get(agent).equals(agent.getGoal()))
-                mapOfPriority.put(agent,1.0);
-            else
-            {
-                mapOfPriority.put(agentsOrder.get(i),2+(1.0/(i+1)));
+            if (current.get(agent).equals(agent.getGoal()))
+                mapOfPriority.put(agent, 1.0);
+            else {
+                mapOfPriority.put(agentsOrder.get(i), 2 + (1.0 / (i + 1)));
             }
 
         }
         return mapOfPriority;
     }
 
-    private List<Agent> topolgicalSort(Set<Agent>agents, Map<Agent, Set<Agent>> conflicted)
-    {
-        Map<Agent,NodeTopo> agentToNode =getNodes(agents,conflicted);
+    private List<Agent> topolgicalSort(Set<Agent> agents, Map<Agent, Set<Agent>> conflicted) {
+        Map<Agent, NodeTopo> agentToNode = getNodes(agents, conflicted);
         Set<NodeTopo> permanent = new HashSet<>();
         Set<NodeTopo> temporary = new HashSet<>();
         Set<NodeTopo> unmarked = new HashSet<>(agentToNode.values());
         NodeTopo node;
         List<NodeTopo> topoOrder = new ArrayList<>();
-        while(unmarked.size()>0)
-        {
+        while (unmarked.size() > 0) {
             node = unmarked.iterator().next();
             try {
-                visit(node,unmarked,permanent,temporary,topoOrder);
-                if(temporary.size()>0)
-                {
+                visit(node, unmarked, permanent, temporary, topoOrder);
+                if (temporary.size() > 0) {
                     System.out.println("Da Fuck");
                 }
             } catch (Exception e) {
@@ -47,71 +42,60 @@ public class ConstraintPriorityPolicy implements IPriorityPolicy {
         }
 
         List<Agent> agentOrder = new ArrayList<>();
-        for(int i=0; i<topoOrder.size();i++)
-        {
+        for (int i = 0; i < topoOrder.size(); i++) {
             agentOrder.add(topoOrder.get(i).getAgent());
         }
-       return agentOrder;
+        return agentOrder;
     }
 
     private void visit(NodeTopo node, Set<NodeTopo> unmarked, Set<NodeTopo> permanent, Set<NodeTopo> temporary, List<NodeTopo> topoOrder) throws Exception {
-        if(unmarked.contains(node))
+        if (unmarked.contains(node))
             unmarked.remove(node);
-        if(permanent.contains(node))
+        if (permanent.contains(node))
             return;
-        if(temporary.contains(node))
-        {
+        if (temporary.contains(node)) {
             throw new Exception("not a DAG");
         }
 
         temporary.add(node);
         Set<NodeTopo> neighbors = node.getNeighbors();
-        for(NodeTopo neighbor: neighbors)
-        {
-            visit(neighbor,unmarked,permanent,temporary, topoOrder);
+        for (NodeTopo neighbor : neighbors) {
+            visit(neighbor, unmarked, permanent, temporary, topoOrder);
         }
 
         temporary.remove(node);
         permanent.add(node);
-        topoOrder.add(0,node);
+        topoOrder.add(0, node);
 
 
     }
 
     /**
      * This function receives a set of agents and their dependencies and will create a graph
-     * @param agents - The set of agents
+     *
+     * @param agents     - The set of agents
      * @param conflicted - The dndencies btween the agents
      * @return - The nodes
      */
-    private Map<Agent,NodeTopo>getNodes(Set<Agent>agents, Map<Agent, Set<Agent>> conflicted)
-    {
-        Map<Agent,NodeTopo> agentToNode = new HashMap<>();
-        for( Agent agent: agents)
-        {
+    private Map<Agent, NodeTopo> getNodes(Set<Agent> agents, Map<Agent, Set<Agent>> conflicted) {
+        Map<Agent, NodeTopo> agentToNode = new HashMap<>();
+        for (Agent agent : agents) {
             NodeTopo curr;
-            if(!agentToNode.containsKey(agent)) {
+            if (!agentToNode.containsKey(agent)) {
                 curr = new NodeTopo(agent);
                 agentToNode.put(agent, curr);
-            }
-            else
-            {
+            } else {
                 curr = agentToNode.get(agent);
             }
 
-            if(conflicted.containsKey(agent))
-            {
+            if (conflicted.containsKey(agent)) {
                 Set<Agent> conflictedAgents = conflicted.get(agent);
                 NodeTopo otherAgent;
-                for(Agent conflictedAgent : conflictedAgents)
-                {
-                    if(!agentToNode.containsKey(conflictedAgent))
-                    {
+                for (Agent conflictedAgent : conflictedAgents) {
+                    if (!agentToNode.containsKey(conflictedAgent)) {
                         otherAgent = new NodeTopo(conflictedAgent);
                         agentToNode.put(conflictedAgent, otherAgent);
-                    }
-                    else
-                    {
+                    } else {
                         otherAgent = agentToNode.get(conflictedAgent);
                     }
 
@@ -121,6 +105,7 @@ public class ConstraintPriorityPolicy implements IPriorityPolicy {
         }
         return agentToNode;
     }
+
     public static void main(String[] args) {
         Agent agent0 = new Agent();
         Agent agent1 = new Agent();
@@ -165,10 +150,9 @@ public class ConstraintPriorityPolicy implements IPriorityPolicy {
 
         ConstraintPriorityPolicy policy = new ConstraintPriorityPolicy();
 
-        List<Agent> agentso = policy.topolgicalSort(agents,map);
+        List<Agent> agentso = policy.topolgicalSort(agents, map);
 
-        for(int i = 0; i<agentso.size();i++)
-        {
+        for (int i = 0; i < agentso.size(); i++) {
             System.out.println(agentso.get(i));
         }
 
@@ -176,10 +160,10 @@ public class ConstraintPriorityPolicy implements IPriorityPolicy {
     }
 }
 
-class NodeTopo
-{
+class NodeTopo {
     private Agent agent;
     private Set<NodeTopo> neighbors;
+
     //private boolean tempMark;
     //private boolean perMark;
     public NodeTopo(Agent agent) {
@@ -191,7 +175,7 @@ class NodeTopo
 
     @Override
     public String toString() {
-        return ""+agent.getId();
+        return "" + agent.getId();
     }
 
     public Agent getAgent() {
@@ -199,8 +183,7 @@ class NodeTopo
     }
 
     //Add the edge ((this) -> neighbor
-    public void addNeigbor(NodeTopo neighbor)
-    {
+    public void addNeigbor(NodeTopo neighbor) {
         this.neighbors.add(neighbor);
     }
 
@@ -221,7 +204,6 @@ class NodeTopo
 
         return Objects.hash(agent);
     }
-
 
 
 }

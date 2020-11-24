@@ -22,28 +22,27 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     private IPriorityPolicy priorityPolicy;
     private IBoundedSingleSearchAlgorithm searchAlgorithm;
     private int totalBudget;
-    private Map<Agent,Double> prioritiesForAgents;
-    private Map<Agent,Integer> budgetsForAgents;
+    private Map<Agent, Double> prioritiesForAgents;
+    private Map<Agent, Integer> budgetsForAgents;
     private Set<Agent> agents;
     private int budgetPool;
     private boolean backtracking;
     private int lookahead;
     private int prefixSize;
-   // private TimeLimiter timeLimiter;
-    private PriorityQueue <Agent> prioritizedAgents;
+    // private TimeLimiter timeLimiter;
+    private PriorityQueue<Agent> prioritizedAgents;
     private Set<Agent> preformingBackTrack;
     private boolean performDeepLookahead;
     private boolean isSharedBudget;
     private IFailPolicy failPolicy;
     private Map<Agent, Integer> amountOfBacktracks;
-    private Map<Agent,Set<Agent>> conflicted;
+    private Map<Agent, Set<Agent>> conflicted;
     private IBacktrackPolicy backtrackPolicy;
 
     /**
      * The constructor of the class
      */
-    public BudgetOrientedSearch()
-    {
+    public BudgetOrientedSearch() {
         this.preformingBackTrack = new HashSet<>();
         this.budgetDistributionPolicy = ParamConfig.getInstance().getBudgetDistributionPolicy();
         this.heuristicFunction = ParamConfig.getInstance().getHeuristic();
@@ -62,57 +61,52 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
         this.conflicted = new HashMap<>();
     }
+
     @Override
     public Map<Agent, Prefix> getSolution() {
 
-        Map<Agent,Node> currentLocation = new HashMap<>();
-        Map<Agent,Prefix> currentPaths = new HashMap<>();
+        Map<Agent, Node> currentLocation = new HashMap<>();
+        Map<Agent, Prefix> currentPaths = new HashMap<>();
         //Setting the start node as the current
-        for(Agent agent : agents)
-        {
-            currentLocation.put(agent,agent.getStart());
-            currentPaths.put(agent,new Prefix(agent.getStart(),agent));
+        for (Agent agent : agents) {
+            currentLocation.put(agent, agent.getStart());
+            currentPaths.put(agent, new Prefix(agent.getStart(), agent));
         }
 
-        Collection<Prefix> givenSolution=null;
+        Collection<Prefix> givenSolution = null;
         Agent agent;
         boolean first = true;
         int iterationNumber = 0;
         //Until he search is finished (succeed or failed)
-        while (first|| !isFinished(givenSolution,iterationNumber))
-        {
+        while (first || !isFinished(givenSolution, iterationNumber)) {
             first = false;
             iterationNumber++;
 
             PerformanceTracker.getInstance().addIteration();
 
-            System.out.println("Start "+iterationNumber);
-            if(!failPolicy.isFinishedAfterFailedIteration() && failPolicy.didTheIterationFail())
-            {
-                givenSolution = failPolicy.determineSolution(currentLocation,prefixSize).values();
-                addPrefixToAgent(givenSolution,  currentLocation,currentPaths);
+            System.out.println("Start " + iterationNumber);
+            if (!failPolicy.isFinishedAfterFailedIteration() && failPolicy.didTheIterationFail()) {
+                givenSolution = failPolicy.determineSolution(currentLocation, prefixSize).values();
+                addPrefixToAgent(givenSolution, currentLocation, currentPaths);
                 continue;
             }
 
             failPolicy.setDidTheIterationFail(false);
             givenSolution = this.getPrefixForIteration(currentLocation);
             //System.out.println(givenSolution);
-            if(givenSolution == null)
-            {
+            if (givenSolution == null) {
                 failPolicy.setDidTheIterationFail(true);
-                if(!failPolicy.isFinishedAfterFailedIteration() && failPolicy.didTheIterationFail())
-                {
+                if (!failPolicy.isFinishedAfterFailedIteration() && failPolicy.didTheIterationFail()) {
                     System.out.println("kaljsdaa");
-                    givenSolution = failPolicy.determineSolution(currentLocation,prefixSize).values();
-                    addPrefixToAgent(givenSolution,  currentLocation,currentPaths);
+                    givenSolution = failPolicy.determineSolution(currentLocation, prefixSize).values();
+                    addPrefixToAgent(givenSolution, currentLocation, currentPaths);
                     continue;
-                }
-                else {
+                } else {
                     currentLocation.clear();
                     break;
                 }
             }
-            if(failPolicy.isFinishedAfterFailedIteration() || !failPolicy.didTheIterationFail()) {
+            if (failPolicy.isFinishedAfterFailedIteration() || !failPolicy.didTheIterationFail()) {
                 addPrefixToAgent(givenSolution, currentLocation, currentPaths);
             }
 
@@ -123,77 +117,75 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
     /**
      * This function will ass the prefixes to the agent's solutions
-     * @param givenSolution - The given prefixes
+     *
+     * @param givenSolution   - The given prefixes
      * @param currentLocation - The current locations of the agents
-     * @param currentPaths - The solution so far
+     * @param currentPaths    - The solution so far
      */
-    private void addPrefixToAgent(Collection <Prefix>givenSolution,  Map<Agent,Node> currentLocation,Map<Agent,Prefix> currentPaths)
-    {
+    private void addPrefixToAgent(Collection<Prefix> givenSolution, Map<Agent, Node> currentLocation, Map<Agent, Prefix> currentPaths) {
         Agent agent;
-        for(Prefix prefixForAgent : givenSolution)
-        {
+        for (Prefix prefixForAgent : givenSolution) {
 
-            if(prefixForAgent == null)
+            if (prefixForAgent == null)
                 break;
 
             //The agent that the prefix is for
             agent = prefixForAgent.getAgent();
 
             //Update the current locations
-            currentLocation.put(agent,prefixForAgent.getNodeAt(prefixForAgent.getSize()-1));
+            currentLocation.put(agent, prefixForAgent.getNodeAt(prefixForAgent.getSize() - 1));
             //Update the current paths
 
             currentPaths.get(agent).extendPrefix(prefixForAgent);
         }
     }
+
     /**
      * This function will check if the search is finished or not
-     * @param prefixes - The prefixes of the agents
+     *
+     * @param prefixes        - The prefixes of the agents
      * @param iterationNumber
      * @return - True of the search is finished (succeeded or failed)
      */
-    public boolean isFinished(Collection<Prefix> prefixes, int iterationNumber)
-    {
+    public boolean isFinished(Collection<Prefix> prefixes, int iterationNumber) {
 
 
-        if(prefixes.contains(null)) {
+        if (prefixes.contains(null)) {
             System.out.println("failed - couldn't find a path");
-          //  this.timeLimiter.stop();
+            //  this.timeLimiter.stop();
             failPolicy.setDidTheIterationFail(true);
-            if(failPolicy.isFinishedAfterFailedIteration())
+            if (failPolicy.isFinishedAfterFailedIteration())
                 return true;
             return false;
         }
 
-        if(PerformanceTracker.getInstance().getNumberOFIteration() == 1000) {
-        //if(PerformanceTracker.getInstance().getNumberOFIteration() == 10000) {
+        if (PerformanceTracker.getInstance().getNumberOFIteration() == 1000) {
+            //if(PerformanceTracker.getInstance().getNumberOFIteration() == 10000) {
             System.out.println("Max iteration allowed");
             return true;
         }
 
-        if(!SolutionChecker.getInstance().checkSolution(prefixes,iterationNumber))
-        {
+        if (!SolutionChecker.getInstance().checkSolution(prefixes, iterationNumber)) {
             System.out.println("failed - the solution is not valid");
             failPolicy.setDidTheIterationFail(true);
-            if(failPolicy.isFinishedAfterFailedIteration())
+            if (failPolicy.isFinishedAfterFailedIteration())
                 return true;
             return false;
         }
 
         failPolicy.setDidTheIterationFail(false);
-        for(Prefix prefix :prefixes)
-        {
+        for (Prefix prefix : prefixes) {
 
             //If there is still an agent that is not in its goal node
-            if(!prefix.getNodeAt(prefix.getSize()-1).equals(prefix.getAgent().getGoal())) {
+            if (!prefix.getNodeAt(prefix.getSize() - 1).equals(prefix.getAgent().getGoal())) {
 
-                System.out.println("Agent "+prefix.getAgent().getId()+" didn't finish he is here - "+prefix.getNodeAt(prefix.getSize()-1)+" instead of here - "+prefix.getAgent().getGoal());
+                System.out.println("Agent " + prefix.getAgent().getId() + " didn't finish he is here - " + prefix.getNodeAt(prefix.getSize() - 1) + " instead of here - " + prefix.getAgent().getGoal());
 
                 return false;
             }
 
         }
- //       this.timeLimiter.stop();
+        //       this.timeLimiter.stop();
         PerformanceTracker.getInstance().setComplete(true);
         System.out.println("Success!");
         return true;
@@ -201,18 +193,18 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
     /**
      * This function will return the prefixes for the agents after an iteration
+     *
      * @param currentLocation - The current locations of the agents
      * @return - Prefixes for the agents after an iteration
      */
-    private Set<Prefix> getPrefixForIteration(Map<Agent,Node> currentLocation)
-    {
+    private Set<Prefix> getPrefixForIteration(Map<Agent, Node> currentLocation) {
         this.budgetPool = 0;
-        if(!isSharedBudget)
-            this.budgetsForAgents = this.budgetDistributionPolicy.getBudgetDistribution(agents,totalBudget,amountOfBacktracks);
+        if (!isSharedBudget)
+            this.budgetsForAgents = this.budgetDistributionPolicy.getBudgetDistribution(agents, totalBudget, amountOfBacktracks);
         else
             this.totalBudget = Problem.getInstance().getTotalBudget();
 
-        this.prioritiesForAgents = this.priorityPolicy.getPriorityDistribution(agents,currentLocation,this.amountOfBacktracks,this.conflicted);
+        this.prioritiesForAgents = this.priorityPolicy.getPriorityDistribution(agents, currentLocation, this.amountOfBacktracks, this.conflicted);
         Set<Prefix> solution = new HashSet<>();
 
         prioritizedAgents = new PriorityQueue<>(new PriorityCompareAgents(this.prioritiesForAgents));
@@ -222,19 +214,18 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         Node currentLoc;
         int budget;
         Prefix solutionForAgent;
-        while(prioritizedAgents.size()>0)
-        {
+        while (prioritizedAgents.size() > 0) {
 
             currAgent = prioritizedAgents.poll();
             currentLoc = currentLocation.get(currAgent);
 
-            if(!isSharedBudget)
+            if (!isSharedBudget)
                 budget = this.budgetsForAgents.get(currAgent);
             else
                 budget = totalBudget;
-            if(budget == -1)//Use Budget pool
+            if (budget == -1)//Use Budget pool
             {
-                if(!isSharedBudget) {
+                if (!isSharedBudget) {
                     if (budgetPool == 0) {
                         //The agents that tries to do backtrack doesn't have budget
                         System.out.println("The agents that tries to do backtrack doesn't have budget");
@@ -242,9 +233,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
                     }
                     budget = budgetPool;
                     budgetPool = 0;
-                }
-                else
-                {
+                } else {
                     if (totalBudget == 0) {
                         //The agents that tries to do backtrack doesn't have budget
                         System.out.println("The agents that tries to do backtrack doesn't have budget");
@@ -256,20 +245,17 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             }
             //currentLocation.remove(currAgent);
 
-            solutionForAgent = getPrefixForAgent(currAgent,currentLoc,budget,solution);
+            solutionForAgent = getPrefixForAgent(currAgent, currentLoc, budget, solution);
 
-           // System.out.println(solutionForAgent);
-            if(solutionForAgent == null && (!backtracking || budgetPool == 0)) {
+            // System.out.println(solutionForAgent);
+            if (solutionForAgent == null && (!backtracking || budgetPool == 0)) {
                 System.out.println("Failed");
                 solution.add(null);
                 return solution;
             }
-            if(!(solutionForAgent == null && backtracking))
-            {
+            if (!(solutionForAgent == null && backtracking)) {
                 solution.add(solutionForAgent);
             }
-
-
 
 
         }
@@ -282,36 +268,34 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
     /**
      * This function will calculate a prefix for a given agent
-     * @param agent - The given agent
-     * @param current - The current node
-     * @param budget - The budget
+     *
+     * @param agent     - The given agent
+     * @param current   - The current node
+     * @param budget    - The budget
      * @param solutions - The previous solutions
      * @return - A prefix for a single agent
      */
-    private Prefix getPrefixForAgent(Agent agent,Node current,int budget,Set<Prefix> solutions)
-    {
+    private Prefix getPrefixForAgent(Agent agent, Node current, int budget, Set<Prefix> solutions) {
         Prefix solution = null;
 
-        Triplet<Prefix,Integer,Set<Agent>> prefixAndRemainingBudgetPair = searchForPrefix(agent,current,budget,solutions);
+        Triplet<Prefix, Integer, Set<Agent>> prefixAndRemainingBudgetPair = searchForPrefix(agent, current, budget, solutions);
 
 
         int remainingBudget = prefixAndRemainingBudgetPair.getSecond();
         solution = prefixAndRemainingBudgetPair.getFirst();
         Set<Agent> problematicAgents = prefixAndRemainingBudgetPair.getThird();
-        if(!isSharedBudget)
-            this.budgetPool+=remainingBudget;
-        else
-        {
+        if (!isSharedBudget)
+            this.budgetPool += remainingBudget;
+        else {
             this.totalBudget = remainingBudget;
         }
 
-        boolean didTheAgentSucceeded =  problematicAgents== null;
+        boolean didTheAgentSucceeded = problematicAgents == null;
         //Dafuck is this??
 //        if(didTheAgentSucceeded && solution.getNodeAt(solution.getSize()-1).equals(agent.getGoal()))
-  //          agent.resetBadPoints();
-        if(!didTheAgentSucceeded && backtracking && ((budgetPool!=0 && !isSharedBudget) || (isSharedBudget && totalBudget!=0)))
-        {
-            this.backtrackPolicy.preformBacktrack(agent,problematicAgents,solutions,amountOfBacktracks,failPolicy,prioritizedAgents,prioritiesForAgents,preformingBackTrack,conflicted,budgetsForAgents);
+        //          agent.resetBadPoints();
+        if (!didTheAgentSucceeded && backtracking && ((budgetPool != 0 && !isSharedBudget) || (isSharedBudget && totalBudget != 0))) {
+            this.backtrackPolicy.preformBacktrack(agent, problematicAgents, solutions, amountOfBacktracks, failPolicy, prioritizedAgents, prioritiesForAgents, preformingBackTrack, conflicted, budgetsForAgents);
         }
 
 
@@ -319,23 +303,19 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
     }
 
 
-
-
-
-
     /**
      * This function will use a search algorithm to determine the prefix for the agent
-     * @param agent - The given agent
-     * @param current - The current node
-     * @param budget - The budget
+     *
+     * @param agent     - The given agent
+     * @param current   - The current node
+     * @param budget    - The budget
      * @param solutions - The previous solutions
      * @return - A prefix for the given agent
      */
-    private Triplet<Prefix,Integer,Set<Agent>> searchForPrefix(Agent agent, Node current, int budget,Set<Prefix> solutions)
-    {
-        if(performDeepLookahead)
-            return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize,-1);
-        return this.searchAlgorithm.searchForPrefix(agent,current,budget,solutions,prefixSize,lookahead);
+    private Triplet<Prefix, Integer, Set<Agent>> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions) {
+        if (performDeepLookahead)
+            return this.searchAlgorithm.searchForPrefix(agent, current, budget, solutions, prefixSize, -1);
+        return this.searchAlgorithm.searchForPrefix(agent, current, budget, solutions, prefixSize, lookahead);
     }
 
 
@@ -343,16 +323,15 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
      * This class will compare the agents according to their priorities
      * If the priority of an agent is bigger than the priority of the other agent, The first is more significant
      */
-    class PriorityCompareAgents implements Comparator<Agent>
-    {
-        private Map<Agent,Double> prioritiesForAgents;//The agents' priorities
+    class PriorityCompareAgents implements Comparator<Agent> {
+        private Map<Agent, Double> prioritiesForAgents;//The agents' priorities
 
         /**
          * The constructor of the class
+         *
          * @param prioritiesForAgents - The priorities for agents
          */
-        public PriorityCompareAgents(Map<Agent,Double> prioritiesForAgents)
-        {
+        public PriorityCompareAgents(Map<Agent, Double> prioritiesForAgents) {
             this.prioritiesForAgents = prioritiesForAgents;
         }
 
@@ -361,9 +340,9 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
             double p1 = this.prioritiesForAgents.get(o1);
             double p2 = this.prioritiesForAgents.get(o2);
 
-            if(p1>p2)
+            if (p1 > p2)
                 return -1;
-            if(p1<p2)
+            if (p1 < p2)
                 return 1;
             return 0;
         }

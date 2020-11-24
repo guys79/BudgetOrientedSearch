@@ -33,14 +33,13 @@ public class ParamConfig {
     private IFailPolicy failPolicy;//The fail policy
     private IBoundedSingleSearchAlgorithm searchAlgorithm;
     private static ParamConfig instance;//The instance
-    private final int numOfDimensions=2;//The number of dimensions;
+    private final int numOfDimensions = 2;//The number of dimensions;
     private final int numberOfAxisLegalToMoveInOneTurn = 2;//The number of axis that the agent can move simultaneously in a single move
     private Boolean backtrack;
     private Boolean performDeepLookahead;
     private Boolean isSharedBudget;
     private IBacktrackPolicy backtrackPolicy;
     private Boolean isGoalLessPriority;
-
 
 
     /**
@@ -51,13 +50,13 @@ public class ParamConfig {
 
     /**
      * The function that configs the parameters according to the given type
+     *
      * @param type - The given type
      */
     public void configParamsWithType(int type) {
         this.type = type;
         System.out.println("New config");
-        switch (type)
-        {
+        switch (type) {
 
             case 1:
                 costFunction = new OctileGridFunction();
@@ -65,7 +64,7 @@ public class ParamConfig {
                 heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
                 priorityPolicy = new PriorityBadPointFavorPolicy();
                 budgetDistributionPolicy = new BudgetExponentialBadpointsFavorPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
+                searchAlgorithm = new ALSSLRTAStar(costFunction, (HeuristicWithPersonalDatabase) heuristic);
                 this.backtrack = true;
                 performDeepLookahead = false;
                 isSharedBudget = false;
@@ -80,7 +79,7 @@ public class ParamConfig {
                 heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
                 priorityPolicy = new ConstraintPriorityPolicy();
                 budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
+                searchAlgorithm = new ALSSLRTAStar(costFunction, (HeuristicWithPersonalDatabase) heuristic);
                 this.backtrack = true;
                 performDeepLookahead = false;
                 isSharedBudget = false;
@@ -92,7 +91,7 @@ public class ParamConfig {
                 heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
                 priorityPolicy = new ConstraintPriorityPolicy();
                 budgetDistributionPolicy = new BudgetExponentialBadpointsFavorPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction,(HeuristicWithPersonalDatabase)heuristic);
+                searchAlgorithm = new ALSSLRTAStar(costFunction, (HeuristicWithPersonalDatabase) heuristic);
                 this.backtrack = true;
                 performDeepLookahead = false;
                 isSharedBudget = false;
@@ -106,31 +105,31 @@ public class ParamConfig {
                 budgetDistributionPolicy = null;
                 searchAlgorithm = null;
                 backtrack = null;
-                performDeepLookahead =null;
+                performDeepLookahead = null;
                 isSharedBudget = null;
                 isGoalLessPriority = null;
                 failPolicy = null;
         }
-        if(checkIfNull())
+        if (checkIfNull())
             throw new UnsupportedOperationException("Some of the params are null in ParamConfig Class");
     }
 
     /**
      * This function will check if one of the parameters is null
+     *
      * @return - True IFF one of the parameters is null
      */
-    private boolean checkIfNull()
-    {
-        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm ==null|| backtrack == null || performDeepLookahead == null || isSharedBudget == null || this.isGoalLessPriority == null || this.failPolicy == null || this.backtrackPolicy ==null;
+    private boolean checkIfNull() {
+        return this.costFunction == null || this.heuristic == null || this.priorityPolicy == null || this.budgetDistributionPolicy == null || searchAlgorithm == null || backtrack == null || performDeepLookahead == null || isSharedBudget == null || this.isGoalLessPriority == null || this.failPolicy == null || this.backtrackPolicy == null;
     }
 
     /**
      * This function will return the instance
+     *
      * @return - The given instance
      */
-    public static ParamConfig getInstance()
-    {
-        if(instance == null)
+    public static ParamConfig getInstance() {
+        if (instance == null)
             instance = new ParamConfig();
         return instance;
     }
@@ -138,6 +137,7 @@ public class ParamConfig {
 
     /**
      * This function will return true if agents at the goal node get less priority
+     *
      * @return - True if agents at the goal node get less priority
      */
     public Boolean getGoalLessPriority() {
@@ -146,6 +146,7 @@ public class ParamConfig {
 
     /**
      * This function will return the bounded search algorithm
+     *
      * @return - The bounded search algorithm
      */
     public IBoundedSingleSearchAlgorithm getSearchAlgorithm() {
@@ -154,6 +155,7 @@ public class ParamConfig {
 
     /**
      * This function will return the number of axis the agent can move simultaneously in the same turn
+     *
      * @return - The number of axis the agent can move simultaneously in the same turn
      */
     public int getNumberOfAxisLegalToMoveInOneTurn() {
@@ -162,6 +164,7 @@ public class ParamConfig {
 
     /**
      * TYhis function will return the number of dimensions
+     *
      * @return - The number of dimensions
      */
     public int getNumOfDimensions() {
@@ -170,15 +173,16 @@ public class ParamConfig {
 
     /**
      * This function will return the cost function
+     *
      * @return - The cost function
      */
-    public ICostFunction getCostFunction()
-    {
+    public ICostFunction getCostFunction() {
         return costFunction;
     }
 
     /**
      * This function will return the heuristic function
+     *
      * @return - The heuristic function
      */
     public IHeuristic getHeuristic() {
@@ -187,6 +191,7 @@ public class ParamConfig {
 
     /**
      * This function will return the config type
+     *
      * @return - The config type
      */
     public int getType() {
@@ -195,6 +200,7 @@ public class ParamConfig {
 
     /**
      * This function will return True if the algorithm preforms backtracking
+     *
      * @return - True IFF the algorithm preforms backtracking
      */
     public Boolean getBacktrack() {
@@ -203,6 +209,7 @@ public class ParamConfig {
 
     /**
      * This function will return the budget distribution policy
+     *
      * @return - The budget distribution policy
      */
     public IBudgetDistributionPolicy getBudgetDistributionPolicy() {
@@ -211,6 +218,7 @@ public class ParamConfig {
 
     /**
      * This function will return the priority policy
+     *
      * @return - The priority policy
      */
     public IPriorityPolicy getPriorityPolicy() {
@@ -219,6 +227,7 @@ public class ParamConfig {
 
     /**
      * This function will return true IFF the algorithm will preform deep lookahead
+     *
      * @return True IFF the algorithm will preform deep lookahead
      */
     public Boolean getPerformDeepLookahead() {
@@ -227,6 +236,7 @@ public class ParamConfig {
 
     /**
      * This function will return true IFF the algorithm will use the shared budget mechanism
+     *
      * @return - True IFF the algorithm will use the shared budget mechanism
      */
     public Boolean getSharedBudget() {
@@ -252,29 +262,30 @@ public class ParamConfig {
     }
 
     /**
-     *  This function will return the parameters and their values
+     * This function will return the parameters and their values
+     *
      * @return - The parameters and value
      */
-    public Map<String,String> getParams()
-    {
-        Map<String,String> params = new HashMap<>();
-        params.put("type",""+type);
-        params.put("costFunction",""+costFunction);
-        params.put("heuristic",""+heuristic);
-        params.put("budgetDistributionPolicy",""+budgetDistributionPolicy);
-        params.put("priorityPolicy",""+priorityPolicy);
-        params.put("searchAlgorithm",""+searchAlgorithm);
-        params.put("numOfDimensions",""+numOfDimensions);
-        params.put("numberOfAxisLegalToMoveInOneTurn",""+numberOfAxisLegalToMoveInOneTurn);
-        params.put("backtrack",""+backtrack);
-        params.put("performDeepLookahead",""+performDeepLookahead);
-        params.put("isSharedBudget",""+isSharedBudget);
-        params.put("isGoalLessPriority",""+isGoalLessPriority);
+    public Map<String, String> getParams() {
+        Map<String, String> params = new HashMap<>();
+        params.put("type", "" + type);
+        params.put("costFunction", "" + costFunction);
+        params.put("heuristic", "" + heuristic);
+        params.put("budgetDistributionPolicy", "" + budgetDistributionPolicy);
+        params.put("priorityPolicy", "" + priorityPolicy);
+        params.put("searchAlgorithm", "" + searchAlgorithm);
+        params.put("numOfDimensions", "" + numOfDimensions);
+        params.put("numberOfAxisLegalToMoveInOneTurn", "" + numberOfAxisLegalToMoveInOneTurn);
+        params.put("backtrack", "" + backtrack);
+        params.put("performDeepLookahead", "" + performDeepLookahead);
+        params.put("isSharedBudget", "" + isSharedBudget);
+        params.put("isGoalLessPriority", "" + isGoalLessPriority);
         return params;
     }
 
     /**
      * This function will return the Fail policy
+     *
      * @return - The fail policy
      */
     public IFailPolicy getFailPolicy() {
@@ -283,6 +294,7 @@ public class ParamConfig {
 
     /**
      * This function will return the backtrack policy
+     *
      * @return - The backtrack policy
      */
     public IBacktrackPolicy getBacktrackPolicy() {

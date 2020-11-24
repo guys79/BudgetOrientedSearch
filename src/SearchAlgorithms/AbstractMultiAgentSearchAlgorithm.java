@@ -15,22 +15,20 @@ public abstract class AbstractMultiAgentSearchAlgorithm implements IMultiAgentSe
 
     private View view;
 
-    public AbstractMultiAgentSearchAlgorithm()
-    {
+    public AbstractMultiAgentSearchAlgorithm() {
 
     }
 
     @Override
     public Map<Agent, Prefix> getSolution(View view) {
         this.view = view;
-        int [][]grid = Problem.getInstance().getGrid();
+        int[][] grid = Problem.getInstance().getGrid();
         this.view.initialize(grid);
         long before = System.currentTimeMillis();
         Map<Agent, Prefix> solutions = getSolution();
         long after = System.currentTimeMillis();
-        PerformanceTracker.getInstance().setOverAllSearch(after-before);
-        for(Prefix prefix : solutions.values())
-        {
+        PerformanceTracker.getInstance().setOverAllSearch(after - before);
+        for (Prefix prefix : solutions.values()) {
             this.view.addAgent(prefix);
         }
         view.draw();

@@ -2,6 +2,7 @@ package Components;
 
 import Components.BoundedSingleSearchAlgorithms.ALSSLRTAStarNode;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -32,7 +33,7 @@ public class Agent {
         this.goal = goal;
         this.numOfBadPoints = 0;
         this.leaves = null;
-        this.problematicAgents = null;
+        this.problematicAgents = new HashSet<>();
 
     }
 
@@ -49,7 +50,7 @@ public class Agent {
         this.leaves = null;
         this.start = start;
         this.goal = goal;
-        this.problematicAgents = null;
+        this.problematicAgents = new HashSet<>();
 
     }
 
@@ -58,6 +59,9 @@ public class Agent {
      * @param problematicAgents - The problematic agent
      */
     public void setProblematicAgents(Set<Agent> problematicAgents) {
+
+        if(PerformanceTracker.getInstance().getNumberOFIteration() == 6 && problematicAgents == null)
+            System.out.println();
         this.problematicAgents = problematicAgents;
     }
 
@@ -66,6 +70,7 @@ public class Agent {
      * @return - The problematic agents for this agent in this iteration
      */
     public Set<Agent> getProblematicAgents() {
+
         return problematicAgents;
     }
 

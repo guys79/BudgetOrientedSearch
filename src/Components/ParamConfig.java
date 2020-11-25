@@ -5,6 +5,7 @@ import Components.BoundedSingleSearchAlgorithms.IBoundedSingleSearchAlgorithm;
 import Components.BudgetDIstributionPolicy.*;
 import Components.CostFunction.ICostFunction;
 import Components.CostFunction.OctileGridFunction;
+import Components.ExcessBudgetPolicy.GraphBasedAgent;
 import Components.ExcessBudgetPolicy.IBacktrackPolicy;
 import Components.ExcessBudgetPolicy.minPriorityAgent;
 import Components.FailPolicy.AdditionAttempt;
@@ -70,7 +71,7 @@ public class ParamConfig {
                 isSharedBudget = false;
                 isGoalLessPriority = true;
                 failPolicy = new AdditionAttempt();
-                this.backtrackPolicy = new minPriorityAgent();
+                this.backtrackPolicy = new GraphBasedAgent();
                 break;
 
             case 2:

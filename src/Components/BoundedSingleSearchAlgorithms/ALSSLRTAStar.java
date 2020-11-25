@@ -77,7 +77,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
         Pair<Integer, Set<Agent>> aStarResult = AStarProcedure(current, openList, budget, closed, prefixSize, solutions);
         int remainBudget = aStarResult.getKey();
         Set<Agent> problematicAgents = aStarResult.getValue();
-
+        agent.setProblematicAgents(problematicAgents);
 
         //No solution
         if (openList == null || openList.size() == 0) {

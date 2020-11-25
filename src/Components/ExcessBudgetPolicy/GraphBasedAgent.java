@@ -3,6 +3,7 @@ package Components.ExcessBudgetPolicy;
 import Components.Agent;
 import Components.BoundedSingleSearchAlgorithms.ALSSLRTAStar;
 import Components.BoundedSingleSearchAlgorithms.ALSSLRTAStarNode;
+import Components.PerformanceTracker;
 import Components.Prefix;
 
 import java.util.*;
@@ -10,17 +11,31 @@ import java.util.*;
 public class GraphBasedAgent extends AbstractBacktrackingPolicy {
 
     private Map<Agent, AgentNode> agentGraph = null;
+    private List<Agent> toBacktrack = null;
+    private int currentIteration = 0;
 
     @Override
     protected Agent getChosenAgent(Set<Agent> problematicAgents, Map<Agent, Double> prioritiesForAgents, Set<Agent> preformingBackTrack, Set<Prefix> solutions) {
-        if (agentGraph == null)
+        boolean needToReset = false;
+        if(currentIteration<PerformanceTracker.getInstance().getNumberOFIteration()) {
+            needToReset = true;
+            currentIteration = PerformanceTracker.getInstance().getNumberOFIteration();
+        }
+        if (agentGraph == null || needToReset)
             agentGraph = new HashMap<>();
+        if (toBacktrack == null || needToReset)
+        {
+            toBacktrack = new ArrayList<>();
 
+        }
+        if(toBacktrack.size()!=0)
+        {
+            return toBacktrack.remove(0);
+        }
         updateGraph(solutions);
 
-        searchInGraph(problematicAgents);
-        // TODO: 24/11/2020 Need to make All the agents in the path do te backtrack. I think I can save thelist and when this function actiates than we will take the first agent ff the list and use it 
-        return null;
+        toBacktrack = searchInGraph(problematicAgents);
+        return toBacktrack.remove(0);
     }
 
 
@@ -84,6 +99,8 @@ public class GraphBasedAgent extends AbstractBacktrackingPolicy {
             agentInGraphNode = entry.getValue();
             problematicForAgent = agentInGraph.getProblematicAgents();
             for (Agent problematic : problematicForAgent) {
+                if(!this.agentGraph.containsKey(problematic))
+                    System.out.println();
                 createBiDirectionalEdge(agentInGraphNode, this.agentGraph.get(problematic));
             }
         }
@@ -93,7 +110,7 @@ public class GraphBasedAgent extends AbstractBacktrackingPolicy {
     private void createNodeForAgent(Agent agent, Set<Prefix> solutions) {
 
         Set<ALSSLRTAStarNode> leaves = agent.getLeaves();
-        Iterator<ALSSLRTAStarNode> iter = leaves.iterator();
+        Iterator<ALSSLRTAStarNode> iter = leaves.iterator(); // TODO: 25/11/2020 need to get all the problematic agents 
         ALSSLRTAStarNode leaf;
         Set<Agent> problematic = agent.getProblematicAgents();
         Set<Agent> problematicForLeaf;

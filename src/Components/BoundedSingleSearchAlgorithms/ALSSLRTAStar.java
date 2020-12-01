@@ -174,8 +174,13 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
         // int restSize = 0;//The sze of unique states in the openList (and rest set)
         //   ALSSLRTAStarNode lastNode = null;//The unique node
         // int numOfOccur;//The number of occurrences of the node in the open list (different times)
-        // Map<Node,Node> notValidLeafStatesAndPredecessors = new HashMap<>();//All the states with timeStamp = prefixLength - 1 that are not valid (conflicted with other agents)
+        // Map<Node,Node> notValidleavestatesAndPredecessors = new HashMap<>();//All the states with timeStamp = prefixLength - 1 that are not valid (conflicted with other agents)
         Set<Agent> problematicAgent = new HashSet<>();
+        Set<ALSSLRTAStarNode> leaves = new HashSet<>();
+
+
+       //System.out.println("Agent " + agent.getId() + " is planning");
+
         //While:
         //1. The open list is not empty
         //2. The number of expansions is smaller than the budget (while there is still remaining budget)
@@ -203,7 +208,9 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
             currentTimeStamp = currentNode.getTimeStamp();
             //If the node is the goal node, stop the search
             if (isGoal(currentNode.getNode()) && currentTimeStamp >= prefixSize - 1) {
+          //      System.out.println("agent "+agent.getId()+" is here");
                 openList.add(currentNode);
+                agent.setLeaves(new HashSet(openList));
                 return new Pair<>(budget - expansions, problematicAgent);
             }
 
@@ -220,7 +227,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
 
                 //For each neighbor
                 for (Node neighbor : neighbors) {
-                    neighborNode = new ALSSLRTAStarNode(neighbor, currentTimeStamp + 1,currentNode);
+                    neighborNode = new ALSSLRTAStarNode(neighbor, currentTimeStamp + 1, currentNode);
                     Set<Agent> problematicAgentForState = isStateValid(neighborNode, solutions, currentNode);
                     //Only if the state is valid we will insert is to the open
                     if (problematicAgentForState.size() == 0) {
@@ -243,6 +250,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
                     } else {
 
                         problematicAgent.addAll(problematicAgentForState);
+                        leaves.add(neighborNode);
                     }
 
 
@@ -252,6 +260,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
 
                 //Add node to the rest set
                 rest.add(currentNode);
+                leaves.add(currentNode);
 
             }
 
@@ -275,7 +284,8 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
         for (ALSSLRTAStarNode node : rest) {
             addToOpenList(node, openList);
         }
-        agent.setLeaves(rest);
+       // System.out.println("Agent " + agent.getId() + " add leaves");
+        agent.setLeaves(leaves);
         return new Pair<>(budget - expansions, problematicAgent);
 
     }
@@ -301,8 +311,8 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
         return conflictedAgents;
     }
 
-    private Set<Agent> getConflictedAgentsOutOfStates(Map<Node, Node> notValidLeafStatesAndPredecessors, Set<Prefix> solutions, int timeStamp) {
-        Set<Node> states = new HashSet<>(notValidLeafStatesAndPredecessors.keySet());
+    private Set<Agent> getConflictedAgentsOutOfStates(Map<Node, Node> notValidleavestatesAndPredecessors, Set<Prefix> solutions, int timeStamp) {
+        Set<Node> states = new HashSet<>(notValidleavestatesAndPredecessors.keySet());
         Set<Agent> agents = new HashSet<>();
         Node nodeInQuestion;
         for (Prefix sol : solutions) {
@@ -319,7 +329,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
 
 
         for (Node node : states) {
-            Node prevNode = notValidLeafStatesAndPredecessors.get(node);
+            Node prevNode = notValidleavestatesAndPredecessors.get(node);
             for (Prefix sol : solutions) {
                 if (sol.getNodeAt(timeStamp).equals(prevNode)) {
                     if (sol.getNodeAt(timeStamp - 1).equals(node))

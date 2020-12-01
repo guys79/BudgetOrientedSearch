@@ -109,8 +109,18 @@ public class GraphBasedAgent extends AbstractBacktrackingPolicy {
 
     private void createNodeForAgent(Agent agent, Set<Prefix> solutions) {
 
+
         Set<ALSSLRTAStarNode> leaves = agent.getLeaves();
-        Iterator<ALSSLRTAStarNode> iter = leaves.iterator(); // TODO: 25/11/2020 need to get all the problematic agents 
+        try
+        {
+            Iterator<ALSSLRTAStarNode> iter = leaves.iterator(); // TODO: 25/11/2020 need to get all the problematic agents
+        }
+        catch (Exception e)
+        {
+            Iterator<ALSSLRTAStarNode> iter = leaves.iterator(); // TODO: 25/11/2020 need to get all the problematic agents
+        }
+        Iterator<ALSSLRTAStarNode> iter = leaves.iterator(); // TODO: 25/11/2020 need to get all the problematic agents
+        System.out.println("sadadasasdasdadas");
         ALSSLRTAStarNode leaf;
         Set<Agent> problematic = agent.getProblematicAgents();
         Set<Agent> problematicForLeaf;

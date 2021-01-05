@@ -85,9 +85,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
             first = false;
             iterationNumber++;
-
             PerformanceTracker.getInstance().addIteration();
-            System.out.println(String.format("%d is the size of the current paths",currentPaths.get(delete).getSize()));
             System.out.println("Start " + iterationNumber);
             if (!failPolicy.isFinishedAfterFailedIteration() && failPolicy.didTheIterationFail()) {
                 givenSolution = failPolicy.determineSolution(currentLocation, prefixSize).values();
@@ -170,7 +168,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
         System.out.println(PerformanceTracker.getInstance().getNumberOFIteration());
        // if (PerformanceTracker.getInstance().getNumberOFIteration() >= 100)
-        if(PerformanceTracker.getInstance().getNumberOFIteration() == 1000) {
+        if(PerformanceTracker.getInstance().getNumberOFIteration() == 500) {
             System.out.println("Max iteration allowed");
             return true;
         }
@@ -294,7 +292,6 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
         int remainingBudget = prefixAndRemainingBudgetPair.getSecond();
         solution = prefixAndRemainingBudgetPair.getFirst();
         Set<Agent> problematicAgents = prefixAndRemainingBudgetPair.getThird();
-
         if (!isSharedBudget)
             this.budgetPool += remainingBudget;
         else {

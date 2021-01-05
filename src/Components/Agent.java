@@ -60,8 +60,6 @@ public class Agent {
      */
     public void setProblematicAgents(Set<Agent> problematicAgents) {
 
-        if(PerformanceTracker.getInstance().getNumberOFIteration() == 6 && problematicAgents == null)
-            System.out.println();
         this.problematicAgents = problematicAgents;
     }
 

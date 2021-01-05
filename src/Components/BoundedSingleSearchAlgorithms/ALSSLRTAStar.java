@@ -52,10 +52,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
         this.inQueue = new HashSet<>();
         currentBest = null;
         this.currentState = current;
-        if(agent.getId() == 111 & PerformanceTracker.getInstance().getNumberOFIteration() == 9)
-            System.out.println();
-        if(agent.getId() == 243 & PerformanceTracker.getInstance().getNumberOFIteration() == 9)
-            System.out.println();
+
         if (current.equals(goal)) {
             boolean needToSearch = false;
             for (int i = 1; i < prefixSize; i++) {
@@ -85,8 +82,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
 
         //No solution
         if (openList == null || openList.size() == 0) {
-            if(PerformanceTracker.getInstance().getNumberOFIteration() >= 34 && agent.getId() == 584)
-                System.out.println();
+
             System.out.println("Agent " + agent.getId() + " couldn't find a state to be on");
             return new Triplet<>(null, remainBudget, problematicAgents);
         }

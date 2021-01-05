@@ -99,18 +99,7 @@ public class GraphBasedAgent extends AbstractBacktrackingPolicy {
             agentInGraphNode = entry.getValue();
             problematicForAgent = agentInGraph.getProblematicAgents();
             for (Agent problematic : problematicForAgent) {
-                if (!this.agentGraph.containsKey(problematic))
-                    System.out.println();
-                try {
-
-                    createBiDirectionalEdge(agentInGraphNode, this.agentGraph.get(problematic));
-                }
-                catch (Exception e) {
-                    System.out.println(this.agentGraph);
-                    System.out.println(problematic);
-                    createBiDirectionalEdge(agentInGraphNode, this.agentGraph.get(problematic));
-
-                }
+                createBiDirectionalEdge(agentInGraphNode, this.agentGraph.get(problematic));
             }
         }
     }

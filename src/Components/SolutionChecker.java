@@ -42,7 +42,7 @@ public class SolutionChecker {
         int numOfAgent = Problem.getInstance().getNumOfAgents();
         if (iterationNumber == 0)
             return checkSize(prefixes, prefixSize, iterationNumber);
-        return checkSize(prefixes, prefixSize, iterationNumber) && checkPrefixesValidation(prefixes) && checkCollisions(prefixes, prefixSize, numOfAgent) && checkSwipes(prefixes, prefixSize);
+        return !prefixes.contains(null) && checkSize(prefixes, prefixSize, iterationNumber) && checkPrefixesValidation(prefixes) && checkCollisions(prefixes, prefixSize, numOfAgent) && checkSwipes(prefixes, prefixSize);
     }
 
     /**

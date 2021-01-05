@@ -17,24 +17,24 @@ public class GraphBasedAgent extends AbstractBacktrackingPolicy {
     @Override
     protected Agent getChosenAgent(Set<Agent> problematicAgents, Map<Agent, Double> prioritiesForAgents, Set<Agent> preformingBackTrack, Set<Prefix> solutions) {
         boolean needToReset = false;
-        if(currentIteration<PerformanceTracker.getInstance().getNumberOFIteration()) {
+        if (currentIteration < PerformanceTracker.getInstance().getNumberOFIteration()) {
             needToReset = true;
             currentIteration = PerformanceTracker.getInstance().getNumberOFIteration();
         }
         if (agentGraph == null || needToReset)
             agentGraph = new HashMap<>();
-        if (toBacktrack == null || needToReset)
-        {
+        if (toBacktrack == null || needToReset) {
             toBacktrack = new ArrayList<>();
 
         }
-        if(toBacktrack.size()!=0)
-        {
+        if (toBacktrack.size() != 0) {
             return toBacktrack.remove(0);
         }
         updateGraph(solutions);
 
-        toBacktrack = searchInGraph(problematicAgents);
+        toBacktrack = searchInGraph(problematicAgents,preformingBackTrack);
+        if(toBacktrack == null)
+            return null;
         return toBacktrack.remove(0);
     }
 
@@ -44,7 +44,7 @@ public class GraphBasedAgent extends AbstractBacktrackingPolicy {
         node2.addNeighbor(node1);
     }
 
-    private List<Agent> searchInGraph(Set<Agent> problematicAgents) {
+    private List<Agent> searchInGraph(Set<Agent> problematicAgents, Set<Agent> preformingBackTrack) {
 
         List<AgentSearchNode> queue = new ArrayList<>();
         Set<AgentNode> visited = new HashSet<>();
@@ -55,7 +55,7 @@ public class GraphBasedAgent extends AbstractBacktrackingPolicy {
         AgentSearchNode curr;
         while (queue.size() > 0) {
             curr = queue.remove(0);
-            if (curr.getAgentNode().isTerminal) {
+            if (curr.getAgentNode().isTerminal && !preformingBackTrack.contains(curr.agentNode.agent)) {
                 return getAgentPath(curr);
 
             }
@@ -99,9 +99,18 @@ public class GraphBasedAgent extends AbstractBacktrackingPolicy {
             agentInGraphNode = entry.getValue();
             problematicForAgent = agentInGraph.getProblematicAgents();
             for (Agent problematic : problematicForAgent) {
-                if(!this.agentGraph.containsKey(problematic))
+                if (!this.agentGraph.containsKey(problematic))
                     System.out.println();
-                createBiDirectionalEdge(agentInGraphNode, this.agentGraph.get(problematic));
+                try {
+
+                    createBiDirectionalEdge(agentInGraphNode, this.agentGraph.get(problematic));
+                }
+                catch (Exception e) {
+                    System.out.println(this.agentGraph);
+                    System.out.println(problematic);
+                    createBiDirectionalEdge(agentInGraphNode, this.agentGraph.get(problematic));
+
+                }
             }
         }
     }
@@ -111,16 +120,8 @@ public class GraphBasedAgent extends AbstractBacktrackingPolicy {
 
 
         Set<ALSSLRTAStarNode> leaves = agent.getLeaves();
-        try
-        {
-            Iterator<ALSSLRTAStarNode> iter = leaves.iterator(); // TODO: 25/11/2020 need to get all the problematic agents
-        }
-        catch (Exception e)
-        {
-            Iterator<ALSSLRTAStarNode> iter = leaves.iterator(); // TODO: 25/11/2020 need to get all the problematic agents
-        }
         Iterator<ALSSLRTAStarNode> iter = leaves.iterator(); // TODO: 25/11/2020 need to get all the problematic agents
-        System.out.println("sadadasasdasdadas");
+        //   System.out.println("sadadasasdasdadas");
         ALSSLRTAStarNode leaf;
         Set<Agent> problematic = agent.getProblematicAgents();
         Set<Agent> problematicForLeaf;

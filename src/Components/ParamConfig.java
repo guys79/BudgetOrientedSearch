@@ -63,8 +63,8 @@ public class ParamConfig {
                 costFunction = new OctileGridFunction();
                 //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
                 heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new PriorityBadPointFavorPolicy();
-                budgetDistributionPolicy = new BudgetExponentialBadpointsFavorPolicy();
+                priorityPolicy = new EqualPriorityPolicy();
+                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction, (HeuristicWithPersonalDatabase) heuristic);
                 this.backtrack = true;
                 performDeepLookahead = false;
@@ -78,27 +78,44 @@ public class ParamConfig {
                 costFunction = new OctileGridFunction();
                 //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
                 heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new ConstraintPriorityPolicy();
-                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
-                searchAlgorithm = new ALSSLRTAStar(costFunction, (HeuristicWithPersonalDatabase) heuristic);
-                this.backtrack = true;
-                performDeepLookahead = false;
-                isSharedBudget = false;
-                isGoalLessPriority = true;
-                break;
-            case 3:
-                costFunction = new OctileGridFunction();
-                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
-                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
-                priorityPolicy = new ConstraintPriorityPolicy();
+                priorityPolicy = new EqualPriorityPolicy();
                 budgetDistributionPolicy = new BudgetExponentialBadpointsFavorPolicy();
                 searchAlgorithm = new ALSSLRTAStar(costFunction, (HeuristicWithPersonalDatabase) heuristic);
                 this.backtrack = true;
                 performDeepLookahead = false;
                 isSharedBudget = false;
                 isGoalLessPriority = true;
+                failPolicy = new AdditionAttempt();
+                this.backtrackPolicy = new GraphBasedAgent();
                 break;
-
+            case 3:
+                costFunction = new OctileGridFunction();
+                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
+                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
+                priorityPolicy = new PriorityBadPointFavorPolicy();
+                budgetDistributionPolicy = new EqualBudgetDistributionPolicy();
+                searchAlgorithm = new ALSSLRTAStar(costFunction, (HeuristicWithPersonalDatabase) heuristic);
+                this.backtrack = true;
+                performDeepLookahead = false;
+                isSharedBudget = false;
+                isGoalLessPriority = true;
+                failPolicy = new AdditionAttempt();
+                this.backtrackPolicy = new GraphBasedAgent();
+                break;
+            case 4:
+                costFunction = new OctileGridFunction();
+                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
+                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
+                priorityPolicy = new RandomPriority();
+                budgetDistributionPolicy = new BudgetExponentialBadpointsFavorPolicy();
+                searchAlgorithm = new ALSSLRTAStar(costFunction, (HeuristicWithPersonalDatabase) heuristic);
+                this.backtrack = true;
+                performDeepLookahead = false;
+                isSharedBudget = false;
+                isGoalLessPriority = true;
+                failPolicy = new AdditionAttempt();
+                this.backtrackPolicy = new GraphBasedAgent();
+                break;
             default:
                 costFunction = null;
                 heuristic = null;

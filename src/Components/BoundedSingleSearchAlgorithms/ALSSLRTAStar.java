@@ -43,6 +43,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
     public Triplet<Prefix, Integer, Set<Agent>> searchForPrefix(Agent agent, Node current, int budget, Set<Prefix> solutions, int prefixSize, int lookahead) {
 
         this.agent = agent;
+        this.agent.setProblematicAgents(new HashSet<>());
         this.nodeToGValue = new HashMap<>();
         this.goal = this.agent.getGoal();
         this.lookahead = lookahead;
@@ -51,7 +52,10 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
         this.inQueue = new HashSet<>();
         currentBest = null;
         this.currentState = current;
-
+        if(agent.getId() == 111 & PerformanceTracker.getInstance().getNumberOFIteration() == 9)
+            System.out.println();
+        if(agent.getId() == 243 & PerformanceTracker.getInstance().getNumberOFIteration() == 9)
+            System.out.println();
         if (current.equals(goal)) {
             boolean needToSearch = false;
             for (int i = 1; i < prefixSize; i++) {
@@ -81,6 +85,8 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
 
         //No solution
         if (openList == null || openList.size() == 0) {
+            if(PerformanceTracker.getInstance().getNumberOFIteration() >= 34 && agent.getId() == 584)
+                System.out.println();
             System.out.println("Agent " + agent.getId() + " couldn't find a state to be on");
             return new Triplet<>(null, remainBudget, problematicAgents);
         }
@@ -179,7 +185,8 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
         Set<ALSSLRTAStarNode> leaves = new HashSet<>();
 
 
-       //System.out.println("Agent " + agent.getId() + " is planning");
+       //if(PerformanceTracker.getInstance().getNumberOFIteration() == 26 && )
+            //Agent 485 and Agent 134 collided at [143,110] at 0
 
         //While:
         //1. The open list is not empty
@@ -229,6 +236,7 @@ public class ALSSLRTAStar implements IBoundedSingleSearchAlgorithm {
                 for (Node neighbor : neighbors) {
                     neighborNode = new ALSSLRTAStarNode(neighbor, currentTimeStamp + 1, currentNode);
                     Set<Agent> problematicAgentForState = isStateValid(neighborNode, solutions, currentNode);
+
                     //Only if the state is valid we will insert is to the open
                     if (problematicAgentForState.size() == 0) {
 

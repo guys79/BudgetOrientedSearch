@@ -36,8 +36,10 @@ public class Controller {
 
            performSingleRun(1, type, 6, 200, 500, "lak303d", false, 6);
        }*/
-        performSingleRun(1, 1, 8, 800, 100, "lak303d", false, 8);
-        // performTest();
+       // performSingleRun(9, 4, 8, 500, 100, "lak303d", false, 8);//Excellent example
+        //type - 1, mapName - lak303d, scenarioNum - 15, numOfAgent - 300, prefixLength - 9, lookahead - 9, budgetPerAgent - 50
+        //performSingleRun(15, 4, 9, 300, 50, "lak303d", false, 9);
+        performTest();
     }
 
 
@@ -56,14 +58,14 @@ public class Controller {
         int [] numOfAgents = {400};*/
 
 
-        int[] types = {1, 2, 3};
+        int[] types = {1, 2, 3, 4};
         int[] scenNumbers = {1};
         int[] prefixLengths = {3, 6, 9};
         int[] budgetPerAgent = {50, 100, 150};
-        String[] mapNames = {"empty-8-8"};
-        //String [] mapNames = {"lak303d","den520d","lt_gallowstemplar_n","ost003d"};
-        int[] lookaheads = {2, 3, 5};
-        int[] numOfAgents = {6};//
+        //String[] mapNames = {"empty-8-8"};
+        String[] mapNames = {"lak303d", "den520d", "lt_gallowstemplar_n", "ost003d"};
+        int[] lookaheads = {3,6,9};
+        int[] numOfAgents = {100,300,400};//
 
         this.res = new ArrayList<>();
         this.headline = "";

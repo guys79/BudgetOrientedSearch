@@ -168,7 +168,7 @@ public class BudgetOrientedSearch extends AbstractMultiAgentSearchAlgorithm {
 
         System.out.println(PerformanceTracker.getInstance().getNumberOFIteration());
        // if (PerformanceTracker.getInstance().getNumberOFIteration() >= 100)
-        if(PerformanceTracker.getInstance().getNumberOFIteration() == 500) {
+        if(PerformanceTracker.getInstance().getNumberOFIteration() >= 500) {
             System.out.println("Max iteration allowed");
             return true;
         }

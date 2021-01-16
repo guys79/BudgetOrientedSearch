@@ -4,10 +4,9 @@ import Components.*;
 import SearchAlgorithms.*;
 import View.View;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +35,8 @@ public class Controller {
 
            performSingleRun(1, type, 6, 200, 500, "lak303d", false, 6);
        }*/
-       // performSingleRun(9, 4, 8, 500, 100, "lak303d", false, 8);//Excellent example
-       //performSingleRun(1, 1, 9, 300, 200, "lak303d", false, 9);
+        // performSingleRun(9, 4, 8, 500, 100, "lak303d", false, 8);//Excellent example
+        //performSingleRun(1, 1, 9, 300, 200, "lak303d", false, 9);
         //type - 1, mapName - lak303d, scenarioNum - 15, numOfAgent - 300, prefixLength - 9, lookahead - 9, budgetPerAgent - 50
         //performSingleRun(15, 4, 9, 300, 50, "lak303d", false, 9);
         performTest();
@@ -49,6 +48,7 @@ public class Controller {
      */
     private void performTest() {
 
+       // try {
         /*
         int [] types = {1,2,3,4,5,6,7};
         int [] scenNumbers = {1,2};
@@ -59,53 +59,101 @@ public class Controller {
         int [] numOfAgents = {400};*/
 
 
-        int[] types = {1, 2, 3, 4};
-        int[] scenNumbers = {1};
-        int[] prefixLengths = {3, 6, 9};
-        int[] budgetPerAgent = {50, 100, 150,300};
-        //String[] mapNames = {"empty-8-8"};
-        String[] mapNames = {"lak303d", "den520d", "lt_gallowstemplar_n", "ost003d"};
-        int[] lookaheads = {3,6,9};
-        int[] numOfAgents = {100,300,400};
+            int[] types = {1, 2, 3, 4};
+            int[] scenNumbers = {1};
+            int[] prefixLengths = {3, 6, 9};
+            int[] budgetPerAgent = {50,100,150,300};
+            //String[] mapNames = {"empty-8-8"};
+            String[] mapNames = {"lak303d", "den520d", "lt_gallowstemplar_n", "ost003d"};
+            int[] lookaheads = {3, 6, 9};
+            int[] numOfAgents = {500};
 
-        this.res = new ArrayList<>();
-        this.headline = "";
-        Map<String, String> params = ParamConfig.getInstance().getParams();
-        for (String param : params.keySet()) {
-            headline += param + ",";
-        }
-        headline += "Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration, Sum of costs";
-        res.add(headline);
-        String folderLocation = System.getProperty("user.dir") + "\\Resources\\Test";
-        for (int type : types) {
-            for (String mapName : mapNames) {
-                String dirPath = System.getProperty("user.dir") + "\\Resources" + "\\Scenarios\\" + mapName;
-                File file = new File(dirPath);
-                int size = Math.min(15, file.listFiles().length);
-                scenNumbers = new int[size];
-                for (int i = 1; i <= size; i++) {
-                    scenNumbers[i - 1] = i;
-                }
-                for (int scenarioNum : scenNumbers) {
-                    for (int numOfAgent : numOfAgents) {
-                        for (int prefixLength : prefixLengths) {
-                            for (int lookahead : lookaheads) {
-                                if (lookahead == prefixLength) {
-                                    for (int budget : budgetPerAgent) {
 
-                                        System.out.println(String.format("type - %d, mapName - %s, scenarioNum - %d, numOfAgent - %d, prefixLength - %d, lookahead - %d, budgetPerAgent - %d", type, mapName, scenarioNum, numOfAgent, prefixLength, lookahead, budget));
-                                        performSingleRun(scenarioNum, type, prefixLength, numOfAgent, budget, mapName, true, lookahead);
+            this.res = new ArrayList<>();
+            this.headline = "";
+            Map<String, String> params = ParamConfig.getInstance().getParams();
+            for (String param : params.keySet()) {
+                headline += param + ",";
+            }
+            headline += "Map,Scenario number,Number of agents,Prefix length,Lookahead,Budget per agent,Complete,Search Time,Iterations,Average search time per agent,Average search time per iteration, Sum of costs";
+            res.add(headline);
+            String folderLocation = System.getProperty("user.dir") + "\\Resources\\Test";
+            for (int type : types) {
+                for (String mapName : mapNames) {
+                    String dirPath = System.getProperty("user.dir") + "\\Resources" + "\\Scenarios\\" + mapName;
+                    File file = new File(dirPath);
+                    int size = Math.min(5, file.listFiles().length);
+                    scenNumbers = new int[size];
+                    for (int i = 1; i <= size; i++) {
+                        scenNumbers[i - 1] = i;
+                    }
+                    for (int scenarioNum : scenNumbers) {
+                        if (!new File(String.format("%s\\result_%s&%s&%d.csv", folderLocation, mapName, type, scenarioNum)).exists()) {
+                            for (int numOfAgent : numOfAgents) {
+                                for (int prefixLength : prefixLengths) {
+                                    for (int lookahead : lookaheads) {
+                                        if (lookahead == prefixLength) {
+                                            for (int budget : budgetPerAgent) {
 
+                                                System.out.println(String.format("type - %d, mapName - %s, scenarioNum - %d, numOfAgent - %d, prefixLength - %d, lookahead - %d, budgetPerAgent - %d", type, mapName, scenarioNum, numOfAgent, prefixLength, lookahead, budget));
+                                                performSingleRun(scenarioNum, type, prefixLength, numOfAgent, budget, mapName, true, lookahead);
+
+                                            }
+                                        }
                                     }
                                 }
                             }
+                            saveResults(folderLocation, String.format("%s&%s&%d", mapName, type, scenarioNum));
                         }
                     }
                 }
+
+
             }
-            saveResults(folderLocation, types, "" + type);
+            saveExplanationTest(folderLocation, types);
+            try {
+                mergeTestFiles(folderLocation);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+      //  }
+      /*  catch (java.lang.OutOfMemoryError e)
+        {
+            System.out.println("OutOfMemory");
+            performTest();
+        }*/
+
+    }
+
+    private void mergeTestFiles(String folderLocation) throws IOException {
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
+        String path = String.format("%s\\test-%s.csv", folderLocation, dtf.format(now));
+        new File(path).createNewFile();
+        BufferedReader bufferedReader;
+        File folder = new File(folderLocation);
+        File[] filesInFolder = folder.listFiles();
+        String line;
+        String total_file_results = headline;
+        for (File file : filesInFolder) {
+            System.out.println(file.getName());
+            if (file.getName().contains("result_")) {
+                bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()));
+                bufferedReader.readLine();
+                while ((line = bufferedReader.readLine()) != null) {
+                    total_file_results = String.format("%s\n%s", total_file_results, line);
+
+                }
+                bufferedReader.close();
+                file.delete();
+            }
+
+
         }
-        // performSingleRun(1,3,4,100,50,"lak303d",true,4);
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(path)));
+        bufferedWriter.write(total_file_results);
+        bufferedWriter.flush();
 
     }
 
@@ -113,12 +161,10 @@ public class Controller {
      * This function will save the results in the given folder location
      *
      * @param folderLocation - The folder's location
-     * @param types          - The array of types
      * @param additionalName - The additional name
      */
-    private void saveResults(String folderLocation, int[] types, String additionalName) {
+    private void saveResults(String folderLocation, String additionalName) {
         try {
-            saveExplanationTest(folderLocation, types);
             saveResultsInExcel(folderLocation, additionalName);
         } catch (IOException e) {
             e.printStackTrace();
@@ -143,7 +189,7 @@ public class Controller {
         String line;
         for (int i = 0; i < this.res.size(); i++) {
             line = this.res.get(i);
-            bufferedWriter.write(line + "\n");
+            bufferedWriter.write(line + ",\n");
         }
         bufferedWriter.close();
         this.res.clear();
@@ -156,20 +202,22 @@ public class Controller {
      *
      * @param folderLocation - The folder's location
      * @param types          - The array of types
-     * @throws IOException
      */
-    private void saveExplanationTest(String folderLocation, int[] types) throws IOException {
+    private void saveExplanationTest(String folderLocation, int[] types) {
         String name = "Explanation.txt";
         String path = folderLocation + "\\" + name;
+        try {
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(path)));
+            String line;
+            for (int i = 0; i < types.length; i++) {
+                ParamConfig.getInstance().configParamsWithType(types[i]);
+                bufferedWriter.write(ParamConfig.getInstance().toString() + "\n\n");
+            }
 
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(path)));
-
-        String line;
-        for (int i = 0; i < types.length; i++) {
-            ParamConfig.getInstance().configParamsWithType(types[i]);
-            bufferedWriter.write(ParamConfig.getInstance().toString() + "\n\n");
+            bufferedWriter.close();
+        } catch (Exception e) {
+            System.out.println("Failed to save file");
         }
-        bufferedWriter.close();
 
 
     }

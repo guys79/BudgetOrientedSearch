@@ -59,14 +59,16 @@ public class Controller {
         int [] numOfAgents = {400};*/
 
 
-            int[] types = {1, 2, 3, 4};
+            int[] types = {1, 2};
+            //int[] types = {1, 2, 3, 4};
             int[] scenNumbers = {1};
             int[] prefixLengths = {3, 6, 9};
             int[] budgetPerAgent = {50,100,150,300};
             //String[] mapNames = {"empty-8-8"};
-            String[] mapNames = {"lak303d", "den520d", "lt_gallowstemplar_n", "ost003d"};
+            String[] mapNames = {"lak303d",  "lt_gallowstemplar_n", "ost003d"};
+            //String[] mapNames = {"lak303d", "den520d", "lt_gallowstemplar_n", "ost003d"};
             int[] lookaheads = {3, 6, 9};
-            int[] numOfAgents = {500};
+            int[] numOfAgents = {600};
 
 
             this.res = new ArrayList<>();

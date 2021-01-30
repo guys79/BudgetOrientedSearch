@@ -116,6 +116,20 @@ public class ParamConfig {
                 failPolicy = new AdditionAttempt();
                 this.backtrackPolicy = new GraphBasedAgent();
                 break;
+            case 5:
+                costFunction = new OctileGridFunction();
+                //heuristic = new HeuristicWithPersonalDatabase(new PureOctileDistance());
+                heuristic = new PreComputedUniformCostSearch(new PureOctileDistance());
+                priorityPolicy = new PriorityBadPointFavorPolicy();
+                budgetDistributionPolicy = new BudgetExponentialBadpointsFavorPolicy();
+                searchAlgorithm = new ALSSLRTAStar(costFunction, (HeuristicWithPersonalDatabase) heuristic);
+                this.backtrack = true;
+                performDeepLookahead = false;
+                isSharedBudget = false;
+                isGoalLessPriority = true;
+                failPolicy = new AdditionAttempt();
+                this.backtrackPolicy = new GraphBasedAgent();
+                break;
             default:
                 costFunction = null;
                 heuristic = null;

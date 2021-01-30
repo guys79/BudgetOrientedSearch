@@ -59,7 +59,7 @@ public class Controller {
         int [] numOfAgents = {400};*/
 
 
-            int[] types = {1, 2};
+            int[] types = {5};
             //int[] types = {1, 2, 3, 4};
             int[] scenNumbers = {1};
             int[] prefixLengths = {3, 6, 9};
@@ -68,7 +68,7 @@ public class Controller {
             String[] mapNames = {"lak303d",  "lt_gallowstemplar_n", "ost003d"};
             //String[] mapNames = {"lak303d", "den520d", "lt_gallowstemplar_n", "ost003d"};
             int[] lookaheads = {3, 6, 9};
-            int[] numOfAgents = {600};
+            int[] numOfAgents = {500,600};
 
 
             this.res = new ArrayList<>();

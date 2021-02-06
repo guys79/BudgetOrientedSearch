@@ -1,5 +1,6 @@
 package Controller;
 
+import BMAA.BMAA;
 import Components.*;
 import SearchAlgorithms.*;
 import View.View;
@@ -38,7 +39,7 @@ public class Controller {
         // performSingleRun(9, 4, 8, 500, 100, "lak303d", false, 8);//Excellent example
         //performSingleRun(1, 1, 9, 300, 200, "lak303d", false, 9);
         //type - 1, mapName - lak303d, scenarioNum - 15, numOfAgent - 300, prefixLength - 9, lookahead - 9, budgetPerAgent - 50
-        performSingleRun(15, 4, 9, 500, 50, "ost003d", false, 9);
+        performSingleRun(15, 4, 9, 10, 50, "ost003d", false, 9);
         //performTest();
     }
 
@@ -261,7 +262,8 @@ public class Controller {
         for (Agent agent : agents)
             System.out.println(agent);
 
-        IMultiAgentSearchAlgorithm searchAlgorithm = new BudgetOrientedSearch();
+        IMultiAgentSearchAlgorithm searchAlgorithm = new BMAA(false,32,32,false);
+        //IMultiAgentSearchAlgorithm searchAlgorithm = new BudgetOrientedSearch();
 
 
         double sumOfCosts = 0;

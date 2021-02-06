@@ -291,4 +291,8 @@ public class Problem {
         }
         return grid;
     }
+
+    public void setPrefix(int prefix) {
+        this.prefix = prefix;
+    }
 }

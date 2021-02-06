@@ -33,7 +33,7 @@ public class Main extends Application {
         View view = fxmlLoader.getController();
         primaryStage.setTitle("BOS");
         double ratio = 975 / 1600.0;
-        double width = 1200;
+        double width = 1300;
         double height = width * ratio;
 
         primaryStage.setScene(new Scene(root, width, height));

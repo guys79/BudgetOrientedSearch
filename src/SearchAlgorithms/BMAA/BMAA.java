@@ -1,4 +1,4 @@
-package BMAA;
+package SearchAlgorithms.BMAA;
 
 import Components.*;
 import Components.Heuristics.HeuristicWithPersonalDatabase;
@@ -24,8 +24,7 @@ public class BMAA extends AbstractMultiAgentSearchAlgorithm {
     private Map<Agent, Prefix> solution;
     private Map<Agent, Integer> limitForAgent;
     private HeuristicWithPersonalDatabase heuristic;//The heuristic function
-    private Map<Node, Double> gVals;
-    private Map<Node, Node> parants;
+
 
     /**
      * The constructor of the class
@@ -135,8 +134,6 @@ public class BMAA extends AbstractMultiAgentSearchAlgorithm {
         for (Agent agent : agents) {
             List<Node> solList = new ArrayList<>();
             solList.add(this.curr.get(agent));
-            if(PerformanceTracker.getInstance().getNumberOFIteration() >= 150 && agent.getId() == 9)
-                System.out.println();
             if (this.successor.containsKey(agent)) {
                 node = this.successor.get(agent).get(0);
                 if (push && this.blocked.containsKey(node)) {
@@ -151,7 +148,7 @@ public class BMAA extends AbstractMultiAgentSearchAlgorithm {
 
 
             solList.add(this.curr.get(agent));
-            Prefix sol = new Prefix(solList,agent);
+            Prefix sol = new Prefix(solList, agent);
             solution.add(sol);
         }
         //test
@@ -197,6 +194,17 @@ public class BMAA extends AbstractMultiAgentSearchAlgorithm {
 
     }
 
+    private Set<NodeBMAA> getNeighbors(NodeBMAA node) {
+        int time = node.getTimeStamp();
+        Set<Node> neighbors = getNeighbors(node.getNode());
+        Set<NodeBMAA> neighborsContainer = new HashSet<>();
+        for (Node neighbor : neighbors) {
+            neighborsContainer.add(new NodeBMAA(neighbor, time, node));
+        }
+        return neighborsContainer;
+
+    }
+
     private Set<Node> getNeighbors(Node node) {
         if (flow) {
             // TODO: 06/02/2021
@@ -214,17 +222,16 @@ public class BMAA extends AbstractMultiAgentSearchAlgorithm {
      * @return - The prefix for the given agent.
      */
     private void searchPhase(Agent agent) {
-        if(PerformanceTracker.getInstance().getNumberOFIteration() >= 150 && agent.getId() == 9)
-            System.out.println();
+
         if (this.curr.get(agent).equals(agent.getGoal()))
             return;
         if (!this.successor.containsKey(agent) || time >= this.limitForAgent.get(agent)) {
-            Pair<PriorityQueue<Node>, Set<Node>> openClosed = this.search(agent);
-            PriorityQueue<Node> open = openClosed.getKey();
+            Pair<PriorityQueue<NodeBMAA>, Set<NodeBMAA>> openClosed = this.search(agent);
+            PriorityQueue<NodeBMAA> open = openClosed.getKey();
             if (open.size() > 0) {
-                Node n = open.poll();
+                NodeBMAA n = open.poll();
                 double f_val = getFVal(n, agent);
-                Set<Node> closed = openClosed.getValue();
+                Set<NodeBMAA> closed = openClosed.getValue();
                 this.updateHeuristicPhase(closed, f_val, agent);
                 this.limitForAgent.put(agent, time + moves);
             }
@@ -234,16 +241,16 @@ public class BMAA extends AbstractMultiAgentSearchAlgorithm {
 
     }
 
-    private double getFVal(Node n, Agent agent) {
-        return this.getGVal(n) + this.getHVal(n, agent);
+    private double getFVal(NodeBMAA n, Agent agent) {
+        return this.getGVal(n) + this.getHVal(n.getNode(), agent);
     }
 
-    private void updateHeuristicPhase(Set<Node> closed, double f_val, Agent agent) {
+    private void updateHeuristicPhase(Set<NodeBMAA> closed, double f_val, Agent agent) {
 
         double h;
-        for (Node node : closed) {
-            h = f_val - getGVal(node);
-            this.updateHeuristicValue(node, h, agent);
+        for (NodeBMAA node : closed) {
+            h = f_val - node.getMinGval();
+            this.updateHeuristicValue(node.getNode(), h, agent);
         }
     }
 
@@ -255,50 +262,44 @@ public class BMAA extends AbstractMultiAgentSearchAlgorithm {
         return this.heuristic.getHeuristic(n, agent.getGoal(), agent);
     }
 
-    private double getGVal(Node n) {
+    private double getGVal(NodeBMAA n) {
 
-        return this.gVals.get(n);
+        return n.getGVal();
     }
 
-    private void setGVal(Node n, double newGVal, PriorityQueue<Node> open) {
-        this.gVals.put(n, newGVal);
-        if(open.contains(n)) {
+    private void setGVal(NodeBMAA n, double newGVal, PriorityQueue<NodeBMAA> open) {
+        n.setGVal(newGVal);
+        if (open.contains(n)) {
             open.remove(n);
             open.add(n);
         }
     }
 
 
-    private Pair<PriorityQueue<Node>, Set<Node>> search(Agent agent) {
-        PriorityQueue<Node> open = new PriorityQueue<>(new CompareFVal(agent));
-        Set<Node> closed = new HashSet<>();
-        this.gVals = new HashMap<>();
-        this.parants = new HashMap<>();
-        Pair<PriorityQueue<Node>, Set<Node>> openClosed = new Pair<>(open, closed);
+    private Pair<PriorityQueue<NodeBMAA>, Set<NodeBMAA>> search(Agent agent) {
+        PriorityQueue<NodeBMAA> open = new PriorityQueue<>(new CompareFVal(agent));
+        Set<NodeBMAA> closed = new HashSet<>();
+        Pair<PriorityQueue<NodeBMAA>, Set<NodeBMAA>> openClosed = new Pair<>(open, closed);
         int exp = 0;
-        Node currentNode = this.curr.get(agent);
-        if(agent.getId() == 1)
-            System.out.println();
+        Node current = this.curr.get(agent);
+        NodeBMAA currentNode = new NodeBMAA(current, 0);
         open.add(currentNode);
         this.setGVal(currentNode, 0, open);
-        Node expanded;
-        if(PerformanceTracker.getInstance().getNumberOFIteration() >= 150 && agent.getId() == 9)
-            System.out.println();
+        NodeBMAA expanded;
         while (open.size() > 0) {
             expanded = open.peek();
             if (expanded.equals(agent.getGoal()) || exp >= expensions) {
-                if(PerformanceTracker.getInstance().getNumberOFIteration() >= 150 && agent.getId() == 9)
-                    System.out.println();
+
                 calculatePath(agent, expanded);
                 return openClosed;
             }
             expanded = open.poll();
             closed.add(expanded);
-            Set<Node> neighbors = getNeighbors(expanded);
-            double expandedGVal = getGVal(expanded);
+            Set<NodeBMAA> neighbors = getNeighbors(expanded);
+            double expandedGVal = expanded.getGVal();
             double cost;
 
-            for (Node neighbor : neighbors) {
+            for (NodeBMAA neighbor : neighbors) {
 
                 if (this.blocked.containsKey(neighbor))
                     if (!neighbor.equals(agent.getGoal()))
@@ -309,7 +310,7 @@ public class BMAA extends AbstractMultiAgentSearchAlgorithm {
                         setGVal(neighbor, Double.MAX_VALUE, open);
                     }
 
-                    cost = expandedGVal + ParamConfig.getInstance().getCostFunction().getCost(expanded, neighbor);
+                    cost = expandedGVal + ParamConfig.getInstance().getCostFunction().getCost(expanded.getNode(), neighbor.getNode());
                     if (getGVal(neighbor) > cost) {
                         setGVal(neighbor, cost, open);
                         setParent(neighbor, expanded);
@@ -327,20 +328,20 @@ public class BMAA extends AbstractMultiAgentSearchAlgorithm {
         return openClosed;
     }
 
-    private void setParent(Node node, Node parent) {
-        this.parants.put(node, parent);
+    private void setParent(NodeBMAA node, NodeBMAA parent) {
+        node.setParent(parent);
     }
 
-    private void calculatePath(Agent agent, Node last) {
+    private void calculatePath(Agent agent, NodeBMAA last) {
         List<Node> path = new ArrayList<>();
-        while (this.parants.containsKey(last)) {
-            path.add(0, last);
-            last = this.parants.get(last);
+        while (last.getParent() != null) {
+            path.add(0, last.getNode());
+            last = last.getParent();
         }
         this.successor.put(agent, path);
     }
 
-    public class CompareFVal implements Comparator<Node> {
+    public class CompareFVal implements Comparator<NodeBMAA> {
         private Agent agent;
 
         public CompareFVal(Agent agent) {
@@ -348,7 +349,7 @@ public class BMAA extends AbstractMultiAgentSearchAlgorithm {
         }
 
         @Override
-        public int compare(Node o1, Node o2) {
+        public int compare(NodeBMAA o1, NodeBMAA o2) {
             double f1 = getFVal(o1, agent);
             double f2 = getFVal(o2, agent);
             if (f1 > f2)
